@@ -9,5 +9,4 @@ public class NengtulApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(NengtulApplication.class, args);
 	}
-
 }
