@@ -20,3 +20,15 @@ spring:
       #show_sql: false
       #use_sql_comments: true
     open-in-view: false
+  jwt:
+    secret-key: ${spring.jwt.secret-key}
+
+oauth:
+  kakao:
+    client-id: ${oauth.kakao.client-id}
+    url:
+      auth: ${oauth.kakao.url.auth}
+      api: ${oauth.kakao.url.api}
+
+
+
