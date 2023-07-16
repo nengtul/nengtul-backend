@@ -5,6 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55c76eb2-1ca0-4328-b706-998691683ff2" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/.gradle/8.1.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.1.1/checksums/checksums.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.1.1/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.1.1/checksums/md5-checksums.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.1.1/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.1.1/checksums/sha1-checksums.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.1.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.1.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.1.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.1.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.1.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.1.1/fileHashes/fileHashes.bin" afterDir="false" />
@@ -13,14 +16,15 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/e599a4bb-21be-412c-b965-625d39c5f199.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/e599a4bb-21be-412c-b965-625d39c5f199.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/nengtul.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/nengtul.main.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/nengtul.test.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/nengtul.test.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/nengtul.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/kr/zb/nengtul/NengtulApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/kr/zb/nengtul/NengtulApplication.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/resources/main/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/kr/zb/nengtul/NengtulApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/kr/zb/nengtul/NengtulApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,31 +83,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/nengtul",
-    "project.structure.last.edited": "모듈",
-    "project.structure.proportion": "0.17",
-    "project.structure.side.proportion": "0.3785377",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
-    "spring.configuration.checksum": "f8c9d12526bb448f2126ecc9cbe43fda"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/nengtul/src/main/java/kr/zb/nengtul/global/jwt&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;모듈&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.17&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.3785377&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;f8c9d12526bb448f2126ecc9cbe43fda&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\nengtul\src\main\java\kr\zb\nengtul\global\jwt" />
+      <recent name="C:\nengtul\src\main\java\kr\zb\nengtul\global" />
+      <recent name="C:\nengtul\src\main\java\kr\zb\nengtul\global\oauth" />
+      <recent name="C:\nengtul\src\main\java\kr\zb\nengtul\global\oauth\entity" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\nengtul\src\main\java\kr.zb.nengtul" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="kr.zb.nengtul.user.entity.dto" />
+      <recent name="kr.zb.nengtul.global.jwt" />
+      <recent name="kr.zb.nengtul.global.oauth.entity" />
+      <recent name="kr.zb.nengtul.global.type" />
+      <recent name="kr.zb.nengtul.global.oauth.token" />
     </key>
   </component>
   <component name="RunManager">
@@ -113,6 +130,10 @@
         <env name="DB_PASSWORD" value="1234" />
         <env name="DB_URL" value="jdbc:mysql://localhost:3306/nengtul" />
         <env name="DB_USER_NAME" value="root" />
+        <env name="spring.jwt.secret-key" value="zbzbzbzbzbzbzb1zbzbzbzbzbzbzb1zbzbzbzbzbzbzb1zbzbzbzbzbzbzb1zbzbzbzbzbzbzb1zbzbzbzbzbzbzb1" />
+        <env name="oauth.kakao.client-id" value="4d2e60e0f1bc53387137baff09955f60" />
+        <env name="oauth.kakao.url.api" value="https://kauth.kakao.com" />
+        <env name="oauth.kakao.url.auth" value="https://kauth.kakao.com" />
       </envs>
       <module name="nengtul.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="kr.zb.nengtul.NengtulApplication" />
@@ -130,7 +151,8 @@
       <option name="presentableId" value="Default" />
       <updated>1689338231005</updated>
       <workItem from="1689338233931" duration="2721000" />
-      <workItem from="1689407188990" duration="1448000" />
+      <workItem from="1689407188990" duration="15526000" />
+      <workItem from="1689492288387" duration="4610000" />
     </task>
     <servers />
   </component>
