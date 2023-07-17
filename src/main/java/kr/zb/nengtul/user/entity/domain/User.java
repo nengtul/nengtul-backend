@@ -71,7 +71,7 @@ public class User extends BaseTimeEntity {
   @Column(name = "ADDRESS_DETAIL", length = 128)
   private String addressDetail;
 
-  @Column(name = "SOCIAL_ID", length = 30)
+  @Column(name = "SOCIAL_ID")
   private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
 
   @Column(name = "REFRESH_TOKEN", length = 512)
