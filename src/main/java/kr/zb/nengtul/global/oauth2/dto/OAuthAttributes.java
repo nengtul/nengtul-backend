@@ -4,6 +4,7 @@ import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.oauth2.OAuth2UserInfo;
 import kr.zb.nengtul.global.oauth2.info.KakaoOAuth2UserInfo;
+import kr.zb.nengtul.global.oauth2.info.NaverOAuth2UserInfo;
 import kr.zb.nengtul.user.entity.domain.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,13 +37,13 @@ public class OAuthAttributes {
   public static OAuthAttributes of(ProviderType socialType,
       String userNameAttributeName, Map<String, Object> attributes) {
 
-//    if (socialType == ProviderType.NAVER) {
-//      return ofNaver(userNameAttributeName, attributes);
-//    }
-//    if (socialType == ProviderType.KAKAO) {
+    if (socialType == ProviderType.NAVER) {
+      return ofNaver(userNameAttributeName, attributes);
+    }
+    if (socialType == ProviderType.KAKAO) {
       return ofKakao(userNameAttributeName, attributes);
-//    }
-//    return ofGoogle(userNameAttributeName, attributes);
+    }
+    return null;
   }
 
   private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
@@ -59,12 +60,12 @@ public class OAuthAttributes {
 //        .build();
 //  }
 //
-//  public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
-//    return OAuthAttributes.builder()
-//        .nameAttributeKey(userNameAttributeName)
-//        .oauth2UserInfo(new NaverOAuth2UserInfo(attributes))
-//        .build();
-//  }
+  public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+    return OAuthAttributes.builder()
+        .nameAttributeKey(userNameAttributeName)
+        .oauth2UserInfo(new NaverOAuth2UserInfo(attributes))
+        .build();
+  }
 
   /**
    * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태

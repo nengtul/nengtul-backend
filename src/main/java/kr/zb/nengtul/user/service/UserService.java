@@ -2,6 +2,7 @@ package kr.zb.nengtul.user.service;
 
 import java.security.Principal;
 import kr.zb.nengtul.global.jwt.JwtTokenProvider;
+import kr.zb.nengtul.user.NengException;
 import kr.zb.nengtul.user.entity.domain.User;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
 import kr.zb.nengtul.user.entity.dto.UserLoginDto;
@@ -22,12 +23,12 @@ public class UserService {
   private final JwtTokenProvider jwtTokenProvider;
 
   @Transactional
-  public String join(UserJoinDto userJoinDto) throws Exception {
+  public String join(UserJoinDto userJoinDto){
     // 이메일 중복 확인
     if (userRepository.existsByEmail(userJoinDto.getEmail())) {
-      throw new Exception();
+      throw new NengException();
     } else if (userJoinDto.getPassword().length() < 8) {
-      throw new Exception();
+      throw new NengException();
     }
 
     User user = User.builder()
@@ -56,9 +57,9 @@ public class UserService {
 //    return jwtTokenProvider.createAccessToken(user.getEmail());
 //  }
 
-  public void quit(Principal principal) throws Exception {
+  public void quit(Principal principal){
     System.out.println(principal.getName());
-    User user = userRepository.findByEmail(principal.getName()).orElseThrow(Exception::new);
+    User user = userRepository.findByEmail(principal.getName()).orElseThrow(NengException::new);
     System.out.println(user.getId() + "///" + user.getEmail());
     userRepository.deleteById(user.getId());
   }
