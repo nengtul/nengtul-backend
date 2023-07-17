@@ -24,20 +24,18 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/join")
-  public ResponseEntity<String> join(@RequestBody UserJoinDto userJoinDto)
-      throws NotFoundException {
+  public ResponseEntity<String> join(@RequestBody UserJoinDto userJoinDto) throws Exception {
     return ResponseEntity.ok(userService.join(userJoinDto));
   }
 
-  @PostMapping("/login")
-  public ResponseEntity<String> login(@RequestBody UserLoginDto userLoginDto)
-      throws NotFoundException {
-
-    return ResponseEntity.ok(userService.login(userLoginDto));
-  }
+//  @PostMapping("/login")
+//  public ResponseEntity<String> login(@RequestBody UserLoginDto userLoginDto) throws Exception {
+//
+//    return ResponseEntity.ok(userService.login(userLoginDto));
+//  }
 
   @PostMapping("/quit")
-  public ResponseEntity<Void> quit(Principal principal) throws NotFoundException {
+  public ResponseEntity<Void> quit(Principal principal) throws Exception {
     userService.quit(principal);
     return ResponseEntity.ok(null);
   }

@@ -18,9 +18,9 @@ public abstract class BaseTimeEntity {
   @CreatedDate
   @Column(nullable = false, updatable = false)
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-  private LocalDateTime createdDt;
+  private LocalDateTime createdAt;
 
   @LastModifiedDate
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-  private LocalDateTime modifiedDt;
+  private LocalDateTime modifiedAt;
 }
