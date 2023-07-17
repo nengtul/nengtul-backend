@@ -12,7 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserJoinDto {
-//  private String loginId;
   private String name;
   private String nickname;
   private String password;
