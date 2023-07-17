@@ -24,7 +24,7 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/join")
-  public ResponseEntity<String> join(@RequestBody UserJoinDto userJoinDto) throws Exception {
+  public ResponseEntity<String> join(@RequestBody UserJoinDto userJoinDto){
     return ResponseEntity.ok(userService.join(userJoinDto));
   }
 
@@ -35,7 +35,7 @@ public class UserController {
 //  }
 
   @PostMapping("/quit")
-  public ResponseEntity<Void> quit(Principal principal) throws Exception {
+  public ResponseEntity<Void> quit(Principal principal){
     userService.quit(principal);
     return ResponseEntity.ok(null);
   }
