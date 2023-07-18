@@ -27,6 +27,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
   private static final String NAVER = "naver";
   private static final String KAKAO = "kakao";
+  private static final String GOOGLE = "google";
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -74,10 +75,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
       return ProviderType.NAVER;
     } else if (KAKAO.equals(registrationId)) {
       return ProviderType.KAKAO;
-    }else{
-      return ProviderType.LOCAL;
     }
-//    return ProviderType.GOOGLE;
+    return ProviderType.GOOGLE;
   }
 
   /**
