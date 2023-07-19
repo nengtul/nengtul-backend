@@ -17,11 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -79,7 +76,7 @@ public class User extends BaseTimeEntity {
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
-      String email, String address, String addressDetail, ProviderType providerType) {
+      String email, String address, String addressDetail,String profileImageUrl, ProviderType providerType) {
     this.name = name;
     this.nickname = nickname;
     this.password = password;
@@ -87,6 +84,7 @@ public class User extends BaseTimeEntity {
     this.email = email;
     this.address = address;
     this.addressDetail = addressDetail;
+    this.profileImageUrl = profileImageUrl;
     this.socialId = "";
     this.providerType = ProviderType.LOCAL;
     this.roles = RoleType.USER;
@@ -113,6 +111,7 @@ public class User extends BaseTimeEntity {
     this.roles = roles;
   }
 
+  //oauth2 이름 업데이트 되었을때
   public User update(String name) {
     this.name = name;
     return this;
@@ -122,12 +121,36 @@ public class User extends BaseTimeEntity {
     return this.roles.getKey();
   }
 
-  // 비밀번호 암호화 메소드
-  public void passwordEncode(PasswordEncoder passwordEncoder) {
-    this.password = passwordEncoder.encode(this.password);
-  }
-
   public void updateRefreshToken(String updateRefreshToken) {
     this.refreshToken = updateRefreshToken;
+  }
+
+  //정보 수정용 setter
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  public void setEmailVerifiedYn(String emailVerifiedYn) {
+    this.emailVerifiedYn = emailVerifiedYn;
+  }
+
+  public void setProfileImageUrl(String profileImageUrl) {
+    this.profileImageUrl = profileImageUrl;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+  public void setAddressDetail(String addressDetail) {
+    this.addressDetail = addressDetail;
   }
 }

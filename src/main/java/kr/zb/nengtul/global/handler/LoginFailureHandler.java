@@ -1,5 +1,7 @@
 package kr.zb.nengtul.global.handler;
 
+import static kr.zb.nengtul.global.exception.ErrorCode.CHECK_ID_AND_PW;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +18,15 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException exception) throws IOException {
-    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    response.setStatus(CHECK_ID_AND_PW.getHttpStatus().value());
     response.setCharacterEncoding("UTF-8");
-    response.setContentType("text/plain;charset=UTF-8");
-    response.getWriter().write("로그인 실패! 이메일이나 비밀번호를 확인해주세요.");
-    log.info("로그인에 실패했습니다. 메시지 : {}", exception.getMessage());
+    response.setContentType("application/json;charset=UTF-8");
+
+    String errorMessage = "{\"status\": " + CHECK_ID_AND_PW.getHttpStatus().value() +
+        ", \"code\": \"" + "CHECK_ID_AND_PW" +
+        "\", \"message\": \"" + CHECK_ID_AND_PW.getDetail() + "\"}";
+
+    response.getWriter().write(errorMessage);
+    log.info("소셜 로그인에 실패했습니다. 에러 메시지 : {}", exception.getMessage());
   }
 }
