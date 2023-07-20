@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.jwt.JwtTokenProvider;
 import kr.zb.nengtul.user.entity.domain.User;
+import kr.zb.nengtul.user.entity.dto.UserDetailDto;
 import kr.zb.nengtul.user.entity.dto.UserFindEmailDto;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
 import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
@@ -84,6 +85,13 @@ public class UserService {
       throw new CustomException(EXPIRED_CODE);
     }
     user.setEmailVerifiedYn(true);
+  }
+
+  //유저 상세보기
+  public UserDetailDto getUserDetail(Principal principal) {
+    User user = userRepository.findByEmail(principal.getName()).get();
+
+    return UserDetailDto.buildUserDetailDto(user);
   }
 
   //회원 탈퇴
