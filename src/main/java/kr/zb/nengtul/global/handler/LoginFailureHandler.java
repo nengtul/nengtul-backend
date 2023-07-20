@@ -27,6 +27,6 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
         "\", \"message\": \"" + CHECK_ID_AND_PW.getDetail() + "\"}";
 
     response.getWriter().write(errorMessage);
-    log.info("소셜 로그인에 실패했습니다. 에러 메시지 : {}", exception.getMessage());
+    log.info("로그인에 실패했습니다. 에러 메시지 : {}", exception.getMessage());
   }
 }
