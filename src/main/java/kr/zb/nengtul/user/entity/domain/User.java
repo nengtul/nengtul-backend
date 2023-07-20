@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
@@ -22,56 +23,49 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "USER")
 public class User extends BaseTimeEntity {
 
   @JsonIgnore
   @Id
-  @Column(name = "USER_ID")
+  @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
 
-  @Column(name = "EMAIL", length = 512, unique = true)
+  @Column(length = 512, unique = true)
   private String email;
 
-  @Column(name = "NAME", length = 100)
+  @Column(length = 10)
   private String name;
 
-  @Column(name = "NICK_NAME", length = 100)
+  @Column(length = 10)
   private String nickname;
 
-  @Column(name = "PASSWORD", length = 128)
+  @Column(length = 100) //password encoder에서 길어지기 때문에 길이 증가
   private String password;
 
-  @Column(name = "PHONE_NUMBER", length = 11)
+  @Column(length = 11)
   private String phoneNumber;
 
-  @JsonIgnore
-  @Column(name = "EMAIL_VERIFIED_YN", length = 1)
-  private String emailVerifiedYn;
+  private LocalDateTime verifyExpiredAt;
+  private String verificationCode;
+  private boolean emailVerifiedYn;
 
-  @Column(name = "PROFILE_IMAGE_URL", length = 512)
   private String profileImageUrl;
+  
+  private int point; // 포인트별 등급 상승을 위해 생성
 
-  @Column(name = "ROLE_TYPE", length = 20)
   @Enumerated(EnumType.STRING)
   private RoleType roles;
 
-  @Column(name = "PROVIDER_TYPE", length = 20)
   @Enumerated(EnumType.STRING)
   private ProviderType providerType;
 
-  @Column(name = "ADDRESS", length = 512)
   private String address;
-
-  @Column(name = "ADDRESS_DETAIL", length = 128)
   private String addressDetail;
 
-  @Column(name = "SOCIAL_ID")
   private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
 
-  @Column(name = "REFRESH_TOKEN", length = 512)
   private String refreshToken; // 리프레시 토큰
 
   @Builder
@@ -82,6 +76,7 @@ public class User extends BaseTimeEntity {
     this.password = password;
     this.phoneNumber = phoneNumber;
     this.email = email;
+    this.emailVerifiedYn = false;
     this.address = address;
     this.addressDetail = addressDetail;
     this.profileImageUrl = profileImageUrl;
@@ -90,10 +85,10 @@ public class User extends BaseTimeEntity {
     this.roles = RoleType.USER;
   }
 
+  //OAuth2용
   public User(
       String name,
       String email,
-      String emailVerifiedYn,
       String profileImageUrl,
       String socialId,
       String phoneNumber,
@@ -103,7 +98,9 @@ public class User extends BaseTimeEntity {
     this.name = name;
     this.password = "NO_PASS";
     this.email = email != null ? email : "NO_EMAIL";
-    this.emailVerifiedYn = emailVerifiedYn;
+    this.verificationCode = "";
+    this.verifyExpiredAt = LocalDateTime.now();
+    this.emailVerifiedYn = true;
     this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
     this.providerType = providerType;
     this.socialId = socialId;
@@ -138,9 +135,7 @@ public class User extends BaseTimeEntity {
     this.phoneNumber = phoneNumber;
   }
 
-  public void setEmailVerifiedYn(String emailVerifiedYn) {
-    this.emailVerifiedYn = emailVerifiedYn;
-  }
+
 
   public void setProfileImageUrl(String profileImageUrl) {
     this.profileImageUrl = profileImageUrl;
@@ -152,5 +147,16 @@ public class User extends BaseTimeEntity {
 
   public void setAddressDetail(String addressDetail) {
     this.addressDetail = addressDetail;
+  }
+
+  public void setEmailVerifiedYn(boolean emailVerifiedYn) {
+    this.emailVerifiedYn = emailVerifiedYn;
+  }
+  public void setVerifyExpiredAt(LocalDateTime verifyExpiredAt) {
+    this.verifyExpiredAt = verifyExpiredAt;
+  }
+
+  public void setVerificationCode(String verificationCode) {
+    this.verificationCode = verificationCode;
   }
 }
