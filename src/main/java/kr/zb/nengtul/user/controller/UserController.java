@@ -1,15 +1,12 @@
 package kr.zb.nengtul.user.controller;
 
 import java.security.Principal;
-import java.util.Map;
-import kr.zb.nengtul.global.jwt.JwtToken;
+import kr.zb.nengtul.user.mailgun.service.EmailSendService;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
-import kr.zb.nengtul.user.entity.dto.UserLoginDto;
 import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
+  private final EmailSendService emailSendService;
 
   @PostMapping("/join")
   public ResponseEntity<String> join(@RequestBody UserJoinDto userJoinDto){
+//    emailSendService.sendEmail(); 메일건 테스트용
     return ResponseEntity.ok(userService.join(userJoinDto));
   }
 
