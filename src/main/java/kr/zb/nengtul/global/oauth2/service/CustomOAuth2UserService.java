@@ -1,6 +1,8 @@
 package kr.zb.nengtul.global.oauth2.service;
 
 import kr.zb.nengtul.global.entity.ProviderType;
+import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.global.oauth2.CustomOAuth2User;
 import kr.zb.nengtul.global.oauth2.dto.OAuthAttributes;
 import kr.zb.nengtul.user.entity.domain.User;
@@ -97,6 +99,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
    * OAuthAttributes의 toEntity() 메소드를 통해 빌더로 User 객체 생성 후 반환 생성된 User 객체를 DB에 저장
    */
   private User saveUser(OAuthAttributes attributes, ProviderType providerType) {
+    if(userRepository.existsByEmail( attributes.getOauth2UserInfo().getEmail())){
+      //TODO: 이미 등록되어있는 이메일입니다. 뜨고 이후에 처리 어떻게 할것인지.
+      throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
+    }
     User createdUser = attributes.toEntity(providerType, attributes.getOauth2UserInfo());
     return userRepository.save(createdUser);
   }
