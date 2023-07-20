@@ -38,7 +38,7 @@
 ## 📄 BackEnd-Architecture
 
 ## 📑 [ERD](https://www.erdcloud.com/d/73ggNMAvHyjBvBshE)
-![image](https://github.com/nengtul/.github/assets/101981639/0b28f43e-1640-4d8d-be1d-52a266211e4b)
+![image](https://github.com/nengtul/nengtul-backend/assets/101981639/19128847-d093-4c27-9531-93057426fc69)
 
 ## 📑 [API명세서](https://www.notion.so/API-ab731bbd93684b858bd055a734e0017b)
 
