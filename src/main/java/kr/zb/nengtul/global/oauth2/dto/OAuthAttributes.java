@@ -77,7 +77,6 @@ public class OAuthAttributes {
     return new User(
         oauth2UserInfo.getName(),
         oauth2UserInfo.getEmail(),
-        "Y",
         oauth2UserInfo.getImageUrl(),
         oauth2UserInfo.getSocialId(),
         oauth2UserInfo.getPhoneNumber(),

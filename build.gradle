@@ -38,6 +38,8 @@ dependencies {
 
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+	implementation 'org.apache.commons:commons-lang3'
+
 	//JWT
 	implementation 'com.auth0:java-jwt:4.2.1'
 

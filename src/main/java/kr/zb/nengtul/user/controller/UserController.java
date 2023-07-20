@@ -1,7 +1,6 @@
 package kr.zb.nengtul.user.controller;
 
 import java.security.Principal;
-import kr.zb.nengtul.user.mailgun.service.EmailSendService;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
 import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
 import kr.zb.nengtul.user.service.UserService;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,13 +21,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
-  private final EmailSendService emailSendService;
 
   @PostMapping("/join")
   public ResponseEntity<String> join(@RequestBody UserJoinDto userJoinDto){
-//    emailSendService.sendEmail(); 메일건 테스트용
     return ResponseEntity.ok(userService.join(userJoinDto));
   }
+
+  @PutMapping("/verify")
+  public ResponseEntity<String> verify(@RequestParam String email,@RequestParam String code){
+    userService.verify(email,code);
+    return ResponseEntity.ok("인증이 완료되었습니다.");
+  }
+
+  @PostMapping("/verify/reset")
+  public ResponseEntity<String> resetVerify(Principal principal){
+    userService.resetVerify(principal);
+    return ResponseEntity.ok("코드 재발급 및 연장이 완료되었습니다.");
+  }
+
 
   @PostMapping("/quit")
   public ResponseEntity<Void> quit(Principal principal){
