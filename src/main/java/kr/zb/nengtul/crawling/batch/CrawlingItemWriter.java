@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class CrawlingItemWriter implements ItemWriter<Recipe> {
 
     private final RecipeRepository recipeRepository;
+
     @Override
     public void write(Chunk<? extends Recipe> recipes) {
         recipeRepository.saveAll(recipes);
