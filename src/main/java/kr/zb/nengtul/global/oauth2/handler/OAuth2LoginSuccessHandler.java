@@ -10,6 +10,7 @@ import kr.zb.nengtul.global.oauth2.CustomOAuth2User;
 import kr.zb.nengtul.user.entity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
-    log.info("OAuth2 Login 성공!");
+    log.info("OAuth2 Login 성공");
     try {
       CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
@@ -40,7 +41,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             user.updateRefreshToken(refreshToken);
             userRepository.saveAndFlush(user);
           });
+      response.setStatus(HttpStatus.OK.value());
+      response.setCharacterEncoding("UTF-8");
+      response.setContentType("application/json;charset=UTF-8");
 
+      String successMessage = "{\"AccessToken\": \"" + accessToken +
+          "\", \"refreshToken\": \"" + refreshToken + "\"}";
+      response.getWriter().write(successMessage);
       jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, null);
       loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
     } catch (Exception e) {
