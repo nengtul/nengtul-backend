@@ -23,6 +23,9 @@
 <img src="https://img.shields.io/badge/Spring JPA-000000?style=flat-square&logo=Spring Jpa&logoColor=#6DB33F"/></a>
 <img src="https://img.shields.io/badge/Oauth 2.0-000000?style=flat-square&logo=Authy&logoColor=blue"/></a>
 <img src="https://img.shields.io/badge/JSON Web Tokens-000000?style=flat-square&logo=JSON Web Tokens&logoColor=purple"/></a>
+<img src="https://img.shields.io/badge/jsoup-000000?style=flat-square&logo=html5&logoColor=#6DB33F"/></a>
+<img src="https://img.shields.io/badge/Spring_Batch-000000?style=flat-square&logo=Spring&logoColor=#6DB33F"/></a>
+
 ### Database
 <img src="https://img.shields.io/badge/Mysql-000000?style=flat-square&logo=MySql&logoColor="/></a>
 ### DevOps
