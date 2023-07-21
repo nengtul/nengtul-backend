@@ -65,15 +65,21 @@ public class SecurityConfig {
         // 아이콘, css, js 관련
         // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
         .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**",
+            "/index.html",
             "/login/**",
-            "/v1/nengtul/user/join", "/v1/nengtul/user/login", "/index.html"
+            "/v1/nengtul/user/join",//회원가입
+            "/v1/nengtul/user/login",//로그인
+            "v1/nengtul/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
+            "v1/nengtul/user/findid",//아이디 찾기
+            "v1/nengtul/user/verify/**" //이메일 인증
         ).permitAll()
-        .requestMatchers("/v1/nengtul/user/quit").hasRole("USER") // 회원가입 접근 가능
+        .requestMatchers("/v1/nengtul/user/**").hasRole("USER") // 회원가입 접근 가능
         .requestMatchers("/v1/nengtul/admin/**").hasRole("ADMIN") // 회원가입 접근 가능
-        .anyRequest().permitAll() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+        .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         .and()
         //== 소셜 로그인 설정 ==//
-        .oauth2Login()
+        .oauth2Login().loginPage("/index.html") //권한 오류 발생시 /index.html 로 이동 (테스트용)
+//        .oauth2Login().loginPage("/v1/nengtul/user/login")
         .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
         .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
         .userInfoEndpoint().userService(customOAuth2UserService); // customUserService 설정
