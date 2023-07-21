@@ -1,4 +1,4 @@
-package kr.zb.nengtul.crawling.batch;
+package kr.zb.nengtul.crawling.crawling.batch;
 
 import java.util.ArrayList;
 import java.util.List;

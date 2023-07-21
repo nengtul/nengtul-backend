@@ -1,7 +1,7 @@
-package kr.zb.nengtul.crawling.batch;
+package kr.zb.nengtul.crawling.crawling.batch;
 
-import kr.zb.nengtul.board.domain.Recipe;
-import kr.zb.nengtul.board.repository.RecipeRepository;
+import kr.zb.nengtul.crawling.board.domain.Recipe;
+import kr.zb.nengtul.crawling.board.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;

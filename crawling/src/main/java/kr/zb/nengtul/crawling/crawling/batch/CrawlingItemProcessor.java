@@ -1,9 +1,9 @@
-package kr.zb.nengtul.crawling.batch;
+package kr.zb.nengtul.crawling.crawling.batch;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import kr.zb.nengtul.board.domain.Recipe;
+import kr.zb.nengtul.crawling.board.domain.Recipe;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;

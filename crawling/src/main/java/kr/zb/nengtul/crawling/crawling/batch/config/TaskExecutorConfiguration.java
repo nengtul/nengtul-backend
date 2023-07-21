@@ -1,4 +1,4 @@
-package kr.zb.nengtul.crawling.batch.config;
+package kr.zb.nengtul.crawling.crawling.batch.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
