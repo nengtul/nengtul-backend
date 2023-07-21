@@ -32,8 +32,8 @@ public class Recipe {
     private Long id;
     private Long userId;
     private String title;
-    @Column(columnDefinition = "TEXT")
     private String intro;
+    @Column(columnDefinition = "TEXT")
     private String ingredient;
     @Column(columnDefinition = "TEXT")
 
