@@ -195,7 +195,8 @@ public class UserService {
     StringBuilder builder = new StringBuilder();
     //TODO : HTML email 폼 적용 예정
     return builder.append("안녕하세요 ").append(name).append("! 링크를 통해 이메일 인증을 진행해주세요. \n\n")
-        .append("http://localhost:8080/v1/nengtul/user/verify?email=")
+      //.append("http://localhost:8080/v1/nengtul/user/verify?email=") //로컬
+        .append("http://43.200.162.72:8080/v1/nengtul/user/verify?email=") //배포
         .append(email)
         .append("&code=")
         .append(code).toString();
