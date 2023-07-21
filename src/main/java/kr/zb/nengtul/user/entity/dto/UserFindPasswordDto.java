@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserFindPasswordDto {
+  private String email;
   private String name;
   private String phoneNumber;
 }

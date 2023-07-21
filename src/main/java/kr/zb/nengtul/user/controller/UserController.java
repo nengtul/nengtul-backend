@@ -3,6 +3,7 @@ package kr.zb.nengtul.user.controller;
 import java.security.Principal;
 import kr.zb.nengtul.user.entity.dto.UserDetailDto;
 import kr.zb.nengtul.user.entity.dto.UserFindEmailDto;
+import kr.zb.nengtul.user.entity.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
 import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
 import kr.zb.nengtul.user.service.UserService;
@@ -33,8 +34,8 @@ public class UserController {
     return ResponseEntity.ok(userService.join(userJoinDto));
   }
 
-  //이메일 인증
-  @PutMapping("/verify")
+  //이메일 인증 (이메일에서 링크를 클릭하여 put 요청을 보낼 수 없어서 GET요청으로 처리)
+  @GetMapping("/verify")
   public ResponseEntity<String> verify(@RequestParam String email, @RequestParam String code) {
     userService.verify(email, code);
     return ResponseEntity.ok("인증이 완료되었습니다.");
@@ -55,8 +56,8 @@ public class UserController {
 
   //임시 비밀번호 발급
   @GetMapping("/findpw")
-  public ResponseEntity<String> findPasswordForSendMail(@RequestParam String email) {
-    return ResponseEntity.ok(userService.findPasswordForSendMail(email));
+  public ResponseEntity<String> getNewPassword(@RequestBody UserFindPasswordDto userFindPasswordDto) {
+    return ResponseEntity.ok(userService.getNewPassword(userFindPasswordDto));
   }
 
   //회원 상세보기
