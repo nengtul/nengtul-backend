@@ -1,9 +1,9 @@
-package kr.zb.nengtul.crawling.batch.config;
+package kr.zb.nengtul.crawling.crawling.batch.config;
 
-import kr.zb.nengtul.crawling.batch.CrawlingItemProcessor;
-import kr.zb.nengtul.crawling.batch.CrawlingItemReader;
-import kr.zb.nengtul.crawling.batch.CrawlingItemWriter;
-import kr.zb.nengtul.board.domain.Recipe;
+import kr.zb.nengtul.crawling.board.domain.Recipe;
+import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemProcessor;
+import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemReader;
+import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

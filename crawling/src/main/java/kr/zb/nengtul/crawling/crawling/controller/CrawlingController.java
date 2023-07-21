@@ -1,6 +1,6 @@
-package kr.zb.nengtul.crawling.controller;
+package kr.zb.nengtul.crawling.crawling.controller;
 
-import kr.zb.nengtul.crawling.service.CrawlingService;
+import kr.zb.nengtul.crawling.crawling.service.CrawlingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;

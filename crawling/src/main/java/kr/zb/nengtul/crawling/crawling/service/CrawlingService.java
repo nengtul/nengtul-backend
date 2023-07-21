@@ -1,4 +1,4 @@
-package kr.zb.nengtul.crawling.service;
+package kr.zb.nengtul.crawling.crawling.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
