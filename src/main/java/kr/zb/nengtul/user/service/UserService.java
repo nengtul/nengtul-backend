@@ -35,12 +35,11 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
-  private final JwtTokenProvider jwtTokenProvider;
   private final MailgunClient mailgunClient;
 
   //회원가입 및 이메일 인증 발송
   @Transactional
-  public String join(UserJoinDto userJoinDto) {
+  public void join(UserJoinDto userJoinDto) {
     // 이메일 중복 확인
     if (userRepository.existsByEmail(userJoinDto.getEmail())) {
       throw new CustomException(ALREADY_EXIST_EMAIL);
@@ -60,18 +59,7 @@ public class UserService {
         .build();
     userRepository.save(user);
 
-    String code = RandomStringUtils.random(10, true, true);
-
-    SendMailForm sendMailForm = SendMailForm.builder()
-        .from("lvet0330@gmail.com")
-        .to(userJoinDto.getEmail())
-        .subject("냉털 계정 인증용 이메일")
-        .text(getVerificationEmailBody(userJoinDto.getEmail(), userJoinDto.getName(), code))
-        .build();
-
-    mailgunClient.sendEmail(sendMailForm);
-    changeCustomerValidateEmail(user.getId(), code);
-    return "회원가입에 성공하였습니다. 이메일을 확인하고 이메일 인증을 진행해 주세요.";
+    verifyEmailForm(user, userJoinDto.getEmail(), userJoinDto.getName());
   }
 
   //이메일 인증
@@ -141,9 +129,10 @@ public class UserService {
 
   //임시 비밀번호 발급(비밀번호 찾기)
   @Transactional
-  public String getNewPassword(UserFindPasswordDto userFindPasswordDto) {
+  public void getNewPassword(UserFindPasswordDto userFindPasswordDto) {
     //이메일 전송 (이메일, 이름, 휴대폰 번호 부여받음)
-    User user = userRepository.findByEmailAndNameAndPhoneNumber(userFindPasswordDto.getEmail(), userFindPasswordDto.getName(), userFindPasswordDto.getPhoneNumber())
+    User user = userRepository.findByEmailAndNameAndPhoneNumber(userFindPasswordDto.getEmail(),
+            userFindPasswordDto.getName(), userFindPasswordDto.getPhoneNumber())
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
     String code = RandomStringUtils.random(10, true, true);
@@ -153,38 +142,40 @@ public class UserService {
         .from("lvet0330@gmail.com")
         .to(user.getEmail())
         .subject("냉털 임시 비밀번호 발급 이메일")
-        .text(getPasswordEmailBody( user.getName(), code))
+        .text(getPasswordEmailBody(user.getName(), code))
         .build();
 
     mailgunClient.sendEmail(sendMailForm);
     user.setPassword(passwordEncoder.encode(code));
     userRepository.save(user);
-    return "이메일을 통해 임시 비밀번호가 발급되었습니다. 임시 비밀번호를 통해 로그인해주세요.";
   }
 
   //인증코드 및 시간 설정
   @Transactional
-  public LocalDateTime changeCustomerValidateEmail(Long customerId, String verificationCode) {
+  public void changeCustomerValidateEmail(Long customerId, String verificationCode) {
     User user = userRepository.findById(customerId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
     user.setVerifyExpiredAt(LocalDateTime.now().plusDays(1));
     user.setVerificationCode(verificationCode);
     userRepository.save(user);
-    return user.getVerifyExpiredAt();
   }
 
   //인증코드 및 시간 재설정
   public void resetVerify(Long userId) {
     //유저 정보페이지에서 가져오기때문에 바로 get
     User user = userRepository.findById(userId).get();
+    verifyEmailForm(user, user.getEmail(), user.getName());
+  }
+
+  private void verifyEmailForm(User user, String email, String name) {
     String code = RandomStringUtils.random(10, true, true);
 
     SendMailForm sendMailForm = SendMailForm.builder()
         .from("lvet0330@gmail.com")
-        .to(user.getEmail())
+        .to(email)
         .subject("냉털 계정 인증용 이메일")
-        .text(getVerificationEmailBody(user.getEmail(), user.getName(), code))
+        .text(getVerificationEmailBody(email, name, code))
         .build();
 
     mailgunClient.sendEmail(sendMailForm);
@@ -193,25 +184,22 @@ public class UserService {
 
   //인증용 이메일 (인증요청시 온 버튼을 어떻게 put으로 보내지??)
   private String getVerificationEmailBody(String email, String name, String code) {
-    StringBuilder builder = new StringBuilder();
     //TODO : HTML email 폼 적용 예정
-    return builder.append("안녕하세요 ").append(name).append("! 링크를 통해 이메일 인증을 진행해주세요. \n\n")
-      //.append("http://localhost:8080/v1/nengtul/user/verify?email=") //로컬
-        .append("http://43.200.162.72:8080/v1/nengtul/user/verify?email=") //배포
-        .append(email)
-        .append("&code=")
-        .append(code).toString();
+    return "안녕하세요 " + name + "! 링크를 통해 이메일 인증을 진행해주세요. \n\n"
+        //.append("http://localhost:8080/v1/nengtul/user/verify?email=") //로컬
+        + "http://43.200.162.72:8080/v1/nengtul/user/verify?email=" //배포
+        + email
+        + "&code="
+        + code;
   }
 
   //비밀번호 찾기용 Email
   private String getPasswordEmailBody(String name, String code) {
-    StringBuilder builder = new StringBuilder();
     //TODO : HTML email 폼 적용 예정
-    return builder.append("안녕하세요 ").append(name)
-        .append(" 님! 이메일에 작성된 임시 비밀번호를 통해 로그인해주세요. \n\n")
-        .append("임시 비밀번호를 통해 로그인 후 비밀번호를 꼭 변경해주세요. \n\n")
-        .append("임시 비밀번호 : ")
-        .append(code).toString();
+    return  "안녕하세요 " + name
+        + " 님! 이메일에 작성된 임시 비밀번호를 통해 로그인해주세요. \n\n"
+        + "임시 비밀번호를 통해 로그인 후 비밀번호를 꼭 변경해주세요. \n\n"
+        + "임시 비밀번호 : "
+        + code;
   }
-
 }
