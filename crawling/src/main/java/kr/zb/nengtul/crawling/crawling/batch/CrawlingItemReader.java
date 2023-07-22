@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import kr.zb.nengtul.crawling.crawling.CrawlInfo;
+import kr.zb.nengtul.crawling.crawling.dto.CrawlInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,11 +19,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CrawlingItemReader implements ItemReader<CrawlInfo> {
 
-    private final List<CrawlInfo> crawlInfoList;
-    private final AtomicInteger currentIndex;
     private static final int MAX_RETRY_COUNT = 3;
     private static final int RETRY_DELAY_MS = 1000;
+    private final List<CrawlInfo> crawlInfoList;
+    private final AtomicInteger currentIndex;
     private final Map<Integer, String> cat4Map; // 만개의 레시피 카테고리별 구분 파라미터 값
+
+    public CrawlingItemReader() throws Exception {
+        crawlInfoList = new ArrayList<>();
+        currentIndex = new AtomicInteger(0);
+
+        cat4Map = getCat4Map();
+
+        for (int cat4 : cat4Map.keySet()) {
+            for (int pageIndex = 1; pageIndex <= 2; pageIndex++) {
+                crawlLinksForCrawlInfo(cat4, pageIndex);
+            }
+        }
+    }
 
     private Map<Integer, String> getCat4Map() {
         Map<Integer, String> cat4Map = new HashMap<>();
@@ -47,19 +60,6 @@ public class CrawlingItemReader implements ItemReader<CrawlInfo> {
         return cat4Map;
     }
 
-    public CrawlingItemReader() throws Exception {
-        crawlInfoList = new ArrayList<>();
-        currentIndex = new AtomicInteger(0);
-
-        cat4Map = getCat4Map();
-
-        for (int cat4 : cat4Map.keySet()) {
-            for (int pageIndex = 1; pageIndex <= 2; pageIndex++) {
-                crawlLinksForCrawlInfo(cat4, pageIndex);
-            }
-        }
-    }
-
     private void crawlLinksForCrawlInfo(int cat4, int pageIndex) throws Exception {
         int retryCount = 0;
         while (retryCount < MAX_RETRY_COUNT) {
@@ -74,14 +74,19 @@ public class CrawlingItemReader implements ItemReader<CrawlInfo> {
                 for (Element element : elements) {
                     String recipeUrl = element.attr("href");
 
-                    CrawlInfo crawlInfo = new CrawlInfo(cat4Map.get(cat4), recipeUrl);
+                    Elements imgTags = element.select("img");
+                    String mainPhotoUrl = (imgTags.size() > 1) ? imgTags.get(1).attr("src")
+                            : imgTags.get(0).attr("src");
+
+                    CrawlInfo crawlInfo = new CrawlInfo(cat4Map.get(cat4), recipeUrl, mainPhotoUrl);
                     crawlInfoList.add(crawlInfo);
                     log.info(recipeUrl);
                 }
                 // 크롤링에 성공하면 반복문 종료
                 break;
             } catch (IOException e) {
-                log.error("Error while crawling category: {}, page: {}, Retry count: {}", cat4Map.get(cat4), pageIndex, retryCount + 1);
+                log.error("Error while crawling category: {}, page: {}, Retry count: {}",
+                        cat4Map.get(cat4), pageIndex, retryCount + 1);
                 log.error("Exception: {}", e.getMessage());
                 retryCount++;
                 if (retryCount < MAX_RETRY_COUNT) {

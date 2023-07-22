@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import kr.zb.nengtul.crawling.board.domain.Recipe;
-import kr.zb.nengtul.crawling.crawling.CrawlInfo;
+import kr.zb.nengtul.crawling.crawling.dto.CrawlInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -26,7 +26,8 @@ public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
     public Recipe process(CrawlInfo item) throws Exception {
         int retryCount = 0;
         String category = item.getCategory();
-        String url = "https://www.10000recipe.com"+item.getUrl();
+        String url = "https://www.10000recipe.com"+item.getRecipeUrl();
+        String mainPhotoUrl = item.getMainPhotoUrl();
         log.info(url);
         while (retryCount < MAX_RETRY_COUNT) {
             try {
@@ -52,11 +53,11 @@ public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
                 String ingredient = ingredientElements != null ? getIngredients(ingredientElements)
                         : "레시피 마다 달라요!";
                 String cookingStep = getCombinedSteps(stepElements);
-                String serving = servingElement.text().isEmpty() ? "-" : servingElement.text();
+                String serving = servingElement.text().isEmpty() ? "" : servingElement.text();
                 String cookingTime =
-                        cookingTimeElements.text().isEmpty() ? "-" : cookingTimeElements.text();
+                        cookingTimeElements.text().isEmpty() ? "" : cookingTimeElements.text();
                 String videoUrl =
-                        recipeVideoIframe != null ? recipeVideoIframe.attr("org_src") : "-";
+                        recipeVideoIframe != null ? recipeVideoIframe.attr("org_src") : "";
                 String imageUrl = getImageUrls(imageElements);
 
                 return Recipe.builder()
@@ -70,6 +71,7 @@ public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
                         .serving(serving)
                         .category(category)
                         .videoUrl(videoUrl)
+                        .mainPhotoUrl(mainPhotoUrl)
                         .build();
             } catch (IOException e) {
                 log.error("Error while crawling URL: {}", url);
@@ -103,7 +105,7 @@ public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
         StringBuilder imageBuilder = new StringBuilder();
         for (Element imageElement : imageElements) {
             Element imgElement = imageElement.selectFirst("img");
-            String imageUrl = imgElement != null ? imgElement.attr("src") : "-";
+            String imageUrl = imgElement != null ? imgElement.attr("src") : "";
             imageBuilder.append(imageUrl).append("\n");
         }
         return imageBuilder.toString().trim();

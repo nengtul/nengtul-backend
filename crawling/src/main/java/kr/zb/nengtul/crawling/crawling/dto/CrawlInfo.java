@@ -1,4 +1,4 @@
-package kr.zb.nengtul.crawling.crawling;
+package kr.zb.nengtul.crawling.crawling.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,7 @@ import lombok.Getter;
 public class CrawlInfo {
 
     private String category;
-    private String url;
+    private String recipeUrl;
+    private String mainPhotoUrl;
 
 }
