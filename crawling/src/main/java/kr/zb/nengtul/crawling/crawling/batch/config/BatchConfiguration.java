@@ -1,7 +1,7 @@
 package kr.zb.nengtul.crawling.crawling.batch.config;
 
 import kr.zb.nengtul.crawling.board.domain.Recipe;
-import kr.zb.nengtul.crawling.crawling.CrawlInfo;
+import kr.zb.nengtul.crawling.crawling.dto.CrawlInfo;
 import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemProcessor;
 import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemReader;
 import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemWriter;

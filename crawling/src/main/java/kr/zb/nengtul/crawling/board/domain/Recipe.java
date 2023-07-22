@@ -30,21 +30,32 @@ public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long userId;
+
     private String title;
+
     private String intro;
+
     @Column(columnDefinition = "TEXT")
     private String ingredient;
-    @Column(columnDefinition = "TEXT")
 
+    @Column(columnDefinition = "TEXT")
     private String cookingStep;
+
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
+
     private String cookingTime;
+
     private String serving;
-    @Column(columnDefinition = "VARCHAR(50) DEFAULT '-'")
+
     private String category;
+
     private String videoUrl;
+
+    private String mainPhotoUrl;
+
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long viewCount;
 
