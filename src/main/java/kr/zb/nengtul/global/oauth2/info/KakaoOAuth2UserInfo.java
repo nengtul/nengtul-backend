@@ -11,30 +11,17 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
   @Override
   public String getEmail() {
-    Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-    return (String) kakaoAccount.get("email");
+    return (String) getValue("kakao_account", "email");
   }
 
   @Override
   public String getName() {
-    Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
-    Map<String, Object> profile = (Map<String, Object>) account.get("profile");
-
-    if (account == null || profile == null) {
-      return null;
-    }
-
-    return (String) profile.get("nickname");
+    return (String) getValue("kakao_account", "profile", "nickname");
   }
 
   @Override
   public String getSocialId() {
-    Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-
-    if (response == null) {
-      return null;
-    }
-    return (String) response.get("id");
+    return (String) getValue("response", "id");
   }
 
   @Override
@@ -44,13 +31,17 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
   @Override
   public String getImageUrl() {
-    Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
-    Map<String, Object> profile = (Map<String, Object>) account.get("profile");
+    return (String) getValue("kakao_account", "profile", "thumbnail_image_url");
+  }
 
-    if (account == null || profile == null) {
-      return null;
+  private Object getValue(String... keys) {
+    Map<String, Object> current = attributes;
+    for (String key : keys) {
+      current = (Map<String, Object>) current.get(key);
+      if (current == null) {
+        return null;
+      }
     }
-
-    return (String) profile.get("thumbnail_image_url");
+    return current;
   }
 }
