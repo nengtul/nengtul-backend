@@ -13,7 +13,8 @@ import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.jwt.JwtTokenProvider;
 import kr.zb.nengtul.user.entity.domain.User;
 import kr.zb.nengtul.user.entity.dto.UserDetailDto;
-import kr.zb.nengtul.user.entity.dto.UserFindEmailDto;
+import kr.zb.nengtul.user.entity.dto.UserFindEmailReqDto;
+import kr.zb.nengtul.user.entity.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.entity.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
 import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
@@ -129,13 +130,13 @@ public class UserService {
   }
 
   //가입한 이메일 찾기(아이디 찾기)
-  public String findEmail(UserFindEmailDto userFindEmailDto) {
-    User user = userRepository.findByName(userFindEmailDto.getName())
+  public UserFindEmailResDto findEmail(UserFindEmailReqDto userFindEmailReqDto) {
+    User user = userRepository.findByName(userFindEmailReqDto.getName())
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-    if (!user.getPhoneNumber().equals(userFindEmailDto.getPhoneNumber())) {
+    if (!user.getPhoneNumber().equals(userFindEmailReqDto.getPhoneNumber())) {
       throw new CustomException(NOT_FOUND_USER);
     }
-    return user.getEmail();
+    return UserFindEmailResDto.buildUserFindEmailResDto(user.getEmail());
   }
 
   //임시 비밀번호 발급(비밀번호 찾기)

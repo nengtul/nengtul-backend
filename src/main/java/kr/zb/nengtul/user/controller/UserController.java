@@ -2,7 +2,8 @@ package kr.zb.nengtul.user.controller;
 
 import java.security.Principal;
 import kr.zb.nengtul.user.entity.dto.UserDetailDto;
-import kr.zb.nengtul.user.entity.dto.UserFindEmailDto;
+import kr.zb.nengtul.user.entity.dto.UserFindEmailReqDto;
+import kr.zb.nengtul.user.entity.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.entity.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
 import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/nengtul/user")
+@RequestMapping("/v1/user")
 public class UserController {
 
   private final UserService userService;
@@ -50,8 +51,8 @@ public class UserController {
 
   //아이디 찾기
   @GetMapping("/findid")
-  public ResponseEntity<String> findEmail(@RequestBody UserFindEmailDto userFindEmailDto) {
-    return ResponseEntity.ok(userService.findEmail(userFindEmailDto));
+  public ResponseEntity<UserFindEmailResDto> findEmail(@RequestBody UserFindEmailReqDto userFindEmailReqDto) {
+    return ResponseEntity.ok(userService.findEmail(userFindEmailReqDto));
   }
 
   //임시 비밀번호 발급
