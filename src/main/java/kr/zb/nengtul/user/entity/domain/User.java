@@ -70,7 +70,7 @@ public class User extends BaseTimeEntity {
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
-      String email, String address, String addressDetail,String profileImageUrl, ProviderType providerType) {
+      String email, String address, String addressDetail,String profileImageUrl) {
     this.name = name;
     this.nickname = nickname;
     this.password = password;
@@ -112,10 +112,6 @@ public class User extends BaseTimeEntity {
   public User update(String name) {
     this.name = name;
     return this;
-  }
-
-  public String getRoleKey() {
-    return this.roles.getKey();
   }
 
   public void updateRefreshToken(String updateRefreshToken) {

@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ApiExceptionAdvice {
   // CustomException 이 발생했을 때 처리하는 핸들러 메서드
   @ExceptionHandler({CustomException.class})
-  public ResponseEntity<CustomException.CustomExceptionResponse> exceptionHandler(
-      HttpServletRequest req, final CustomException e){
+  public ResponseEntity<CustomException.CustomExceptionResponse> exceptionHandler(CustomException e){
     // CustomExceptionResponse 객체를 생성하여 응답 반환
     return ResponseEntity
         .status(e.getStatus())
