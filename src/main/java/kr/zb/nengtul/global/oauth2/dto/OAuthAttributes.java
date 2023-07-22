@@ -29,12 +29,6 @@ public class OAuthAttributes {
     this.oauth2UserInfo = oauth2UserInfo;
   }
 
-  /**
-   * ProviderType에 맞는 메소드 호출하여 OAuthAttributes 객체 반환
-   * 파라미터 : userNameAttributeName -> OAuth2 로그인 시 키(PK)가 되는 값 / attributes : OAuth 서비스의 유저 정보들
-   * 소셜별 of 메소드(ofGoogle, ofKaKao, ofNaver)들은 각각 소셜 로그인 API에서 제공하는
-   * 회원의 식별값(id), attributes, nameAttributeKey를 저장 후 build
-   */
   public static OAuthAttributes of(ProviderType socialType,
       String userNameAttributeName, Map<String, Object> attributes) {
 
@@ -68,11 +62,6 @@ public class OAuthAttributes {
         .build();
   }
 
-  /**
-   * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태
-   * OAuth2UserInfo에서 socialId(식별값), nickname, imageUrl을 가져와서 build
-   * role은 USER로 설정
-   */
   public User toEntity(ProviderType providerType, OAuth2UserInfo oauth2UserInfo) {
     return new User(
         oauth2UserInfo.getName(),
