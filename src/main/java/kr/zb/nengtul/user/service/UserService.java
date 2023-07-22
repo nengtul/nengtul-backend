@@ -10,7 +10,6 @@ import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.global.jwt.JwtTokenProvider;
 import kr.zb.nengtul.user.entity.domain.User;
 import kr.zb.nengtul.user.entity.dto.UserDetailDto;
 import kr.zb.nengtul.user.entity.dto.UserFindEmailReqDto;
@@ -79,7 +78,8 @@ public class UserService {
 
   //유저 상세보기
   public UserDetailDto getUserDetail(Principal principal) {
-    User user = userRepository.findByEmail(principal.getName()).get();
+    User user = userRepository.findByEmail(principal.getName())
+        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
     return UserDetailDto.buildUserDetailDto(user);
   }
@@ -164,7 +164,8 @@ public class UserService {
   //인증코드 및 시간 재설정
   public void resetVerify(Long userId) {
     //유저 정보페이지에서 가져오기때문에 바로 get
-    User user = userRepository.findById(userId).get();
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     verifyEmailForm(user, user.getEmail(), user.getName());
   }
 
@@ -182,7 +183,7 @@ public class UserService {
     changeCustomerValidateEmail(user.getId(), code);
   }
 
-  //인증용 이메일 (인증요청시 온 버튼을 어떻게 put으로 보내지??)
+  //인증용 이메일
   private String getVerificationEmailBody(String email, String name, String code) {
     //TODO : HTML email 폼 적용 예정
     return "안녕하세요 " + name + "! 링크를 통해 이메일 인증을 진행해주세요. \n\n"
@@ -196,7 +197,7 @@ public class UserService {
   //비밀번호 찾기용 Email
   private String getPasswordEmailBody(String name, String code) {
     //TODO : HTML email 폼 적용 예정
-    return  "안녕하세요 " + name
+    return "안녕하세요 " + name
         + " 님! 이메일에 작성된 임시 비밀번호를 통해 로그인해주세요. \n\n"
         + "임시 비밀번호를 통해 로그인 후 비밀번호를 꼭 변경해주세요. \n\n"
         + "임시 비밀번호 : "
