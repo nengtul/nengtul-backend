@@ -61,9 +61,9 @@ public class SecurityConfig {
                 "/login/**",
                 "/v1/user/join",//회원가입
                 "/v1/user/login",//로그인
-                "v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
-                "v1/user/findid",//아이디 찾기
-                "v1/user/verify/**" //이메일 인증
+                "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
+                "/v1/user/findid",//아이디 찾기
+                "/v1/user/verify/**" //이메일 인증
             ).permitAll()
             .requestMatchers("/v1/user/**").hasRole("USER") // 회원가입 접근 가능
             .requestMatchers("/v1/admin/**").hasRole("ADMIN") // 회원가입 접근 가능
@@ -86,13 +86,13 @@ public class SecurityConfig {
     return http.build();
   }
 
+  //password Encoder
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
 
-  //password Encoder
   @Bean
   public AuthenticationManager authenticationManager() {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
