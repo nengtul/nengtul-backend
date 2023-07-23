@@ -29,7 +29,7 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-  private static final String NO_CHECK_URL = "/v1/nengtul/user/login"; // "/v1/nengtul/user/login"으로 들어오는 요청은 Filter 작동 X
+  private static final String NO_CHECK_URL = "/v1/user/login"; // "/v1/user/login"으로 들어오는 요청은 Filter 작동 X
 
   private final JwtTokenProvider jwtTokenProvider;
   private final UserRepository userRepository;
