@@ -24,7 +24,8 @@ public enum ErrorCode {
   NOT_FOUND_NOTICE(HttpStatus.BAD_REQUEST, "공지를 찾을 수 없습니다."),
 
   //공통
-  NO_PERMISSION(HttpStatus.BAD_REQUEST, "권한이 없습니다.");
+  NO_CONTENT(HttpStatus.NO_CONTENT, "일치하는 내용이 없습니다."),
+  NO_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String detail;

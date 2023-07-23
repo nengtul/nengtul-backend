@@ -2,11 +2,11 @@ package kr.zb.nengtul.notice.controller;
 
 import java.security.Principal;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeReqDto;
-import kr.zb.nengtul.notice.entitiy.dto.NoticeResDto;
 import kr.zb.nengtul.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,8 +31,16 @@ public class NoticeController {
 
   //수정
   @PutMapping("/{noticeId}")
-  public ResponseEntity<Void> update(@PathVariable Long noticeId, @RequestBody NoticeReqDto noticeReqDto, Principal principal) {
+  public ResponseEntity<Void> update(@PathVariable Long noticeId,
+      @RequestBody NoticeReqDto noticeReqDto, Principal principal) {
     noticeService.update(noticeId, noticeReqDto, principal);
+    return ResponseEntity.ok(null);
+  }
+
+  //삭제
+  @DeleteMapping("/{noticeId}")
+  public ResponseEntity<Void> delete(@PathVariable Long noticeId, Principal principal) {
+    noticeService.delete(noticeId, principal);
     return ResponseEntity.ok(null);
   }
 
