@@ -28,7 +28,7 @@ public class Notice extends BaseTimeEntity {
   private Long id;
 
   @JsonManagedReference
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   private User user;
 
   private String title;
