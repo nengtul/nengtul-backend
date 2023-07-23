@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFindEmailDto {
+public class UserFindEmailReqDto {
   private String name;
   private String phoneNumber;
 }

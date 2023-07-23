@@ -2,7 +2,8 @@ package kr.zb.nengtul.user.controller;
 
 import java.security.Principal;
 import kr.zb.nengtul.user.entity.dto.UserDetailDto;
-import kr.zb.nengtul.user.entity.dto.UserFindEmailDto;
+import kr.zb.nengtul.user.entity.dto.UserFindEmailReqDto;
+import kr.zb.nengtul.user.entity.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.entity.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.entity.dto.UserJoinDto;
 import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
@@ -23,41 +24,43 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/nengtul/user")
+@RequestMapping("/v1/user")
 public class UserController {
 
   private final UserService userService;
 
   //회원가입
   @PostMapping("/join")
-  public ResponseEntity<String> join(@RequestBody UserJoinDto userJoinDto) {
-    return ResponseEntity.ok(userService.join(userJoinDto));
+  public ResponseEntity<Void> join(@RequestBody UserJoinDto userJoinDto) {
+    userService.join(userJoinDto);
+    return ResponseEntity.ok(null);
   }
 
   //이메일 인증 (이메일에서 링크를 클릭하여 put 요청을 보낼 수 없어서 GET요청으로 처리)
   @GetMapping("/verify")
-  public ResponseEntity<String> verify(@RequestParam String email, @RequestParam String code) {
+  public ResponseEntity<Void> verify(@RequestParam String email, @RequestParam String code) {
     userService.verify(email, code);
-    return ResponseEntity.ok("인증이 완료되었습니다.");
+    return ResponseEntity.ok(null);
   }
 
   //이메일 인증번호 재발급 요청
   @PostMapping("/verify/reset/{userId}")
-  public ResponseEntity<String> resetVerify(@PathVariable Long userId) {
+  public ResponseEntity<Void> resetVerify(@PathVariable Long userId) {
     userService.resetVerify(userId);
-    return ResponseEntity.ok("코드 재발급 및 연장이 완료되었습니다.");
+    return ResponseEntity.ok(null);
   }
 
   //아이디 찾기
   @GetMapping("/findid")
-  public ResponseEntity<String> findEmail(@RequestBody UserFindEmailDto userFindEmailDto) {
-    return ResponseEntity.ok(userService.findEmail(userFindEmailDto));
+  public ResponseEntity<UserFindEmailResDto> findEmail(@RequestBody UserFindEmailReqDto userFindEmailReqDto) {
+    return ResponseEntity.ok(userService.findEmail(userFindEmailReqDto));
   }
 
   //임시 비밀번호 발급
   @GetMapping("/findpw")
-  public ResponseEntity<String> getNewPassword(@RequestBody UserFindPasswordDto userFindPasswordDto) {
-    return ResponseEntity.ok(userService.getNewPassword(userFindPasswordDto));
+  public ResponseEntity<Void> getNewPassword(@RequestBody UserFindPasswordDto userFindPasswordDto) {
+    userService.getNewPassword(userFindPasswordDto);
+    return ResponseEntity.ok(null);
   }
 
   //회원 상세보기

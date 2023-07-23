@@ -3,7 +3,6 @@ package kr.zb.nengtul.global.oauth2.handler;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.CHECK_SOCIAL_SERVER;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-      AuthenticationException exception) throws IOException, ServletException {
+      AuthenticationException exception) throws IOException {
     response.setStatus(CHECK_SOCIAL_SERVER.getHttpStatus().value());
     response.setCharacterEncoding("UTF-8");
     response.setContentType("application/json;charset=UTF-8");

@@ -2,7 +2,6 @@ package kr.zb.nengtul.user.mailgun.client;
 
 import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.PostMapping;
