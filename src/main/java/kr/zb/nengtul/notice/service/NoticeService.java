@@ -1,6 +1,8 @@
 package kr.zb.nengtul.notice.service;
 
+import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_NOTICE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
+import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import kr.zb.nengtul.global.exception.CustomException;
@@ -36,6 +38,25 @@ public class NoticeService {
         .viewCount(0L)
         .build();
     noticeRepository.save(notice);
+  }
+
+  @Transactional
+  public void update(Long noticeId, NoticeReqDto noticeReqDto, Principal principal) {
+    User user = userRepository.findByEmail(principal.getName())
+        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+
+    Notice notice = noticeRepository.findById(noticeId)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
+
+    if (notice.getUser().equals(user)) {
+      notice.setTitle(noticeReqDto.getTitle());
+      notice.setContent(noticeReqDto.getContent());
+      notice.setNoticeImg(noticeReqDto.getNoticeImg());
+
+      noticeRepository.save(notice);
+    } else {
+      throw new CustomException(NO_PERMISSION);
+    }
   }
 
 
