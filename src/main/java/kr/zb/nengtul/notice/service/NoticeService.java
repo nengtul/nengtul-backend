@@ -60,4 +60,17 @@ public class NoticeService {
   }
 
 
+  @Transactional
+  public void delete(Long noticeId, Principal principal) {
+    User user = userRepository.findByEmail(principal.getName())
+        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+
+    Notice notice = noticeRepository.findById(noticeId)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
+    if (notice.getUser().equals(user)) {
+      noticeRepository.deleteById(noticeId);
+    } else {
+      throw new CustomException(NO_PERMISSION);
+    }
+  }
 }
