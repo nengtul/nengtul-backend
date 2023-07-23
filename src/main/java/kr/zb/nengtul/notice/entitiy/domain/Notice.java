@@ -3,11 +3,9 @@ package kr.zb.nengtul.notice.entitiy.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.user.entity.domain.User;
@@ -38,4 +36,16 @@ public class Notice extends BaseTimeEntity {
   private String noticeImg;
 
   private Long viewCount;
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+  public void setNoticeImg(String noticeImg) {
+    this.noticeImg = noticeImg;
+  }
 }
