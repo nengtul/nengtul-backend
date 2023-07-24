@@ -5,15 +5,19 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.notice.entitiy.domain.Notice;
+import kr.zb.nengtul.notice.entitiy.dto.NoticeDetailDto;
+import kr.zb.nengtul.notice.entitiy.dto.NoticeListDto;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeReqDto;
-import kr.zb.nengtul.notice.entitiy.dto.NoticeResDto;
 import kr.zb.nengtul.notice.entitiy.repository.NoticeRepository;
 import kr.zb.nengtul.user.entity.domain.User;
 import kr.zb.nengtul.user.entity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,4 +77,23 @@ public class NoticeService {
       throw new CustomException(NO_PERMISSION);
     }
   }
+
+  public List<NoticeListDto> getList(Pageable pageable) {
+    List<Notice> noticeList = noticeRepository.findAll();
+    return noticeList.stream()
+        .map(NoticeListDto::buildNoticeListDto)
+        .collect(Collectors.toList());
+  }
+
+  @Transactional
+  public NoticeDetailDto getDetails(Long noticeId) {
+    Notice notice = noticeRepository.findById(noticeId)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
+    notice.setViewCount(notice.getViewCount() + 1);
+    noticeRepository.saveAndFlush(notice);
+
+    return NoticeDetailDto.buildNoticeDetailDto(notice);
+  }
+
+
 }
