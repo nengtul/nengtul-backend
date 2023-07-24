@@ -186,8 +186,8 @@ public class UserService {
   private String getVerificationEmailBody(String email, String name, String code) {
     //TODO : HTML email 폼 적용 예정
     return "안녕하세요 " + name + "! 링크를 통해 이메일 인증을 진행해주세요. \n\n"
-        //.append("http://localhost:8080/v1/nengtul/user/verify?email=") //로컬
-        + "http://43.200.162.72:8080/v1/nengtul/user/verify?email=" //배포
+        //.append("http://localhost:8080/v1/user/verify?email=") //로컬
+        + "http://43.200.162.72:8080/v1/user/verify?email=" //배포
         + email
         + "&code="
         + code;
