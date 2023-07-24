@@ -4,6 +4,7 @@ import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_EMAIL;
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
+import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
 import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
@@ -119,11 +120,9 @@ public class UserService {
 
   //가입한 이메일 찾기(아이디 찾기)
   public UserFindEmailResDto findEmail(UserFindEmailReqDto userFindEmailReqDto) {
-    User user = userRepository.findByName(userFindEmailReqDto.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-    if (!user.getPhoneNumber().equals(userFindEmailReqDto.getPhoneNumber())) {
-      throw new CustomException(NOT_FOUND_USER);
-    }
+    User user = userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
+            userFindEmailReqDto.getPhoneNumber())
+        .orElseThrow(() -> new CustomException(NO_CONTENT));
     return UserFindEmailResDto.buildUserFindEmailResDto(user.getEmail());
   }
 
@@ -133,7 +132,7 @@ public class UserService {
     //이메일 전송 (이메일, 이름, 휴대폰 번호 부여받음)
     User user = userRepository.findByEmailAndNameAndPhoneNumber(userFindPasswordDto.getEmail(),
             userFindPasswordDto.getName(), userFindPasswordDto.getPhoneNumber())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+        .orElseThrow(() -> new CustomException(NO_CONTENT));
 
     String code = RandomStringUtils.random(10, true, true);
 

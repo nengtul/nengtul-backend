@@ -34,7 +34,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   private final JwtTokenProvider jwtTokenProvider;
   private final UserRepository userRepository;
 
-  private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+  private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -55,9 +55,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     }
 
     // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
-    if (refreshToken == null) {
-      checkAccessTokenAndAuthentication(request, response, filterChain);
-    }
+    checkAccessTokenAndAuthentication(request, response, filterChain);
   }
 
   //리프레시 토큰으로 유저 정보 찾기 & 액세스 토큰/리프레시 토큰 재발급
@@ -84,12 +82,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   public void checkAccessTokenAndAuthentication(HttpServletRequest request,
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    log.info("checkAccessTokenAndAuthentication() 호출");
     jwtTokenProvider.extractAccessToken(request)
         .filter(jwtTokenProvider::isTokenValid)
-        .ifPresent(accessToken -> jwtTokenProvider.extractEmail(accessToken)
-            .ifPresent(email -> userRepository.findByEmail(email)
-                .ifPresent(this::saveAuthentication)));
+        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
+            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
 
     filterChain.doFilter(request, response);
   }
