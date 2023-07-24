@@ -1,4 +1,4 @@
-package kr.zb.nengtul.crawling.batch.config;
+package kr.zb.nengtul.crawling.crawling.batch.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +13,10 @@ public class TaskExecutorConfiguration {
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10); // 스레드 풀의 기본 크기
-        executor.setMaxPoolSize(50); // 스레드 풀의 최대 크기
-        executor.setQueueCapacity(100); // 대기 큐의 크기
+        int coreCount = Runtime.getRuntime().availableProcessors(); // 현재 시스템의 CPU 코어 수 가져오기
+        executor.setCorePoolSize(coreCount + 2);
+        executor.setMaxPoolSize(coreCount * 2);
+        executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("BatchTaskExecutor-"); // 스레드 이름 접두사 설정
         executor.initialize();
         return executor;
