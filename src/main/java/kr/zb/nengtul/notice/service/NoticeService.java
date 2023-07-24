@@ -6,6 +6,7 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.global.jwt.service.CustomUserDetailService;
 import kr.zb.nengtul.notice.entitiy.domain.Notice;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeDetailDto;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeListDto;
@@ -30,9 +31,7 @@ public class NoticeService {
 
   @Transactional
   public void create(NoticeReqDto noticeReqDto, Principal principal) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-
+    User user = findUserByEmail(principal.getName());
     Notice notice = Notice.builder()
         .title(noticeReqDto.getTitle())
         .content(noticeReqDto.getContent())
@@ -45,9 +44,7 @@ public class NoticeService {
 
   @Transactional
   public void update(Long noticeId, NoticeReqDto noticeReqDto, Principal principal) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-
+    User user = findUserByEmail(principal.getName());
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
 
@@ -65,9 +62,7 @@ public class NoticeService {
 
   @Transactional
   public void delete(Long noticeId, Principal principal) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-
+    User user = findUserByEmail(principal.getName());
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
     if (notice.getUser().equals(user)) {
@@ -92,5 +87,8 @@ public class NoticeService {
     return NoticeDetailDto.buildNoticeDetailDto(notice);
   }
 
-
+  public User findUserByEmail(String email) {
+    return userRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+  }
 }

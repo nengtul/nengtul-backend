@@ -1,7 +1,6 @@
 package kr.zb.nengtul.notice.controller;
 
 import java.security.Principal;
-import java.util.List;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeDetailDto;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeListDto;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeReqDto;

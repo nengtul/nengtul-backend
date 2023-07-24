@@ -65,8 +65,7 @@ public class UserService {
   //이메일 인증
   @Transactional
   public void verify(String email, String code) {
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(email);
     if (user.isEmailVerifiedYn()) {
       throw new CustomException(ALREADY_VERIFIED);
     } else if (!user.getVerificationCode().equals(code)) {
@@ -79,8 +78,7 @@ public class UserService {
 
   //유저 상세보기
   public UserDetailDto getUserDetail(Principal principal) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(principal.getName());
 
     return UserDetailDto.buildUserDetailDto(user);
   }
@@ -88,16 +86,15 @@ public class UserService {
   //회원 탈퇴
   @Transactional
   public void quit(Principal principal) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(principal.getName());
+
     userRepository.deleteById(user.getId());
   }
 
   //회원 정보 수정
   @Transactional
   public String update(Principal principal, UserUpdateDto userUpdateDto) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(principal.getName());
 
     if (userUpdateDto.getPassword() == null || userUpdateDto.getPassword().length() < 8) {
       throw new CustomException(SHORT_PASSWORD);
@@ -167,6 +164,7 @@ public class UserService {
     verifyEmailForm(user, user.getEmail(), user.getName());
   }
 
+  //이메일 인증 폼
   private void verifyEmailForm(User user, String email, String name) {
     String code = RandomStringUtils.random(10, true, true);
 
@@ -200,5 +198,10 @@ public class UserService {
         + "임시 비밀번호를 통해 로그인 후 비밀번호를 꼭 변경해주세요. \n\n"
         + "임시 비밀번호 : "
         + code;
+  }
+
+  public User findUserByEmail(String email) {
+    return userRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
   }
 }
