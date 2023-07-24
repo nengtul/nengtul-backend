@@ -8,6 +8,7 @@ import kr.zb.nengtul.notice.entitiy.dto.NoticeReqDto;
 import kr.zb.nengtul.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,7 +52,7 @@ public class NoticeController {
 
   //전체 조회
   @GetMapping("/list")
-  public ResponseEntity<List<NoticeListDto>> getList(Pageable pageable) {
+  public ResponseEntity<Page<NoticeListDto>> getList(Pageable pageable) {
     return ResponseEntity.ok(noticeService.getList(pageable));
   }
 
