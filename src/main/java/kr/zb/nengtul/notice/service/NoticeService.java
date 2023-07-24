@@ -5,8 +5,6 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.notice.entitiy.domain.Notice;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeDetailDto;
