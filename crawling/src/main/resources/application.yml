@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none
+  batch:
+    job:
+      enabled: true
+      name: crawlingJob
+    jdbc:
+      initialize-schema: always
+server:
+  port: 8081
