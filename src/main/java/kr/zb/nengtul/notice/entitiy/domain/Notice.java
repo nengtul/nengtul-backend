@@ -2,10 +2,12 @@ package kr.zb.nengtul.notice.entitiy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.user.entity.domain.User;
@@ -31,10 +33,12 @@ public class Notice extends BaseTimeEntity {
 
   private String title;
 
+  @Lob
   private String content;
 
   private String noticeImg;
 
+  @Column(columnDefinition = "default 0", nullable = false)
   private Long viewCount;
 
   public void setTitle(String title) {
@@ -47,5 +51,9 @@ public class Notice extends BaseTimeEntity {
 
   public void setNoticeImg(String noticeImg) {
     this.noticeImg = noticeImg;
+  }
+
+  public void setViewCount(Long viewCount) {
+    this.viewCount = viewCount;
   }
 }
