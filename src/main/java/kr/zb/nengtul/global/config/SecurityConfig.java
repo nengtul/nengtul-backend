@@ -63,7 +63,8 @@ public class SecurityConfig {
                 "/v1/user/login",//로그인
                 "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
                 "/v1/user/findid",//아이디 찾기
-                "/v1/user/verify/**" //이메일 인증
+                "/v1/user/verify/**", //이메일 인증
+                "/v1/notice/list/**" //공지사항 조회관련
             ).permitAll()
             .requestMatchers("/v1/user/**").hasAnyRole("USER","ADMIN")
             .requestMatchers(
@@ -72,9 +73,8 @@ public class SecurityConfig {
             ).hasRole("ADMIN")
             .anyRequest().permitAll() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         )
-        //== 소셜 로그인 설정 ==// //권한 오류 발생시 /index.html 로 이동 (테스트용)
-        ////        .oauth2Login().loginPage("/v1/nengtul/user/login")
-        .oauth2Login(oauth2Configurer -> oauth2Configurer.loginPage("/index.html")
+        //== 소셜 로그인 설정 ==//
+        .oauth2Login(oauth2Configurer -> oauth2Configurer.loginPage("/")
             .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
             .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
             .userInfoEndpoint(
