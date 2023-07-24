@@ -88,7 +88,6 @@ public class UserService {
   //회원 탈퇴
   @Transactional
   public void quit(Principal principal) {
-    System.out.println(principal.getName());
     User user = userRepository.findByEmail(principal.getName())
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     userRepository.deleteById(user.getId());

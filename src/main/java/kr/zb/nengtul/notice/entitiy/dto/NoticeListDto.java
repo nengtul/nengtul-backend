@@ -18,6 +18,7 @@ public class NoticeListDto {
   private String userName;
   private String title;
   private String noticeImg;
+  private Long viewCount;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
 
@@ -27,6 +28,7 @@ public class NoticeListDto {
         .userName(notice.getUser().getName())
         .title(notice.getTitle())
         .noticeImg(notice.getNoticeImg())
+        .viewCount(notice.getViewCount())
         .createdAt(notice.getCreatedAt())
         .modifiedAt(notice.getModifiedAt())
         .build();

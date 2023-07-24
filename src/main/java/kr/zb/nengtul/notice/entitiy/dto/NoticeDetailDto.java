@@ -20,6 +20,7 @@ public class NoticeDetailDto {
   private String title;
   private String content;
   private String noticeImg;
+  private Long viewCount;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
 
@@ -33,6 +34,7 @@ public class NoticeDetailDto {
         .noticeImg(notice.getNoticeImg())
         .createdAt(notice.getCreatedAt())
         .modifiedAt(notice.getModifiedAt())
+        .viewCount(notice.getViewCount())
         .build();
   }
 }
