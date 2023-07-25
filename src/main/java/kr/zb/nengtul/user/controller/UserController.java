@@ -1,5 +1,6 @@
 package kr.zb.nengtul.user.controller;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
 import kr.zb.nengtul.user.entity.dto.UserDetailDto;
 import kr.zb.nengtul.user.entity.dto.UserFindEmailReqDto;
@@ -31,7 +32,7 @@ public class UserController {
 
   //회원가입
   @PostMapping("/join")
-  public ResponseEntity<Void> join(@RequestBody UserJoinDto userJoinDto) {
+  public ResponseEntity<Void> join(@RequestBody @Valid UserJoinDto userJoinDto) {
     userService.join(userJoinDto);
     return ResponseEntity.ok(null);
   }
@@ -52,7 +53,8 @@ public class UserController {
 
   //아이디 찾기
   @GetMapping("/findid")
-  public ResponseEntity<UserFindEmailResDto> findEmail(@RequestBody UserFindEmailReqDto userFindEmailReqDto) {
+  public ResponseEntity<UserFindEmailResDto> findEmail(
+      @RequestBody UserFindEmailReqDto userFindEmailReqDto) {
     return ResponseEntity.ok(userService.findEmail(userFindEmailReqDto));
   }
 
@@ -79,7 +81,7 @@ public class UserController {
   //회원 정보 수정(상세보기 페이지에서 진행)
   @PutMapping("/detail")
   public ResponseEntity<String> update(Principal principal,
-      @RequestBody UserUpdateDto userUpdateDto) {
+      @RequestBody @Valid UserUpdateDto userUpdateDto) {
     return ResponseEntity.ok(userService.update(principal, userUpdateDto));
   }
 }

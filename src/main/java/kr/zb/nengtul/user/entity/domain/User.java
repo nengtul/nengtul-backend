@@ -31,24 +31,18 @@ public class User extends BaseTimeEntity {
 
   @JsonIgnore
   @Id
-  @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
 
-  @Column(length = 512, unique = true)
   private String email;
 
-  @Column(length = 10)
   private String name;
 
-  @Column(length = 10)
   private String nickname;
 
-  @Column(length = 100) //password encoder에서 길어지기 때문에 길이 증가
   private String password;
 
-  @Column(length = 11)
   private String phoneNumber;
 
   private LocalDateTime verifyExpiredAt;
