@@ -1,5 +1,6 @@
 package kr.zb.nengtul.notice.controller;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeDetailDto;
 import kr.zb.nengtul.notice.entitiy.dto.NoticeListDto;
@@ -29,7 +30,8 @@ public class NoticeController {
 
   //생성
   @PostMapping
-  public ResponseEntity<Void> create(@RequestBody NoticeReqDto noticeReqDto, Principal principal) {
+  public ResponseEntity<Void> create(@RequestBody @Valid NoticeReqDto noticeReqDto,
+      Principal principal) {
     noticeService.create(noticeReqDto, principal);
     return ResponseEntity.ok(null);
   }
@@ -37,7 +39,7 @@ public class NoticeController {
   //수정
   @PutMapping("/{noticeId}")
   public ResponseEntity<Void> update(@PathVariable Long noticeId,
-      @RequestBody NoticeReqDto noticeReqDto, Principal principal) {
+      @RequestBody @Valid NoticeReqDto noticeReqDto, Principal principal) {
     noticeService.update(noticeId, noticeReqDto, principal);
     return ResponseEntity.ok(null);
   }
