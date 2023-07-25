@@ -37,9 +37,14 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
   private Object getValue(String... keys) {
     Map<String, Object> current = attributes;
     for (String key : keys) {
-      current = (Map<String, Object>) current.get(key);
-      if (current == null) {
+      Object value = current.get(key);
+      if (value == null) {
         return null;
+      }
+      if (value instanceof Map) {
+        current = (Map<String, Object>) value;
+      } else {
+        return value;
       }
     }
     return current;
