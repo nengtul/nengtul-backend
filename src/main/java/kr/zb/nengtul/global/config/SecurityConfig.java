@@ -11,7 +11,7 @@ import kr.zb.nengtul.global.jwt.service.CustomUserDetailService;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginFailureHandler;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginSuccessHandler;
 import kr.zb.nengtul.global.oauth2.service.CustomOAuth2UserService;
-import kr.zb.nengtul.user.entity.repository.UserRepository;
+import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

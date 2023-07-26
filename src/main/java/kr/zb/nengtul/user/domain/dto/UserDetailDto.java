@@ -1,7 +1,7 @@
-package kr.zb.nengtul.user.entity.dto;
+package kr.zb.nengtul.user.domain.dto;
 
 import kr.zb.nengtul.global.entity.ProviderType;
-import kr.zb.nengtul.user.entity.domain.User;
+import kr.zb.nengtul.user.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

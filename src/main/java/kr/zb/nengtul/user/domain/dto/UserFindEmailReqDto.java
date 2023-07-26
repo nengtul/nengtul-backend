@@ -1,4 +1,4 @@
-package kr.zb.nengtul.user.entity.dto;
+package kr.zb.nengtul.user.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

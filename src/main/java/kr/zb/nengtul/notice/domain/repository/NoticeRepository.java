@@ -1,6 +1,6 @@
-package kr.zb.nengtul.notice.entitiy.repository;
+package kr.zb.nengtul.notice.domain.repository;
 
-import kr.zb.nengtul.notice.entitiy.domain.Notice;
+import kr.zb.nengtul.notice.domain.entity.Notice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {

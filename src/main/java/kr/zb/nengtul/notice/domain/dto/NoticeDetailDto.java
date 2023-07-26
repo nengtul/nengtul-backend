@@ -1,7 +1,7 @@
-package kr.zb.nengtul.notice.entitiy.dto;
+package kr.zb.nengtul.notice.domain.dto;
 
 import java.time.LocalDateTime;
-import kr.zb.nengtul.notice.entitiy.domain.Notice;
+import kr.zb.nengtul.notice.domain.entity.Notice;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package kr.zb.nengtul.user.entity.dto;
+package kr.zb.nengtul.user.domain.dto;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.EMAIL_FORMAT_NOT_CORRECT_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.EMAIL_NOT_NULL_MESSAGE;
@@ -9,7 +9,6 @@ import static kr.zb.nengtul.global.exception.ErrorCode.PHONE_NUMBER_NOT_NULL_MES
 import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD_LENGTH_MESSAGE;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

@@ -2,9 +2,9 @@ package kr.zb.nengtul.notice.controller;
 
 import jakarta.validation.Valid;
 import java.security.Principal;
-import kr.zb.nengtul.notice.entitiy.dto.NoticeDetailDto;
-import kr.zb.nengtul.notice.entitiy.dto.NoticeListDto;
-import kr.zb.nengtul.notice.entitiy.dto.NoticeReqDto;
+import kr.zb.nengtul.notice.domain.dto.NoticeDetailDto;
+import kr.zb.nengtul.notice.domain.dto.NoticeListDto;
+import kr.zb.nengtul.notice.domain.dto.NoticeReqDto;
 import kr.zb.nengtul.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
