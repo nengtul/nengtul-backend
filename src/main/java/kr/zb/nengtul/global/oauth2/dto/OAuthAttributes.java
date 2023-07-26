@@ -62,6 +62,7 @@ public class OAuthAttributes {
   public User toEntity(ProviderType providerType, OAuth2UserInfo oauth2UserInfo) {
     return new User(
         oauth2UserInfo.getName(),
+        providerType.getValue() + oauth2UserInfo.getSocialId(),
         oauth2UserInfo.getEmail(),
         oauth2UserInfo.getImageUrl(),
         oauth2UserInfo.getSocialId(),

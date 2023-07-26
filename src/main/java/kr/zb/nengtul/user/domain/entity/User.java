@@ -1,4 +1,4 @@
-package kr.zb.nengtul.user.entity.domain;
+package kr.zb.nengtul.user.domain.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -17,7 +17,7 @@ import java.util.List;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
-import kr.zb.nengtul.notice.entitiy.domain.Notice;
+import kr.zb.nengtul.notice.domain.entity.Notice;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,11 +34,12 @@ public class User extends BaseTimeEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-
+  @Column(unique = true)
   private String email;
 
   private String name;
 
+  @Column(unique = true)
   private String nickname;
 
   private String password;
@@ -50,7 +51,7 @@ public class User extends BaseTimeEntity {
   private boolean emailVerifiedYn;
 
   private String profileImageUrl;
-  
+
   private int point; // 포인트별 등급 상승을 위해 생성
 
   @Enumerated(EnumType.STRING)
@@ -72,7 +73,7 @@ public class User extends BaseTimeEntity {
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
-      String email, String address, String addressDetail,String profileImageUrl) {
+      String email, String address, String addressDetail, String profileImageUrl) {
     this.name = name;
     this.nickname = nickname;
     this.password = password;
@@ -90,6 +91,7 @@ public class User extends BaseTimeEntity {
   //OAuth2용
   public User(
       String name,
+      String nickname,
       String email,
       String profileImageUrl,
       String socialId,
@@ -98,6 +100,7 @@ public class User extends BaseTimeEntity {
       RoleType roles
   ) {
     this.name = name;
+    this.nickname = nickname;
     this.password = "NO_PASS";
     this.email = email != null ? email : "NO_EMAIL";
     this.verificationCode = "";
@@ -134,7 +137,6 @@ public class User extends BaseTimeEntity {
   }
 
 
-
   public void setProfileImageUrl(String profileImageUrl) {
     this.profileImageUrl = profileImageUrl;
   }
@@ -150,6 +152,7 @@ public class User extends BaseTimeEntity {
   public void setEmailVerifiedYn(boolean emailVerifiedYn) {
     this.emailVerifiedYn = emailVerifiedYn;
   }
+
   public void setVerifyExpiredAt(LocalDateTime verifyExpiredAt) {
     this.verifyExpiredAt = verifyExpiredAt;
   }
