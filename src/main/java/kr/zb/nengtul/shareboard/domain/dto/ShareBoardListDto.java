@@ -13,32 +13,31 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShareBoardDetailDto {
+public class ShareBoardListDto {
 
-  private Long id;
-  private Long userId;
-  private String userNickname;
-  private String title;
-  private String content;
-  private Long price;
-  private double lat;
-  private double lon;
-  private long views;
-  private LocalDateTime createdAt;
-  private LocalDateTime modifiedAt;
+  private Long id; //게시물 id
+  private Long userId; //채팅걸기위한 userId
+  private String userNickname; //닉네임
+  private String title; //제목
+  private String shareImg; //대표사진
+  private Long price; //가격
+  private double lat; //위도
+  private double lon; //경도
+  private boolean isClosed; //거래되었는지(기본 false)
+  private LocalDateTime createdAt; //작성시간
+  private LocalDateTime modifiedAt;//수정시간
 
-
-  public static ShareBoardDetailDto buildShareBoardDetailDto(ShareBoard shareBoard) {
-    return ShareBoardDetailDto.builder()
+  public static ShareBoardListDto buildShareBoardListDto(ShareBoard shareBoard) {
+    return ShareBoardListDto.builder()
         .id(shareBoard.getId())
         .userId(shareBoard.getUser().getId())
         .userNickname(shareBoard.getUser().getNickname())
         .title(shareBoard.getTitle())
-        .content(shareBoard.getContent())
+        .shareImg(shareBoard.getShareImg())
         .price(shareBoard.getPrice())
         .lat(shareBoard.getLat())
         .lon(shareBoard.getLon())
-        .views(shareBoard.getViews())
+        .isClosed(shareBoard.isClosed())
         .createdAt(shareBoard.getCreatedAt())
         .modifiedAt(shareBoard.getModifiedAt())
         .build();
