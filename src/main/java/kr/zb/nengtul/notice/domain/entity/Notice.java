@@ -1,4 +1,4 @@
-package kr.zb.nengtul.notice.entitiy.domain;
+package kr.zb.nengtul.notice.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
-import kr.zb.nengtul.user.entity.domain.User;
+import kr.zb.nengtul.user.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

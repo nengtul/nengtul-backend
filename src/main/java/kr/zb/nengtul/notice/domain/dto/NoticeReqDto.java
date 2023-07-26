@@ -1,4 +1,4 @@
-package kr.zb.nengtul.notice.entitiy.dto;
+package kr.zb.nengtul.notice.domain.dto;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.CONTENT_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.TITLE_NOT_NULL_MESSAGE;
