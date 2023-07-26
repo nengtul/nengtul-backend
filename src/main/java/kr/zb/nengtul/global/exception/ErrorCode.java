@@ -18,7 +18,7 @@ public enum ErrorCode {
   CHECK_SOCIAL_SERVER(HttpStatus.NOT_FOUND, "소셜로그인에 실패하였습니다. 서버를 확인 하세요."),
   SHORT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 8자 이상이여야 합니다."),
 
-  //게시판,
+  //게시판
 
   //공지사항
   NOT_FOUND_NOTICE(HttpStatus.NOT_FOUND, "공지를 찾을 수 없습니다."),
@@ -27,7 +27,8 @@ public enum ErrorCode {
   NOT_NULL_TITLE(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요."),
   NOT_NULL_CONTENT(HttpStatus.BAD_REQUEST, "내용을 입력해 주세요."),
   NO_CONTENT(HttpStatus.NO_CONTENT, "일치하는 내용이 없습니다."),
-  NO_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+  NO_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+  NOT_VERIFY_EMAIL(HttpStatus.FORBIDDEN, "이메일 인증을 하지 않아 작성 권한이 없습니다.");
 
   //ExceptionHandler 에서 MethodArgumentNotValidException 용으로 사용
   //유저
@@ -40,9 +41,14 @@ public enum ErrorCode {
   public static final String EMAIL_NOT_NULL_MESSAGE = "이메일을 입력해 주세요.";
   public static final String EMAIL_FORMAT_NOT_CORRECT_MESSAGE = "이메일 형식은 abc@def.gh 형식이여야 합니다.";
 
-  //공지사항
+  //공통
   public static final String TITLE_NOT_NULL_MESSAGE = "제목을 입력해 주세요.";
   public static final String CONTENT_NOT_NULL_MESSAGE = "내용을 입력해 주세요.";
+
+  //나눔게시판
+  public static final String LAT_NOT_NULL_MESSAGE = "위도를 입력해 주세요.";
+  public static final String LON_NOT_NULL_MESSAGE = "경도을 입력해 주세요.";
+
 
   private final HttpStatus httpStatus;
   private final String detail;

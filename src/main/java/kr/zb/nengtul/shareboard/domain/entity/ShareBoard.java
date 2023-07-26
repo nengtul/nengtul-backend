@@ -1,6 +1,5 @@
-package kr.zb.nengtul.notice.domain.entity;
+package kr.zb.nengtul.shareboard.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.user.domain.entity.User;
@@ -22,8 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Builder
-public class Notice extends BaseTimeEntity {
-  @JsonIgnore
+public class ShareBoard extends BaseTimeEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -34,27 +31,17 @@ public class Notice extends BaseTimeEntity {
 
   private String title;
 
-  @Lob
+  private String shareImg;
+
   private String content;
 
-  private String noticeImg;
+  private Long price;
+
+  private double lat;//위도
+
+  private double lon;//경도
 
   @Column(columnDefinition = "bigint default 0", nullable = false)
-  private Long viewCount;
+  private Long views;
 
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public void setContent(String content) {
-    this.content = content;
-  }
-
-  public void setNoticeImg(String noticeImg) {
-    this.noticeImg = noticeImg;
-  }
-
-  public void setViewCount(Long viewCount) {
-    this.viewCount = viewCount;
-  }
 }
