@@ -66,12 +66,14 @@ public class SecurityConfig {
                 "/v1/user/verify/**", //이메일 인증
                 "/v1/notice/list/**" //공지사항 조회관련
             ).permitAll()
-            .requestMatchers("/v1/user/**").hasAnyRole("USER","ADMIN")
+            .requestMatchers("/v1/user/**",
+                "/v1/shareboard/**"
+            ).hasAnyRole("USER", "ADMIN")
             .requestMatchers(
                 "/v1/admin/**",
                 "/v1/notice/**"
             ).hasRole("ADMIN")
-            .anyRequest().permitAll() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+            .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         )
         //== 소셜 로그인 설정 ==//
         .oauth2Login(oauth2Configurer -> oauth2Configurer.loginPage("/")

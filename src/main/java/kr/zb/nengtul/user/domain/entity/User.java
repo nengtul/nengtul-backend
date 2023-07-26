@@ -18,6 +18,7 @@ import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.notice.domain.entity.Notice;
+import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +30,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class User extends BaseTimeEntity {
 
-  @JsonIgnore
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -70,6 +70,10 @@ public class User extends BaseTimeEntity {
   @JsonBackReference
   @OneToMany(cascade = CascadeType.ALL)
   private List<Notice> noticeList;
+
+  @JsonBackReference
+  @OneToMany
+  private List<ShareBoard> shareBoardList;
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
@@ -159,5 +163,13 @@ public class User extends BaseTimeEntity {
 
   public void setVerificationCode(String verificationCode) {
     this.verificationCode = verificationCode;
+  }
+
+  public void setPointAddShardBoard(int point) {
+    this.point += 3;
+  }
+
+  public boolean isEmailVerifiedYn() {
+    return emailVerifiedYn;
   }
 }
