@@ -51,6 +51,8 @@ public enum ErrorCode {
   //나눔게시판
   public static final String LAT_NOT_NULL_MESSAGE = "위도를 입력해 주세요.";
   public static final String LON_NOT_NULL_MESSAGE = "경도을 입력해 주세요.";
+  public static final String LAT_AVERAGE_MESSAGE = "위도의 범위는 -90 ~ 90 입니다.";
+  public static final String LON_AVERAGE_MESSAGE = "경도의 범위는 -180 ~ 180 입니다.";
 
 
   private final HttpStatus httpStatus;

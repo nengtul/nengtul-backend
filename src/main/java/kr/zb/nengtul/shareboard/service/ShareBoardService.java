@@ -6,10 +6,11 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NOT_VERIFY_EMAIL;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.notice.domain.dto.NoticeReqDto;
-import kr.zb.nengtul.notice.domain.entity.Notice;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
+import kr.zb.nengtul.shareboard.domain.dto.ShareBoardListDto;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
 import kr.zb.nengtul.user.domain.entity.User;
@@ -36,26 +37,26 @@ public class ShareBoardService {
     ShareBoard shareBoard = ShareBoard.builder()
         .user(user)
         .title(shareBoardDto.getTitle())
-        .content(shareBoardDto.getContent())
         .shareImg(shareBoardDto.getShareImg())
         .price(shareBoardDto.getPrice())
         .lat(shareBoardDto.getLat())
         .lon(shareBoardDto.getLon())
-        .views(0L)
+        .closed(false)
         .build();
     user.setPointAddShardBoard(user.getPoint());
     userRepository.saveAndFlush(user);
     shareBoardRepository.save(shareBoard);
   }
+
   @Transactional
   public void update(Long id, ShareBoardDto shareBoardDto, Principal principal) {
-    ShareBoard shareBoard = shareBoardRepository.findById(id).orElseThrow(()->new CustomException(NOT_FOUND_SHARE_BOARD));
+    ShareBoard shareBoard = shareBoardRepository.findById(id)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = findUserByEmail(principal.getName());
-    if(shareBoard.getUser() != user){
+    if (shareBoard.getUser() != user) {
       throw new CustomException(NO_PERMISSION);
     }
     shareBoard.setTitle(shareBoardDto.getTitle());
-    shareBoard.setContent(shareBoardDto.getContent());
     shareBoard.setShareImg(shareBoardDto.getShareImg());
     shareBoard.setPrice(shareBoardDto.getPrice());
     shareBoard.setLat(shareBoardDto.getLat());
@@ -65,12 +66,30 @@ public class ShareBoardService {
 
   @Transactional
   public void delete(Long id, Principal principal) {
-    ShareBoard shareBoard = shareBoardRepository.findById(id).orElseThrow(()->new CustomException(NOT_FOUND_SHARE_BOARD));
+    ShareBoard shareBoard = shareBoardRepository.findById(id)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = findUserByEmail(principal.getName());
-    if(shareBoard.getUser() != user){
+    if (shareBoard.getUser() != user) {
       throw new CustomException(NO_PERMISSION);
     }
     shareBoardRepository.delete(shareBoard);
+  }
+
+  @Transactional
+  public List<ShareBoardListDto> getList(double lat, double lon, double range, Boolean closed) {
+    List<ShareBoard> shareBoardList;
+    if (closed == null) {
+      shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(
+          lat - range, lat + range, lon - range, lon + range);
+
+    } else {
+      shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetweenAndClosed(
+          lat - range, lat + range, lon - range, lon + range, closed);
+
+    }
+    return shareBoardList.stream()
+        .map(ShareBoardListDto::buildShareBoardListDto)
+        .collect(Collectors.toList());
   }
 
   public User findUserByEmail(String email) {
