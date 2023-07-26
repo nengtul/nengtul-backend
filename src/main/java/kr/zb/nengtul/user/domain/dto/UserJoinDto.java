@@ -3,6 +3,7 @@ package kr.zb.nengtul.user.domain.dto;
 import static kr.zb.nengtul.global.exception.ErrorCode.EMAIL_FORMAT_NOT_CORRECT_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.EMAIL_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NAME_NOT_NULL_MESSAGE;
+import static kr.zb.nengtul.global.exception.ErrorCode.NICKNAME_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.PASSWORD_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.PHONE_NUMBER_FORMAT_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.PHONE_NUMBER_NOT_NULL_MESSAGE;
@@ -28,6 +29,7 @@ public class UserJoinDto {
   @NotEmpty(message = NAME_NOT_NULL_MESSAGE)
   private String name;
 
+  @NotEmpty(message = NICKNAME_NOT_NULL_MESSAGE)
   private String nickname;
 
   @NotEmpty(message = PASSWORD_NOT_NULL_MESSAGE)

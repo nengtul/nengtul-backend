@@ -32,6 +32,7 @@ public enum ErrorCode {
   //ExceptionHandler 에서 MethodArgumentNotValidException 용으로 사용
   //유저
   public static final String NAME_NOT_NULL_MESSAGE = "이름을 입력해 주세요.";
+  public static final String NICKNAME_NOT_NULL_MESSAGE = "닉네임을 입력해 주세요.";
   public static final String SHORT_PASSWORD_LENGTH_MESSAGE = "비밀번호는 8자 이상이여야 합니다.";
   public static final String PASSWORD_NOT_NULL_MESSAGE = "비밀번호를 입력해 주세요.";
   public static final String PHONE_NUMBER_NOT_NULL_MESSAGE = "휴대폰 번호를 입력해 주세요.";

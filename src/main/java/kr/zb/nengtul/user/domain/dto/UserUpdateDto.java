@@ -1,5 +1,6 @@
 package kr.zb.nengtul.user.domain.dto;
 
+import static kr.zb.nengtul.global.exception.ErrorCode.NICKNAME_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.PASSWORD_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.PHONE_NUMBER_FORMAT_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.PHONE_NUMBER_NOT_NULL_MESSAGE;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateDto {
-
+  @NotEmpty(message = NICKNAME_NOT_NULL_MESSAGE)
   private String nickname;
 
   @NotEmpty(message = PASSWORD_NOT_NULL_MESSAGE)
