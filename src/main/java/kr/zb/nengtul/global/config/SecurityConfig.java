@@ -26,6 +26,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * 인증은 CustomJsonUsernamePasswordAuthenticationFilter에서 authenticate()로 인증된 사용자로 처리
@@ -46,12 +48,14 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
+    return http
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
         .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
-        .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
+            SessionCreationPolicy.STATELESS))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
@@ -66,27 +70,25 @@ public class SecurityConfig {
                 "/v1/user/verify/**", //이메일 인증
                 "/v1/notice/list/**" //공지사항 조회관련
             ).permitAll()
-            .requestMatchers("/v1/user/**").hasAnyRole("USER","ADMIN")
+            .requestMatchers("/v1/user/**",
+                "/v1/shareboard/**"
+            ).hasAnyRole("USER", "ADMIN")
             .requestMatchers(
                 "/v1/admin/**",
                 "/v1/notice/**"
             ).hasRole("ADMIN")
-            .anyRequest().permitAll() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+            .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         )
         //== 소셜 로그인 설정 ==//
         .oauth2Login(oauth2Configurer -> oauth2Configurer.loginPage("/")
             .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
             .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
-            .userInfoEndpoint(
-                userInfoEndpointConfig -> userInfoEndpointConfig.userService(
-                    customOAuth2UserService)));
-
-    // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
-    http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
-    http.addFilterBefore(jwtAuthenticationProcessingFilter(),
-        CustomJsonUsernamePasswordAuthenticationFilter.class);
-
-    return http.build();
+            .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
+                customOAuth2UserService)))
+        // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
+        .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
+        .addFilterBefore(jwtAuthenticationProcessingFilter(),
+            CustomJsonUsernamePasswordAuthenticationFilter.class).build();
   }
 
   @Bean
@@ -129,5 +131,18 @@ public class SecurityConfig {
   public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
     return new JwtAuthenticationProcessingFilter(
         jwtTokenProvider, userRepository);
+  }
+
+  //cors 설정
+  @Bean
+  public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOrigin("*");
+    configuration.addAllowedMethod("*");
+    configuration.addAllowedHeader("*");
+    configuration.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 }
