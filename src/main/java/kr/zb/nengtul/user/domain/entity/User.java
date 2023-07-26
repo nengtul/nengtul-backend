@@ -1,7 +1,9 @@
-package kr.zb.nengtul.user.entity.domain;
+package kr.zb.nengtul.user.domain.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,10 +11,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.List;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
+import kr.zb.nengtul.notice.domain.entity.Notice;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,24 +31,19 @@ public class User extends BaseTimeEntity {
 
   @JsonIgnore
   @Id
-  @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-
-  @Column(length = 512, unique = true)
+  @Column(unique = true)
   private String email;
 
-  @Column(length = 10)
   private String name;
 
-  @Column(length = 10)
+  @Column(unique = true)
   private String nickname;
 
-  @Column(length = 100) //password encoder에서 길어지기 때문에 길이 증가
   private String password;
 
-  @Column(length = 11)
   private String phoneNumber;
 
   private LocalDateTime verifyExpiredAt;
@@ -51,7 +51,7 @@ public class User extends BaseTimeEntity {
   private boolean emailVerifiedYn;
 
   private String profileImageUrl;
-  
+
   private int point; // 포인트별 등급 상승을 위해 생성
 
   @Enumerated(EnumType.STRING)
@@ -67,9 +67,13 @@ public class User extends BaseTimeEntity {
 
   private String refreshToken; // 리프레시 토큰
 
+  @JsonBackReference
+  @OneToMany(cascade = CascadeType.ALL)
+  private List<Notice> noticeList;
+
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
-      String email, String address, String addressDetail,String profileImageUrl) {
+      String email, String address, String addressDetail, String profileImageUrl) {
     this.name = name;
     this.nickname = nickname;
     this.password = password;
@@ -87,6 +91,7 @@ public class User extends BaseTimeEntity {
   //OAuth2용
   public User(
       String name,
+      String nickname,
       String email,
       String profileImageUrl,
       String socialId,
@@ -95,6 +100,7 @@ public class User extends BaseTimeEntity {
       RoleType roles
   ) {
     this.name = name;
+    this.nickname = nickname;
     this.password = "NO_PASS";
     this.email = email != null ? email : "NO_EMAIL";
     this.verificationCode = "";
@@ -131,7 +137,6 @@ public class User extends BaseTimeEntity {
   }
 
 
-
   public void setProfileImageUrl(String profileImageUrl) {
     this.profileImageUrl = profileImageUrl;
   }
@@ -147,6 +152,7 @@ public class User extends BaseTimeEntity {
   public void setEmailVerifiedYn(boolean emailVerifiedYn) {
     this.emailVerifiedYn = emailVerifiedYn;
   }
+
   public void setVerifyExpiredAt(LocalDateTime verifyExpiredAt) {
     this.verifyExpiredAt = verifyExpiredAt;
   }

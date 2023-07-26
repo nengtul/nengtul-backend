@@ -1,4 +1,4 @@
-package kr.zb.nengtul.user.entity.dto;
+package kr.zb.nengtul.user.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,14 +11,10 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserJoinDto {
-  private String name;
-  private String nickname;
-  private String password;
-  private String phoneNumber;
+public class UserFindPasswordDto {
   private String email;
-  private String address;
-  private String addressDetail;
+  private String name;
+  private String phoneNumber;
 }
 
 

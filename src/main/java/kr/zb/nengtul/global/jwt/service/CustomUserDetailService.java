@@ -1,7 +1,7 @@
 package kr.zb.nengtul.global.jwt.service;
 
-import kr.zb.nengtul.user.entity.domain.User;
-import kr.zb.nengtul.user.entity.repository.UserRepository;
+import kr.zb.nengtul.user.domain.entity.User;
+import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -11,7 +11,7 @@ import kr.zb.nengtul.global.jwt.service.CustomUserDetailService;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginFailureHandler;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginSuccessHandler;
 import kr.zb.nengtul.global.oauth2.service.CustomOAuth2UserService;
-import kr.zb.nengtul.user.entity.repository.UserRepository;
+import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,20 +63,23 @@ public class SecurityConfig {
                 "/v1/user/login",//로그인
                 "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
                 "/v1/user/findid",//아이디 찾기
-                "/v1/user/verify/**" //이메일 인증
+                "/v1/user/verify/**", //이메일 인증
+                "/v1/notice/list/**" //공지사항 조회관련
             ).permitAll()
-            .requestMatchers("/v1/user/**").hasRole("USER") // 회원가입 접근 가능
-            .requestMatchers("/v1/admin/**").hasRole("ADMIN") // 회원가입 접근 가능
-            .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+            .requestMatchers("/v1/user/**").hasAnyRole("USER","ADMIN")
+            .requestMatchers(
+                "/v1/admin/**",
+                "/v1/notice/**"
+            ).hasRole("ADMIN")
+            .anyRequest().permitAll() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         )
-        //== 소셜 로그인 설정 ==// //권한 오류 발생시 /index.html 로 이동 (테스트용)
-        ////        .oauth2Login().loginPage("/v1/nengtul/user/login")
-        .oauth2Login(oauth2Configurer -> oauth2Configurer.loginPage("/index.html")
-        .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
-        .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
-        .userInfoEndpoint(
-            userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)))
-    ; // customUserService 설정
+        //== 소셜 로그인 설정 ==//
+        .oauth2Login(oauth2Configurer -> oauth2Configurer.loginPage("/")
+            .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
+            .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
+            .userInfoEndpoint(
+                userInfoEndpointConfig -> userInfoEndpointConfig.userService(
+                    customOAuth2UserService)));
 
     // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
     http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
@@ -86,13 +89,13 @@ public class SecurityConfig {
     return http.build();
   }
 
-  //password Encoder
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
 
+  //password Encoder
   @Bean
   public AuthenticationManager authenticationManager() {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();

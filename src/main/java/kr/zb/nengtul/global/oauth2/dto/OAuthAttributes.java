@@ -7,7 +7,7 @@ import kr.zb.nengtul.global.oauth2.OAuth2UserInfo;
 import kr.zb.nengtul.global.oauth2.info.GoogleOAuth2UserInfo;
 import kr.zb.nengtul.global.oauth2.info.KakaoOAuth2UserInfo;
 import kr.zb.nengtul.global.oauth2.info.NaverOAuth2UserInfo;
-import kr.zb.nengtul.user.entity.domain.User;
+import kr.zb.nengtul.user.domain.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -35,21 +35,24 @@ public class OAuthAttributes {
     return ofGoogle(userNameAttributeName, attributes);
   }
 
-  private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
+  private static OAuthAttributes ofKakao(String userNameAttributeName,
+      Map<String, Object> attributes) {
     return OAuthAttributes.builder()
         .nameAttributeKey(userNameAttributeName)
         .oauth2UserInfo(new KakaoOAuth2UserInfo(attributes))
         .build();
   }
 
-  public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
+  public static OAuthAttributes ofGoogle(String userNameAttributeName,
+      Map<String, Object> attributes) {
     return OAuthAttributes.builder()
         .nameAttributeKey(userNameAttributeName)
         .oauth2UserInfo(new GoogleOAuth2UserInfo(attributes))
         .build();
   }
 
-  public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+  public static OAuthAttributes ofNaver(String userNameAttributeName,
+      Map<String, Object> attributes) {
     return OAuthAttributes.builder()
         .nameAttributeKey(userNameAttributeName)
         .oauth2UserInfo(new NaverOAuth2UserInfo(attributes))
@@ -59,6 +62,7 @@ public class OAuthAttributes {
   public User toEntity(ProviderType providerType, OAuth2UserInfo oauth2UserInfo) {
     return new User(
         oauth2UserInfo.getName(),
+        providerType.getValue() + oauth2UserInfo.getSocialId(),
         oauth2UserInfo.getEmail(),
         oauth2UserInfo.getImageUrl(),
         oauth2UserInfo.getSocialId(),

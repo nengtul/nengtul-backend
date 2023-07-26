@@ -4,20 +4,21 @@ import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_EMAIL;
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
+import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
 import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.user.entity.domain.User;
-import kr.zb.nengtul.user.entity.dto.UserDetailDto;
-import kr.zb.nengtul.user.entity.dto.UserFindEmailReqDto;
-import kr.zb.nengtul.user.entity.dto.UserFindEmailResDto;
-import kr.zb.nengtul.user.entity.dto.UserFindPasswordDto;
-import kr.zb.nengtul.user.entity.dto.UserJoinDto;
-import kr.zb.nengtul.user.entity.dto.UserUpdateDto;
-import kr.zb.nengtul.user.entity.repository.UserRepository;
+import kr.zb.nengtul.user.domain.entity.User;
+import kr.zb.nengtul.user.domain.dto.UserDetailDto;
+import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
+import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
+import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
+import kr.zb.nengtul.user.domain.dto.UserJoinDto;
+import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
+import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.mailgun.client.MailgunClient;
 import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import lombok.RequiredArgsConstructor;
@@ -64,8 +65,7 @@ public class UserService {
   //이메일 인증
   @Transactional
   public void verify(String email, String code) {
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(email);
     if (user.isEmailVerifiedYn()) {
       throw new CustomException(ALREADY_VERIFIED);
     } else if (!user.getVerificationCode().equals(code)) {
@@ -78,8 +78,7 @@ public class UserService {
 
   //유저 상세보기
   public UserDetailDto getUserDetail(Principal principal) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(principal.getName());
 
     return UserDetailDto.buildUserDetailDto(user);
   }
@@ -87,17 +86,15 @@ public class UserService {
   //회원 탈퇴
   @Transactional
   public void quit(Principal principal) {
-    System.out.println(principal.getName());
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(principal.getName());
+
     userRepository.deleteById(user.getId());
   }
 
   //회원 정보 수정
   @Transactional
   public String update(Principal principal, UserUpdateDto userUpdateDto) {
-    User user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    User user = findUserByEmail(principal.getName());
 
     if (userUpdateDto.getPassword() == null || userUpdateDto.getPassword().length() < 8) {
       throw new CustomException(SHORT_PASSWORD);
@@ -119,11 +116,9 @@ public class UserService {
 
   //가입한 이메일 찾기(아이디 찾기)
   public UserFindEmailResDto findEmail(UserFindEmailReqDto userFindEmailReqDto) {
-    User user = userRepository.findByName(userFindEmailReqDto.getName())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-    if (!user.getPhoneNumber().equals(userFindEmailReqDto.getPhoneNumber())) {
-      throw new CustomException(NOT_FOUND_USER);
-    }
+    User user = userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
+            userFindEmailReqDto.getPhoneNumber())
+        .orElseThrow(() -> new CustomException(NO_CONTENT));
     return UserFindEmailResDto.buildUserFindEmailResDto(user.getEmail());
   }
 
@@ -133,7 +128,7 @@ public class UserService {
     //이메일 전송 (이메일, 이름, 휴대폰 번호 부여받음)
     User user = userRepository.findByEmailAndNameAndPhoneNumber(userFindPasswordDto.getEmail(),
             userFindPasswordDto.getName(), userFindPasswordDto.getPhoneNumber())
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+        .orElseThrow(() -> new CustomException(NO_CONTENT));
 
     String code = RandomStringUtils.random(10, true, true);
 
@@ -169,6 +164,7 @@ public class UserService {
     verifyEmailForm(user, user.getEmail(), user.getName());
   }
 
+  //이메일 인증 폼
   private void verifyEmailForm(User user, String email, String name) {
     String code = RandomStringUtils.random(10, true, true);
 
@@ -187,8 +183,8 @@ public class UserService {
   private String getVerificationEmailBody(String email, String name, String code) {
     //TODO : HTML email 폼 적용 예정
     return "안녕하세요 " + name + "! 링크를 통해 이메일 인증을 진행해주세요. \n\n"
-        //.append("http://localhost:8080/v1/nengtul/user/verify?email=") //로컬
-        + "http://43.200.162.72:8080/v1/nengtul/user/verify?email=" //배포
+        //.append("http://localhost:8080/v1/user/verify?email=") //로컬
+        + "http://43.200.162.72:8080/v1/user/verify?email=" //배포
         + email
         + "&code="
         + code;
@@ -202,5 +198,10 @@ public class UserService {
         + "임시 비밀번호를 통해 로그인 후 비밀번호를 꼭 변경해주세요. \n\n"
         + "임시 비밀번호 : "
         + code;
+  }
+
+  public User findUserByEmail(String email) {
+    return userRepository.findByEmail(email)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
   }
 }

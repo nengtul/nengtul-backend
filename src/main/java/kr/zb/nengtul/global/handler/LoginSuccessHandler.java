@@ -1,16 +1,12 @@
 package kr.zb.nengtul.global.handler;
 
-import static kr.zb.nengtul.global.exception.ErrorCode.CHECK_ID_AND_PW;
-
-import com.nimbusds.oauth2.sdk.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import kr.zb.nengtul.global.jwt.JwtTokenProvider;
-import kr.zb.nengtul.user.entity.repository.UserRepository;
+import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
