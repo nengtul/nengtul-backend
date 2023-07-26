@@ -23,6 +23,9 @@ public enum ErrorCode {
   //공지사항
   NOT_FOUND_NOTICE(HttpStatus.NOT_FOUND, "공지를 찾을 수 없습니다."),
 
+  //나눔 게시판
+  NOT_FOUND_SHARE_BOARD(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."),
+
   //공통
   NOT_NULL_TITLE(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요."),
   NOT_NULL_CONTENT(HttpStatus.BAD_REQUEST, "내용을 입력해 주세요."),
