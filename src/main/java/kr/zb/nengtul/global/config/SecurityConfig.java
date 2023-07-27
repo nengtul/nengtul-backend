@@ -2,7 +2,7 @@ package kr.zb.nengtul.global.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.zb.nengtul.global.filter.CustomJsonUsernamePasswordAuthenticationFilter;
+//import kr.zb.nengtul.global.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import kr.zb.nengtul.global.handler.LoginFailureHandler;
 import kr.zb.nengtul.global.handler.LoginSuccessHandler;
 import kr.zb.nengtul.global.jwt.JwtAuthenticationProcessingFilter;
@@ -25,6 +25,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -86,9 +87,9 @@ public class SecurityConfig {
                 customOAuth2UserService))
         .and()
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
-        .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
-        .addFilterBefore(jwtAuthenticationProcessingFilter(),
-            CustomJsonUsernamePasswordAuthenticationFilter.class).build();
+//        .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
+        .addFilterBefore(jwtAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class).build();
+//            CustomJsonUsernamePasswordAuthenticationFilter.class).build();
   }
 
   @Bean
@@ -117,15 +118,15 @@ public class SecurityConfig {
   }
 
   //커스텀 필터 및 성공 실패 핸들러
-  @Bean
-  public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter() {
-    CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
-        = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
-    customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
-    return customJsonUsernamePasswordLoginFilter;
-  }
+//  @Bean
+//  public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter() {
+//    CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
+//        = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
+//    customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
+//    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
+//    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
+//    return customJsonUsernamePasswordLoginFilter;
+//  }
 
   @Bean
   public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
