@@ -49,17 +49,16 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-            SessionCreationPolicy.STATELESS))
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
         .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
-
+        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
+            SessionCreationPolicy.STATELESS))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico","/**/favicon.ico",
+            .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
                 "/h2-console/**",
                 "/index.html",
                 "/login/**",
@@ -80,11 +79,11 @@ public class SecurityConfig {
             .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         )
         //== 소셜 로그인 설정 ==//
-        .oauth2Login(oauth2Configurer -> oauth2Configurer.loginPage("/")
-            .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
-            .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
-            .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
-                customOAuth2UserService)))
+        .oauth2Login(oauth2Login -> oauth2Login
+        .successHandler(oAuth2LoginSuccessHandler)
+        .failureHandler(oAuth2LoginFailureHandler)
+        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
+            customOAuth2UserService)))
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
         .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
         .addFilterBefore(jwtAuthenticationProcessingFilter(),

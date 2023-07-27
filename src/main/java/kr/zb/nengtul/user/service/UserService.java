@@ -5,12 +5,20 @@ import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
+import static kr.zb.nengtul.global.exception.ErrorCode.PASSWORD_CHECK_MESSAGE;
+import static kr.zb.nengtul.global.exception.ErrorCode.PASSWORD_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD;
+import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_PASSWORD;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.global.handler.LoginSuccessHandler;
+import kr.zb.nengtul.global.jwt.JwtTokenProvider;
+import kr.zb.nengtul.user.domain.dto.UserLoginDto;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
@@ -24,6 +32,7 @@ import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +45,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final MailgunClient mailgunClient;
+  private final JwtTokenProvider jwtTokenProvider;
 
   //회원가입 및 이메일 인증 발송
   @Transactional
@@ -61,6 +71,35 @@ public class UserService {
 
     verifyEmailForm(user, userJoinDto.getEmail(), userJoinDto.getName());
   }
+
+//  @Transactional
+//  public void login(HttpServletResponse response, UserLoginDto userLoginDto) throws IOException {
+//    User user = userRepository.findByEmail(userLoginDto.getEmail())
+//        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+//    // 비밀번호 일치 확인
+//    if (!passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword())) {
+//      throw new CustomException(WRONG_PASSWORD);
+//    }
+//    String email = userLoginDto.getEmail();
+//    String accessToken = jwtTokenProvider.createAccessToken(
+//        email); // JwtService의 createAccessToken을 사용하여 AccessToken 발급
+//    String refreshToken = jwtTokenProvider.createRefreshToken(); // JwtService의 createRefreshToken을 사용하여 RefreshToken 발급
+//
+//    jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken,
+//        refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
+//
+//    jwtTokenProvider.updateRefreshToken(email, refreshToken);
+//    userRepository.saveAndFlush(user);
+//
+//    response.setStatus(HttpStatus.OK.value());
+//    response.setCharacterEncoding("UTF-8");
+//    response.setContentType("application/json;charset=UTF-8");
+//
+//    String successMessage = "{\"email\": \"" + email +
+//        "\", \"AccessToken\": \"" + accessToken +
+//        "\", \"refreshToken\": \"" + refreshToken + "\"}";
+//    response.getWriter().write(successMessage);
+//  }
 
   //이메일 인증
   @Transactional

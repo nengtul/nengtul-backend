@@ -17,6 +17,7 @@ public enum ErrorCode {
   CHECK_ID_AND_PW(HttpStatus.NOT_FOUND, "이메일 혹은 비밀번호를 확인하세요."),
   CHECK_SOCIAL_SERVER(HttpStatus.NOT_FOUND, "소셜로그인에 실패하였습니다. 서버를 확인 하세요."),
   SHORT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 8자 이상이여야 합니다."),
+  WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 확인해주세요."),
 
   //게시판
 
@@ -39,6 +40,7 @@ public enum ErrorCode {
   public static final String NICKNAME_NOT_NULL_MESSAGE = "닉네임을 입력해 주세요.";
   public static final String SHORT_PASSWORD_LENGTH_MESSAGE = "비밀번호는 8자 이상이여야 합니다.";
   public static final String PASSWORD_NOT_NULL_MESSAGE = "비밀번호를 입력해 주세요.";
+  public static final String PASSWORD_CHECK_MESSAGE = "비밀번호를 확인 주세요.";
   public static final String PHONE_NUMBER_NOT_NULL_MESSAGE = "휴대폰 번호를 입력해 주세요.";
   public static final String PHONE_NUMBER_FORMAT_MESSAGE = "휴대폰 번호의 형식은 ex:010-1234-1234 형식이여야 합니다.";
   public static final String EMAIL_NOT_NULL_MESSAGE = "이메일을 입력해 주세요.";
