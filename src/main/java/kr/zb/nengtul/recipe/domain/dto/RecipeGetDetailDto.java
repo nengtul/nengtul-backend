@@ -1,17 +1,20 @@
 package kr.zb.nengtul.recipe.domain.dto;
 
-import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
-public class RecipeGetDto {
+public class RecipeGetDetailDto {
 
     private String id;
 
     private Long userId;
+
+    private String nickName;
 
     private String title;
 
@@ -27,15 +30,15 @@ public class RecipeGetDto {
 
     private String serving;
 
-    private RecipeCategory category;
+    private String category;
 
     private String videoUrl;
 
     private Long viewCount;
 
-    public static RecipeGetDto fromRecipeDocument(RecipeDocument recipeDocument) {
+    public static RecipeGetDetailDto fromRecipeDocument(RecipeDocument recipeDocument) {
 
-        return RecipeGetDto.builder()
+        return RecipeGetDetailDto.builder()
                 .id(recipeDocument.getId())
                 .userId(recipeDocument.getUserId())
                 .title(recipeDocument.getTitle())
@@ -45,7 +48,7 @@ public class RecipeGetDto {
                 .imageUrl(recipeDocument.getImageUrl())
                 .cookingTime(recipeDocument.getCookingTime())
                 .serving(recipeDocument.getServing())
-                .category(recipeDocument.getCategory())
+                .category(recipeDocument.getCategory().getKorean())
                 .videoUrl(recipeDocument.getVideoUrl())
                 .build();
 

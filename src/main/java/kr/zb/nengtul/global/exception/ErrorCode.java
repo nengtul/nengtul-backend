@@ -17,9 +17,10 @@ public enum ErrorCode {
   CHECK_ID_AND_PW(HttpStatus.NOT_FOUND, "이메일 혹은 비밀번호를 확인하세요."),
   CHECK_SOCIAL_SERVER(HttpStatus.NOT_FOUND, "소셜로그인에 실패하였습니다. 서버를 확인 하세요."),
   SHORT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 8자 이상이여야 합니다."),
-  NO_PERMISSION(HttpStatus.BAD_REQUEST, "권한이 없습니다.");
+  NO_PERMISSION(HttpStatus.BAD_REQUEST, "권한이 없습니다."),
 
   //게시판
+  NOT_FOUND_RECIPE(HttpStatus.BAD_REQUEST, "레시피를 찾을 수 없습니다.");
 
   //
 

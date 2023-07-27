@@ -23,9 +23,9 @@ public enum RecipeCategory {
     ETC("기타")
     ;
 
-    final String detail;
+    final String korean;
 
-    RecipeCategory(String detail) {
-        this.detail = detail;
+    RecipeCategory(String korean) {
+        this.korean = korean;
     }
 }

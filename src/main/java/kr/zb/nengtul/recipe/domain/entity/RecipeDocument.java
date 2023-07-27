@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
-import kr.zb.nengtul.recipe.domain.dto.RecipeGetDto;
+import kr.zb.nengtul.recipe.domain.dto.RecipeUpdateDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,5 +58,45 @@ public class RecipeDocument {
 
     @Field(type = FieldType.Integer)
     private Long viewCount;
+
+    public void updateRecipe(RecipeUpdateDto recipeUpdateDto) {
+
+        if (recipeUpdateDto.getTitle() != null) {
+            this.title = recipeUpdateDto.getTitle();
+        }
+
+        if (recipeUpdateDto.getIntro() != null) {
+            this.ingredient = recipeUpdateDto.getIntro();
+        }
+
+        if (recipeUpdateDto.getIngredient() != null) {
+            this.ingredient = recipeUpdateDto.getIngredient();
+        }
+
+        if (recipeUpdateDto.getCookingStep() != null) {
+            this.cookingStep = recipeUpdateDto.getCookingStep();
+        }
+
+        if (recipeUpdateDto.getImageUrl() != null) {
+            this.imageUrl = recipeUpdateDto.getImageUrl();
+        }
+
+        if (recipeUpdateDto.getCookingTime() != null) {
+            this.cookingTime = recipeUpdateDto.getCookingTime();
+        }
+
+        if (recipeUpdateDto.getServing() != null) {
+            this.serving = recipeUpdateDto.getServing();
+        }
+
+        if (recipeUpdateDto.getRecipeCategory() != null) {
+            this.category = recipeUpdateDto.getRecipeCategory();
+        }
+
+        if (recipeUpdateDto.getVideoUrl() != null) {
+            this.videoUrl = recipeUpdateDto.getVideoUrl();
+        }
+
+    }
 
 }

@@ -9,7 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
@@ -30,7 +29,6 @@ public class User extends BaseTimeEntity {
   @Column
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
 
   @Column(length = 512, unique = true)
   private String email;
