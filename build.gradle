@@ -44,6 +44,9 @@ dependencies {
 	//json
 	implementation 'com.google.code.gson:gson:2.8.9'
 
+	//websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
 	implementation 'org.apache.commons:commons-lang3'
