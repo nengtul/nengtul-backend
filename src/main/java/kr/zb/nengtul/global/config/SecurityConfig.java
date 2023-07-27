@@ -56,7 +56,6 @@ public class SecurityConfig {
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
             SessionCreationPolicy.STATELESS))
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
