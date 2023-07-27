@@ -71,7 +71,7 @@ public class RecipeController {
         return ResponseEntity.ok("레시피 업데이트가 완료됐습니다.");
     }
 
-    @DeleteMapping("{recipeId}")
+    @DeleteMapping("/{recipeId}")
     ResponseEntity<?> deleteRecipe(Principal principal, @PathVariable String recipeId) {
 
         recipeService.deleteRecipe(principal, recipeId);
