@@ -40,13 +40,6 @@ public class UserController {
     return ResponseEntity.ok(null);
   }
 
-//  @PostMapping("/login")
-//  public ResponseEntity<Void> login(@RequestBody UserLoginDto userJoinDto,
-//      HttpServletResponse response) throws IOException {
-//    userService.login(response, userJoinDto);
-//    return ResponseEntity.ok(null);
-//  }
-
   //이메일 인증 (이메일에서 링크를 클릭하여 put 요청을 보낼 수 없어서 GET요청으로 처리)
   @GetMapping("/verify")
   public ResponseEntity<Void> verify(@RequestParam String email, @RequestParam String code) {
@@ -62,14 +55,14 @@ public class UserController {
   }
 
   //아이디 찾기
-  @GetMapping("/findid")
+  @PostMapping("/findid")
   public ResponseEntity<UserFindEmailResDto> findEmail(
       @RequestBody UserFindEmailReqDto userFindEmailReqDto) {
     return ResponseEntity.ok(userService.findEmail(userFindEmailReqDto));
   }
 
   //임시 비밀번호 발급
-  @GetMapping("/findpw")
+  @PostMapping("/findpw")
   public ResponseEntity<Void> getNewPassword(@RequestBody UserFindPasswordDto userFindPasswordDto) {
     userService.getNewPassword(userFindPasswordDto);
     return ResponseEntity.ok(null);
