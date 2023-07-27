@@ -9,8 +9,8 @@ import kr.zb.nengtul.recipe.domain.dto.RecipeGetListDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeUpdateDto;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
-import kr.zb.nengtul.user.entity.domain.User;
-import kr.zb.nengtul.user.entity.repository.UserRepository;
+import kr.zb.nengtul.user.domain.entity.User;
+import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,22 +52,7 @@ public class RecipeService {
     public Page<RecipeGetListDto> getAllRecipe(Pageable pageable) {
 
         return recipeSearchRepository.findAll(pageable)
-                .map(recipeDocument -> {
-                    RecipeGetListDto recipeGetListDto =
-                            RecipeGetListDto.fromRecipeDocument(recipeDocument);
-
-                    User user = userRepository.findById(recipeDocument.getUserId())
-                            .orElseGet(() -> User.builder()
-                                    .nickname("냉장고를털어라")
-                                    .build());
-
-//                    Todo like count 추가
-//                    Long likeCount =
-
-                    recipeGetListDto.setNickName(user.getNickname());
-
-                    return recipeGetListDto;
-                });
+                .map(this::settingRecipeGetListDto);
     }
 
     public RecipeGetDetailDto getRecipeById(String recipeId) {
@@ -86,64 +71,19 @@ public class RecipeService {
     public Page<RecipeGetListDto> getRecipeByCategory(RecipeCategory category, Pageable pageable) {
 
         return recipeSearchRepository.findAllByCategory(category, pageable)
-                .map(recipeDocument -> {
-                    RecipeGetListDto recipeGetListDto =
-                            RecipeGetListDto.fromRecipeDocument(recipeDocument);
-
-                    User user = userRepository.findById(recipeDocument.getUserId())
-                            .orElseGet(() -> User.builder()
-                                    .nickname("냉장고를털어라")
-                                    .build());
-
-                    //Todo like count 추가
-//                    Long likeCount = 
-//
-                    recipeGetListDto.setNickName(user.getNickname());
-
-                    return recipeGetListDto;
-                });
+                .map(this::settingRecipeGetListDto);
     }
 
     public Page<RecipeGetListDto> getRecipeByTitle(String title, Pageable pageable) {
 
         return recipeSearchRepository.findAllByTitle(title, pageable)
-                .map(recipeDocument -> {
-                    RecipeGetListDto recipeGetListDto =
-                            RecipeGetListDto.fromRecipeDocument(recipeDocument);
-
-                    User user = userRepository.findById(recipeDocument.getUserId())
-                            .orElseGet(() -> User.builder()
-                                    .nickname("냉장고를털어라")
-                                    .build());
-
-                    //Todo like count 추가
-//                    Long likeCount =
-//
-                    recipeGetListDto.setNickName(user.getNickname());
-
-                    return recipeGetListDto;
-                });
+                .map(this::settingRecipeGetListDto);
     }
 
     public Page<RecipeGetListDto> getRecipeByIngredient(String ingredient, Pageable pageable) {
 
         return recipeSearchRepository.findAllByIngredient(ingredient, pageable)
-                .map(recipeDocument -> {
-                    RecipeGetListDto recipeGetListDto =
-                            RecipeGetListDto.fromRecipeDocument(recipeDocument);
-
-                    User user = userRepository.findById(recipeDocument.getUserId())
-                            .orElseGet(() -> User.builder()
-                                    .nickname("냉장고를털어라")
-                                    .build());
-
-                    //Todo like count 추가
-//                    Long likeCount =
-//
-                    recipeGetListDto.setNickName(user.getNickname());
-
-                    return recipeGetListDto;
-                });
+                .map(this::settingRecipeGetListDto);
     }
 
     @Transactional
@@ -179,6 +119,24 @@ public class RecipeService {
         recipeSearchRepository.delete(recipeDocument);
     }
 
+    private RecipeGetListDto settingRecipeGetListDto(RecipeDocument recipeDocument) {
+
+        RecipeGetListDto recipeGetListDto =
+                RecipeGetListDto.fromRecipeDocument(recipeDocument);
+
+        User user = userRepository.findById(recipeDocument.getUserId())
+                .orElseGet(() -> User.builder()
+                        .nickname("냉장고를털어라")
+                        .build());
+
+        //Todo like count 추가
+//                    Long likeCount =
+//
+        recipeGetListDto.setNickName(user.getNickname());
+
+        return recipeGetListDto;
+
+    }
 
 
 

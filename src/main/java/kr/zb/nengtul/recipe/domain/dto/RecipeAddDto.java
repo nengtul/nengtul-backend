@@ -7,33 +7,35 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static kr.zb.nengtul.global.exception.ErrorCode.*;
+
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecipeAddDto {
 
-    @NotNull(message = "타이틀을 기재해 주세요.")
+    @NotNull(message = TITLE_NOT_NULL_MESSAGE)
     private String title;
 
-    @NotNull(message = "레시피 소개를 기재해 주세요.")
+    @NotNull(message = INTRO_NOT_NULL_MESSAGE)
     private String intro;
 
-    @NotNull(message = "재료를 기재해 주세요.")
+    @NotNull(message = INGREDIENT_NOT_NULL_MESSAGE)
     private String ingredient;
 
-    @NotNull(message = "조리 순서를 기재해 주세요.")
+    @NotNull(message = COOKING_STEP_NOT_NULL_MESSAGE)
     private String cookingStep;
 
     private String imageUrl;
 
-    @NotNull(message = "조리 시간을 기재해 주세요.")
+    @NotNull(message = COOKING_TIME_NOT_NULL_MESSAGE)
     private String cookingTime;
 
-    @NotNull(message = "몇 인분인지 기재해 주세요.")
+    @NotNull(message = SERVING_NOT_NULL_MESSAGE)
     private String serving;
 
-    @NotNull(message = "카테고리를 기재해 주세요.")
+    @NotNull(message = CATEGORY_NOT_NULL_MESSAGE)
     private RecipeCategory category;
 
     private String videoUrl;

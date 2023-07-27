@@ -1,5 +1,6 @@
 package kr.zb.nengtul.recipe.controller;
 
+import jakarta.validation.Valid;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.dto.RecipeAddDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeUpdateDto;
@@ -21,11 +22,11 @@ public class RecipeController {
 
     @PostMapping
     ResponseEntity<?> addRecipe(Principal principal,
-                                @RequestBody RecipeAddDto recipeAddDto) {
+                                @RequestBody @Valid RecipeAddDto recipeAddDto) {
 
         recipeService.addRecipe(principal, recipeAddDto);
 
-        return ResponseEntity.ok("레시피 등록이 완료되었습니다.");
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping
@@ -68,7 +69,7 @@ public class RecipeController {
 
         recipeService.updateRecipe(principal, recipeId, recipeUpdateDto);
 
-        return ResponseEntity.ok("레시피 업데이트가 완료됐습니다.");
+        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/{recipeId}")
@@ -76,7 +77,7 @@ public class RecipeController {
 
         recipeService.deleteRecipe(principal, recipeId);
 
-        return ResponseEntity.ok("레시피 삭제가 완료됐습니다.");
+        return ResponseEntity.ok(null);
     }
 
 }
