@@ -49,17 +49,17 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
+            SessionCreationPolicy.STATELESS))
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
         .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
-        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-            SessionCreationPolicy.STATELESS))
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
+            .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico","/**/favicon.ico",
                 "/h2-console/**",
                 "/index.html",
                 "/login/**",
@@ -137,7 +137,7 @@ public class SecurityConfig {
   @Bean
   public UrlBasedCorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("*");
+    configuration.addAllowedOriginPattern("*");
     configuration.addAllowedMethod("*");
     configuration.addAllowedHeader("*");
     configuration.setAllowCredentials(true);
