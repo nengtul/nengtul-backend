@@ -20,6 +20,7 @@ public enum ErrorCode {
   WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 확인해주세요."),
 
   //게시판
+  NOT_FOUND_RECIPE(HttpStatus.NOT_FOUND, "레시피를 찾을 수 없습니다."),
 
   //공지사항
   NOT_FOUND_NOTICE(HttpStatus.NOT_FOUND, "공지를 찾을 수 없습니다."),
@@ -50,12 +51,20 @@ public enum ErrorCode {
   public static final String TITLE_NOT_NULL_MESSAGE = "제목을 입력해 주세요.";
   public static final String CONTENT_NOT_NULL_MESSAGE = "내용을 입력해 주세요.";
 
+  //레시피
+  public static final String INTRO_NOT_NULL_MESSAGE = "레시피 소개를 입력해 주세요.";
+  public static final String INGREDIENT_NOT_NULL_MESSAGE = "재료를 입력해 주세요.";
+  public static final String COOKING_STEP_NOT_NULL_MESSAGE = "조리 순서를 입력해 주세요.";
+  public static final String COOKING_TIME_NOT_NULL_MESSAGE = "조리 시간을 입력해 주세요.";
+  public static final String SERVING_NOT_NULL_MESSAGE = "몇 인분인지 입력해 주세요.";
+  public static final String CATEGORY_NOT_NULL_MESSAGE = "카테고리를 입력해 주세요.";
+
+
   //나눔게시판
   public static final String LAT_NOT_NULL_MESSAGE = "위도를 입력해 주세요.";
   public static final String LON_NOT_NULL_MESSAGE = "경도을 입력해 주세요.";
   public static final String LAT_AVERAGE_MESSAGE = "위도의 범위는 -90 ~ 90 입니다.";
   public static final String LON_AVERAGE_MESSAGE = "경도의 범위는 -180 ~ 180 입니다.";
-
 
   private final HttpStatus httpStatus;
   private final String detail;

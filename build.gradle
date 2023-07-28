@@ -52,8 +52,8 @@ dependencies {
 	//JWT
 	implementation 'com.auth0:java-jwt:4.2.1'
 
-	//swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	//elasticsearch
+	implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
 
 }
 
