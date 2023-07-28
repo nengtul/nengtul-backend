@@ -1,15 +1,12 @@
 package kr.zb.nengtul.user.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.security.Principal;
 import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
-import kr.zb.nengtul.user.domain.dto.UserLoginDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
