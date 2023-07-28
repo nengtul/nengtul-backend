@@ -71,7 +71,8 @@ public class SecurityConfig {
                 "/v1/notice/list/**" //공지사항 조회관련
             ).permitAll()
             .requestMatchers("/v1/user/**",
-                "/v1/shareboard/**"
+                "/v1/shareboard/**",
+                "/v1/recipe/**"
             ).hasAnyRole("USER", "ADMIN")
             .requestMatchers(
                 "/v1/admin/**",
