@@ -20,6 +20,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,21 +46,21 @@ public class SecurityConfig {
   private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
   private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
   private final CustomOAuth2UserService customOAuth2UserService;
-
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-            SessionCreationPolicy.STATELESS))
+
+    http
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .csrf(AbstractHttpConfigurer::disable)
         .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
-
+        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
+            SessionCreationPolicy.STATELESS))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
+                "/swagger-ui/**","/swagger-resources/**","/v3/api-docs/**","/v2/api-docs/**",
                 "/h2-console/**",
                 "/index.html",
                 "/login/**",
@@ -81,14 +82,16 @@ public class SecurityConfig {
         )
         //== 소셜 로그인 설정 ==//
         .oauth2Login(oauth2Login -> oauth2Login
-        .successHandler(oAuth2LoginSuccessHandler)
-        .failureHandler(oAuth2LoginFailureHandler)
-        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
-            customOAuth2UserService)))
+            .successHandler(oAuth2LoginSuccessHandler)
+            .failureHandler(oAuth2LoginFailureHandler)
+            .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
+                customOAuth2UserService)))
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
         .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
         .addFilterBefore(jwtAuthenticationProcessingFilter(),
-            CustomJsonUsernamePasswordAuthenticationFilter.class).build();
+            CustomJsonUsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
   }
 
   @Bean
