@@ -37,7 +37,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final MailgunClient mailgunClient;
-  private final JwtTokenProvider jwtTokenProvider;
 
   //회원가입 및 이메일 인증 발송
   @Transactional
@@ -78,13 +77,6 @@ public class UserService {
     user.setEmailVerifiedYn(true);
   }
 
-  //유저 상세보기
-  public UserDetailDto getUserDetail(Principal principal) {
-    User user = findUserByEmail(principal.getName());
-
-    return UserDetailDto.buildUserDetailDto(user);
-  }
-
   //회원 탈퇴
   @Transactional
   public void quit(Principal principal) {
@@ -117,11 +109,10 @@ public class UserService {
   }
 
   //가입한 이메일 찾기(아이디 찾기)
-  public UserFindEmailResDto findEmail(UserFindEmailReqDto userFindEmailReqDto) {
-    User user = userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
+  public User findEmail(UserFindEmailReqDto userFindEmailReqDto) {
+    return userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
             userFindEmailReqDto.getPhoneNumber())
         .orElseThrow(() -> new CustomException(NO_CONTENT));
-    return UserFindEmailResDto.buildUserFindEmailResDto(user.getEmail());
   }
 
   //임시 비밀번호 발급(비밀번호 찾기)

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardListDto;
 import kr.zb.nengtul.shareboard.service.ShareBoardService;
@@ -49,7 +50,9 @@ public class ShareBoardController {
       @Parameter(name = "lon", description = "위도") @RequestParam double lon,
       @Parameter(name = "range", description = "반경 범위") @RequestParam double range,
       @Parameter(name = "closed", description = "완료 여부") @RequestParam(required = false) Boolean closed) {
-    return ResponseEntity.ok(shareBoardService.getList(lat, lon, range, closed));
+    return ResponseEntity.ok(shareBoardService.getList(lat, lon, range, closed).stream()
+        .map(ShareBoardListDto::buildShareBoardListDto)
+        .collect(Collectors.toList()));
   }
 
   //수정

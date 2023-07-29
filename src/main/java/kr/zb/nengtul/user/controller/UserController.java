@@ -66,7 +66,8 @@ public class UserController {
   @PostMapping("/findid")
   public ResponseEntity<UserFindEmailResDto> findEmail(
       @RequestBody UserFindEmailReqDto userFindEmailReqDto) {
-    return ResponseEntity.ok(userService.findEmail(userFindEmailReqDto));
+    return ResponseEntity.ok(
+        new UserFindEmailResDto(userService.findEmail(userFindEmailReqDto).getEmail()));
   }
 
   //임시 비밀번호 발급
@@ -82,7 +83,8 @@ public class UserController {
   @Operation(summary = "회원 상세보기", description = "토큰을 통해 회원 상세 정보를 받습니다.")
   @GetMapping("/detail")
   public ResponseEntity<UserDetailDto> getUserDetail(Principal principal) {
-    return ResponseEntity.ok(userService.getUserDetail(principal));
+    return ResponseEntity.ok(
+        UserDetailDto.buildUserDetailDto(userService.findUserByEmail(principal.getName())));
   }
 
   //회원 탈퇴(상세보기 페이지에서 진행)

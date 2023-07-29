@@ -15,6 +15,7 @@ import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
+import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,11 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShareBoardService {
 
   private final UserRepository userRepository;
+  private final UserService userService;
   private final ShareBoardRepository shareBoardRepository;
 
   @Transactional
   public void create(ShareBoardDto shareBoardDto, Principal principal) {
-    User user = findUserByEmail(principal.getName());
+    User user = userService.findUserByEmail(principal.getName());
     if (!user.isEmailVerifiedYn()) {
       throw new CustomException(NOT_VERIFY_EMAIL);
     }
@@ -52,7 +54,7 @@ public class ShareBoardService {
   public void update(Long id, ShareBoardDto shareBoardDto, Principal principal) {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
-    User user = findUserByEmail(principal.getName());
+    User user = userService.findUserByEmail(principal.getName());
     if (shareBoard.getUser() != user) {
       throw new CustomException(NO_PERMISSION);
     }
@@ -68,7 +70,7 @@ public class ShareBoardService {
   public void delete(Long id, Principal principal) {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
-    User user = findUserByEmail(principal.getName());
+    User user = userService.findUserByEmail(principal.getName());
     if (shareBoard.getUser() != user) {
       throw new CustomException(NO_PERMISSION);
     }
@@ -76,7 +78,7 @@ public class ShareBoardService {
   }
 
   @Transactional
-  public List<ShareBoardListDto> getList(double lat, double lon, double range, Boolean closed) {
+  public List<ShareBoard> getList(double lat, double lon, double range, Boolean closed) {
     List<ShareBoard> shareBoardList;
     if (closed == null) {
       shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(
@@ -87,14 +89,7 @@ public class ShareBoardService {
           lat - range, lat + range, lon - range, lon + range, closed);
 
     }
-    return shareBoardList.stream()
-        .map(ShareBoardListDto::buildShareBoardListDto)
-        .collect(Collectors.toList());
-  }
-
-  public User findUserByEmail(String email) {
-    return userRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    return shareBoardList;
   }
 
 }
