@@ -55,6 +55,7 @@ dependencies {
 	//elasticsearch
 	implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
 
+	implementation project(':s3bucket')
 }
 
 dependencyManagement{

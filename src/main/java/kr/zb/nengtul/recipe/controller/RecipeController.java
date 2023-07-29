@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 
 
 @RestController
@@ -22,9 +24,10 @@ public class RecipeController {
 
     @PostMapping
     ResponseEntity<?> addRecipe(Principal principal,
-                                @RequestBody @Valid RecipeAddDto recipeAddDto) {
+                                @RequestPart @Valid RecipeAddDto recipeAddDto,
+                                @RequestPart List<MultipartFile> images) {
 
-        recipeService.addRecipe(principal, recipeAddDto);
+        recipeService.addRecipe(principal, recipeAddDto, images);
 
         return ResponseEntity.ok(null);
     }
@@ -38,7 +41,7 @@ public class RecipeController {
     @GetMapping("/detail/{recipeId}")
     ResponseEntity<?> getRecipeById(@PathVariable String recipeId) {
 
-        return ResponseEntity.ok(recipeService.getRecipeById(recipeId));
+        return ResponseEntity.ok(recipeService.getRecipeDetailById(recipeId));
     }
 
     @GetMapping("/category/{category}")
