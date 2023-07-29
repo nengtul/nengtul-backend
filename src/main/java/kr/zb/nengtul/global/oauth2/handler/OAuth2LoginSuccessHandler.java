@@ -41,14 +41,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             user.updateRefreshToken(refreshToken);
             userRepository.saveAndFlush(user);
           });
-      response.setStatus(HttpStatus.OK.value());
-      response.setCharacterEncoding("UTF-8");
-      response.setContentType("application/json;charset=UTF-8");
-
-      String successMessage = "{\"AccessToken\": \"" + accessToken +
-          "\", \"refreshToken\": \"" + refreshToken + "\"}";
-      response.getWriter().write(successMessage);
-      jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, null);
+//      jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, null);
       loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
     } catch (CustomException e) {
       throw new CustomException(NOT_FOUND_USER);
@@ -56,7 +49,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
   }
 
-  private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) {
+  private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User)
+      throws IOException {
     String accessToken = jwtTokenProvider.createAccessToken(oAuth2User.getEmail());
     String refreshToken = jwtTokenProvider.createRefreshToken();
     response.addHeader(jwtTokenProvider.getAccessHeader(), "Bearer " + accessToken);
