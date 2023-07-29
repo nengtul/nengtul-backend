@@ -13,6 +13,7 @@ import kr.zb.nengtul.notice.domain.dto.NoticeReqDto;
 import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
+import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,12 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class NoticeService {
 
-  private final UserRepository userRepository;
+  private final UserService userService;
   private final NoticeRepository noticeRepository;
 
   @Transactional
   public void create(NoticeReqDto noticeReqDto, Principal principal) {
-    User user = findUserByEmail(principal.getName());
+    User user = userService.findUserByEmail(principal.getName());
     Notice notice = Notice.builder()
         .title(noticeReqDto.getTitle())
         .content(noticeReqDto.getContent())
@@ -43,7 +44,7 @@ public class NoticeService {
 
   @Transactional
   public void update(Long noticeId, NoticeReqDto noticeReqDto, Principal principal) {
-    User user = findUserByEmail(principal.getName());
+    User user = userService.findUserByEmail(principal.getName());
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
 
@@ -61,7 +62,7 @@ public class NoticeService {
 
   @Transactional
   public void delete(Long noticeId, Principal principal) {
-    User user = findUserByEmail(principal.getName());
+    User user = userService.findUserByEmail(principal.getName());
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
     if (notice.getUser().equals(user)) {
@@ -71,23 +72,17 @@ public class NoticeService {
     }
   }
 
-  public Page<NoticeListDto> getList(Pageable pageable) {
-    Page<Notice> noticeList = noticeRepository.findAll(pageable);
-    return noticeList.map(NoticeListDto::buildNoticeListDto);
+  public Page<Notice> getList(Pageable pageable) {
+    return noticeRepository.findAll(pageable);
   }
 
   @Transactional
-  public NoticeDetailDto getDetails(Long noticeId) {
+  public Notice getDetails(Long noticeId) {
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
     notice.setViewCount(notice.getViewCount() + 1);
     noticeRepository.saveAndFlush(notice);
 
-    return NoticeDetailDto.buildNoticeDetailDto(notice);
-  }
-
-  public User findUserByEmail(String email) {
-    return userRepository.findByEmail(email)
-        .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    return notice;
   }
 }

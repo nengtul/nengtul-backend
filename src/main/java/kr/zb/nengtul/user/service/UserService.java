@@ -5,34 +5,26 @@ import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
-import static kr.zb.nengtul.global.exception.ErrorCode.PASSWORD_CHECK_MESSAGE;
-import static kr.zb.nengtul.global.exception.ErrorCode.PASSWORD_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD;
-import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_PASSWORD;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.global.handler.LoginSuccessHandler;
 import kr.zb.nengtul.global.jwt.JwtTokenProvider;
-import kr.zb.nengtul.user.domain.dto.UserLoginDto;
-import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
+import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.mailgun.client.MailgunClient;
 import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +37,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final MailgunClient mailgunClient;
-  private final JwtTokenProvider jwtTokenProvider;
 
   //회원가입 및 이메일 인증 발송
   @Transactional
@@ -86,13 +77,6 @@ public class UserService {
     user.setEmailVerifiedYn(true);
   }
 
-  //유저 상세보기
-  public UserDetailDto getUserDetail(Principal principal) {
-    User user = findUserByEmail(principal.getName());
-
-    return UserDetailDto.buildUserDetailDto(user);
-  }
-
   //회원 탈퇴
   @Transactional
   public void quit(Principal principal) {
@@ -125,11 +109,10 @@ public class UserService {
   }
 
   //가입한 이메일 찾기(아이디 찾기)
-  public UserFindEmailResDto findEmail(UserFindEmailReqDto userFindEmailReqDto) {
-    User user = userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
+  public User findEmail(UserFindEmailReqDto userFindEmailReqDto) {
+    return userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
             userFindEmailReqDto.getPhoneNumber())
         .orElseThrow(() -> new CustomException(NO_CONTENT));
-    return UserFindEmailResDto.buildUserFindEmailResDto(user.getEmail());
   }
 
   //임시 비밀번호 발급(비밀번호 찾기)

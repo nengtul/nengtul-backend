@@ -35,15 +35,6 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
           user.updateRefreshToken(refreshToken);
           userRepository.saveAndFlush(user);
         });
-
-    response.setStatus(HttpStatus.OK.value());
-    response.setCharacterEncoding("UTF-8");
-    response.setContentType("application/json;charset=UTF-8");
-
-    String successMessage = "{\"email\": \"" + email +
-        "\", \"AccessToken\": \"" + accessToken +
-        "\", \"refreshToken\": \"" + refreshToken + "\"}";
-    response.getWriter().write(successMessage);
   }
 
   private String extractUsername(Authentication authentication) {

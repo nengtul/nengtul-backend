@@ -1,5 +1,6 @@
 package kr.zb.nengtul.recipe.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.dto.RecipeAddDto;
@@ -14,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.List;
 
-
+@Tag(name = "RECIPE API", description = "레시피 API")
 @RestController
 @RequestMapping("/v1/recipe")
 @RequiredArgsConstructor
