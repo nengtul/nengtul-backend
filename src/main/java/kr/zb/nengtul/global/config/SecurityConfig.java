@@ -63,6 +63,7 @@ public class SecurityConfig {
                 "/h2-console/**",
                 "/index.html",
                 "/login/**",
+                "/v1/auth/**",
                 "/v1/user/join",//회원가입
                 "/v1/user/login",//로그인
                 "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)

@@ -65,7 +65,8 @@ public class NoticeController {
   @Operation(summary = "공지사항 조회", description = "공지사항 목록을 전체 조회합니다. (Pageable 적용)")
   @GetMapping("/list")
   public ResponseEntity<Page<NoticeListDto>> getList(Pageable pageable) {
-    return ResponseEntity.ok(noticeService.getList(pageable));
+    return ResponseEntity.ok(
+        noticeService.getList(pageable).map(NoticeListDto::buildNoticeListDto));
   }
 
   //상세 조회
@@ -73,6 +74,7 @@ public class NoticeController {
   @GetMapping("/list/{noticeId}")
   public ResponseEntity<NoticeDetailDto> getDetails(
       @Parameter(name = "id)", description = "공지사항 ID") @PathVariable Long noticeId) {
-    return ResponseEntity.ok(noticeService.getDetails(noticeId));
+    return ResponseEntity.ok(
+        NoticeDetailDto.buildNoticeDetailDto(noticeService.getDetails(noticeId)));
   }
 }
