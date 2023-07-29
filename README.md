@@ -45,6 +45,8 @@
 
 ## 📑 [API명세서](https://www.notion.so/API-ab731bbd93684b858bd055a734e0017b)
 
+## 📑 [SWAGGER](http://43.200.162.72:8080/swagger-ui/index.html)
+
 ## ✨ 프로젝트 주요기능
 
 ### 🔐  **회원 가입/로그인 기능**
