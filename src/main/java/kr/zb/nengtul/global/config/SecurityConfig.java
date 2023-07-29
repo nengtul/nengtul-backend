@@ -20,7 +20,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -72,7 +71,8 @@ public class SecurityConfig {
                 "/v1/notice/list/**" //공지사항 조회관련
             ).permitAll()
             .requestMatchers("/v1/user/**",
-                "/v1/shareboard/**"
+                "/v1/shareboard/**",
+                "/v1/recipe/**"
             ).hasAnyRole("USER", "ADMIN")
             .requestMatchers(
                 "/v1/admin/**",

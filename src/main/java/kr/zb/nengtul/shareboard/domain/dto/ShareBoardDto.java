@@ -1,6 +1,5 @@
 package kr.zb.nengtul.shareboard.domain.dto;
 
-import static kr.zb.nengtul.global.exception.ErrorCode.CONTENT_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.LAT_AVERAGE_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.LAT_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.LON_AVERAGE_MESSAGE;
@@ -9,10 +8,8 @@ import static kr.zb.nengtul.global.exception.ErrorCode.TITLE_NOT_NULL_MESSAGE;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
