@@ -10,15 +10,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
+
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Document(indexName = "recipe")
+@Setting(settingPath = "elasticsearch/elasticsearch-settings.json")
+@Mapping(mappingPath = "elasticsearch/recipe-mappings.json")
 public class RecipeDocument {
 
     @Id
@@ -59,6 +61,12 @@ public class RecipeDocument {
     @Field(type = FieldType.Integer)
     private Long viewCount;
 
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute)
+    private LocalDateTime createdAt;
+
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute)
+    private LocalDateTime modifiedAt;
+
     public void updateRecipe(RecipeUpdateDto recipeUpdateDto) {
 
         if (recipeUpdateDto.getTitle() != null) {
@@ -96,6 +104,8 @@ public class RecipeDocument {
         if (recipeUpdateDto.getVideoUrl() != null) {
             this.videoUrl = recipeUpdateDto.getVideoUrl();
         }
+
+        this.modifiedAt = LocalDateTime.now();
 
     }
 

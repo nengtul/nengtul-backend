@@ -9,6 +9,7 @@ import kr.zb.nengtul.recipe.domain.dto.RecipeGetListDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeUpdateDto;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
+import kr.zb.nengtul.s3bucket.service.AmazonS3Service;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -28,7 +32,10 @@ public class RecipeService {
 
     private final UserRepository userRepository;
 
-    public void addRecipe(Principal principal, RecipeAddDto recipeAddDto) {
+    private final AmazonS3Service amazonS3Service;
+
+    public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
+                          List<MultipartFile> images) {
 
         User user = userRepository.findByEmail(principal.getName()).
                 orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -39,12 +46,41 @@ public class RecipeService {
                 .intro(recipeAddDto.getIntro())
                 .ingredient(recipeAddDto.getIngredient())
                 .cookingStep(recipeAddDto.getCookingStep())
-                .imageUrl(recipeAddDto.getImageUrl())
+                .imageUrl(
+                        amazonS3Service.uploadFileForRecipeCookingStep(
+                                images, recipeAddDto.getTitle())
+                )
                 .cookingTime(recipeAddDto.getCookingTime())
                 .serving(recipeAddDto.getServing())
                 .category(recipeAddDto.getCategory())
                 .videoUrl(recipeAddDto.getVideoUrl())
                 .viewCount(0L)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build());
+
+    }
+
+    public void addRecipeForCrawling(Principal principal, RecipeAddDto recipeAddDto,
+                          String images) {
+
+        User user = userRepository.findByEmail(principal.getName()).
+                orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        recipeSearchRepository.save(RecipeDocument.builder()
+                .userId(user.getId())
+                .title(recipeAddDto.getTitle())
+                .intro(recipeAddDto.getIntro())
+                .ingredient(recipeAddDto.getIngredient())
+                .cookingStep(recipeAddDto.getCookingStep())
+                .imageUrl(images)
+                .cookingTime(recipeAddDto.getCookingTime())
+                .serving(recipeAddDto.getServing())
+                .category(recipeAddDto.getCategory())
+                .videoUrl(recipeAddDto.getVideoUrl())
+                .viewCount(0L)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build());
 
     }
@@ -55,13 +91,16 @@ public class RecipeService {
                 .map(this::settingRecipeGetListDto);
     }
 
-    public RecipeGetDetailDto getRecipeById(String recipeId) {
+    public RecipeGetDetailDto getRecipeDetailById(String recipeId) {
 
-        RecipeGetDetailDto recipeGetDetailDto = RecipeGetDetailDto.fromRecipeDocument(
-                recipeSearchRepository.findById(recipeId).orElseThrow());
+        RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
 
-        User user = userRepository.findById(recipeGetDetailDto.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+        RecipeGetDetailDto recipeGetDetailDto =
+                RecipeGetDetailDto.fromRecipeDocument(recipeDocument);
+
+        User user = userRepository.findById(recipeDocument.getUserId())
+                .orElseGet(() -> User.builder().nickname("냉장고를털어라").build());
 
         recipeGetDetailDto.setNickName(user.getNickname());
 
@@ -137,7 +176,6 @@ public class RecipeService {
         return recipeGetListDto;
 
     }
-
 
 
 }

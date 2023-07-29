@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -36,6 +38,10 @@ public class RecipeGetDetailDto {
 
     private Long viewCount;
 
+    private LocalDateTime createdAt;
+
+    private LocalDateTime modifiedAt;
+
     public static RecipeGetDetailDto fromRecipeDocument(RecipeDocument recipeDocument) {
 
         return RecipeGetDetailDto.builder()
@@ -50,6 +56,9 @@ public class RecipeGetDetailDto {
                 .serving(recipeDocument.getServing())
                 .category(recipeDocument.getCategory().getKorean())
                 .videoUrl(recipeDocument.getVideoUrl())
+                .createdAt(recipeDocument.getCreatedAt())
+                .modifiedAt(recipeDocument.getModifiedAt())
+                .viewCount(recipeDocument.getViewCount())
                 .build();
 
     }
