@@ -27,8 +27,6 @@ public class RecipeAddDto {
     @NotNull(message = COOKING_STEP_NOT_NULL_MESSAGE)
     private String cookingStep;
 
-    private String imageUrl;
-
     @NotNull(message = COOKING_TIME_NOT_NULL_MESSAGE)
     private String cookingTime;
 
