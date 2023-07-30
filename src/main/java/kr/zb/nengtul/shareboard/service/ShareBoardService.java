@@ -1,16 +1,13 @@
 package kr.zb.nengtul.shareboard.service;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_SHARE_BOARD;
-import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_VERIFY_EMAIL;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
-import kr.zb.nengtul.shareboard.domain.dto.ShareBoardListDto;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
 import kr.zb.nengtul.user.domain.entity.User;
@@ -31,7 +28,7 @@ public class ShareBoardService {
   private final ShareBoardRepository shareBoardRepository;
 
   @Transactional
-  public void create(ShareBoardDto shareBoardDto, Principal principal) {
+  public void createShareBoard(ShareBoardDto shareBoardDto, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
     if (!user.isEmailVerifiedYn()) {
       throw new CustomException(NOT_VERIFY_EMAIL);
@@ -51,7 +48,7 @@ public class ShareBoardService {
   }
 
   @Transactional
-  public void update(Long id, ShareBoardDto shareBoardDto, Principal principal) {
+  public void updateShareBoard(Long id, ShareBoardDto shareBoardDto, Principal principal) {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
@@ -67,7 +64,7 @@ public class ShareBoardService {
   }
 
   @Transactional
-  public void delete(Long id, Principal principal) {
+  public void deleteShareBoard(Long id, Principal principal) {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
@@ -78,7 +75,7 @@ public class ShareBoardService {
   }
 
   @Transactional
-  public List<ShareBoard> getList(double lat, double lon, double range, Boolean closed) {
+  public List<ShareBoard> getShareBoardList(double lat, double lon, double range, Boolean closed) {
     List<ShareBoard> shareBoardList;
     if (closed == null) {
       shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(

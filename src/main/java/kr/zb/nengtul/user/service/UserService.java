@@ -13,10 +13,7 @@ import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.global.jwt.JwtTokenProvider;
-import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
-import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
@@ -42,7 +39,7 @@ public class UserService {
 
   //회원가입 및 이메일 인증 발송
   @Transactional
-  public void join(UserJoinDto userJoinDto) {
+  public void joinUser(UserJoinDto userJoinDto) {
     // validation
     if (userRepository.existsByEmail(userJoinDto.getEmail())) {
       throw new CustomException(ALREADY_EXIST_EMAIL);
@@ -71,7 +68,7 @@ public class UserService {
 
   //이메일 인증
   @Transactional
-  public void verify(String email, String code) {
+  public void verifyEmail(String email, String code) {
     User user = findUserByEmail(email);
     if (user.isEmailVerifiedYn()) {
       throw new CustomException(ALREADY_VERIFIED);
@@ -85,7 +82,7 @@ public class UserService {
 
   //회원 탈퇴
   @Transactional
-  public void quit(Principal principal) {
+  public void quitUser(Principal principal) {
     User user = findUserByEmail(principal.getName());
 
     userRepository.deleteById(user.getId());
@@ -93,7 +90,7 @@ public class UserService {
 
   //회원 정보 수정
   @Transactional
-  public String update(Principal principal, UserUpdateDto userUpdateDto) {
+  public String updateUser(Principal principal, UserUpdateDto userUpdateDto) {
     User user = findUserByEmail(principal.getName());
 
     if (userUpdateDto.getPassword() == null || userUpdateDto.getPassword().length() < 8) {
