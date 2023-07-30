@@ -9,7 +9,6 @@ import kr.zb.nengtul.recipe.domain.dto.RecipeGetListDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeUpdateDto;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
-import kr.zb.nengtul.s3bucket.service.AmazonS3Service;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import s3bucket.service.AmazonS3Service;
 
 @Service
 @RequiredArgsConstructor
