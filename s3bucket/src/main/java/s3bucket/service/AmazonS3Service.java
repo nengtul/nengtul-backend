@@ -1,4 +1,4 @@
-package kr.zb.nengtul.s3bucket.service;
+package s3bucket.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
