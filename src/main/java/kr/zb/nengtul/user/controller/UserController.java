@@ -98,8 +98,9 @@ public class UserController {
   //회원 정보 수정(상세보기 페이지에서 진행)
   @Operation(summary = "회원 정보 수정", description = "토큰을 통해 회원을 인식하고, 회원에 대한 정보를 수정합니다.")
   @PutMapping("/detail")
-  public ResponseEntity<String> updateUser(Principal principal,
+  public ResponseEntity<Void> updateUser(Principal principal,
       @RequestBody @Valid UserUpdateDto userUpdateDto) {
-    return ResponseEntity.ok(userService.updateUser(principal, userUpdateDto));
+    userService.updateUser(principal, userUpdateDto);
+    return ResponseEntity.ok(null);
   }
 }

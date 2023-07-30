@@ -43,8 +43,6 @@ public class UserService {
     // validation
     if (userRepository.existsByEmail(userJoinDto.getEmail())) {
       throw new CustomException(ALREADY_EXIST_EMAIL);
-    } else if (userJoinDto.getPassword() == null || userJoinDto.getPassword().length() < 8) {
-      throw new CustomException(SHORT_PASSWORD);
     } else if (userRepository.existsByNickname(userJoinDto.getNickname())) {
       throw new CustomException(ALREADY_EXIST_NICKNAME);
     } else if (userRepository.existsByPhoneNumber(userJoinDto.getPhoneNumber())) {
@@ -90,14 +88,18 @@ public class UserService {
 
   //회원 정보 수정
   @Transactional
-  public String updateUser(Principal principal, UserUpdateDto userUpdateDto) {
+  public void updateUser(Principal principal, UserUpdateDto userUpdateDto) {
     User user = findUserByEmail(principal.getName());
 
-    if (userUpdateDto.getPassword() == null || userUpdateDto.getPassword().length() < 8) {
-      throw new CustomException(SHORT_PASSWORD);
-    } else if (userRepository.existsByNickname(userUpdateDto.getNickname())) {
+    // 닉네임 중복 체크
+    if (!user.getNickname().equals(userUpdateDto.getNickname()) && userRepository.existsByNickname(
+        userUpdateDto.getNickname())) {
       throw new CustomException(ALREADY_EXIST_NICKNAME);
-    } else if (userRepository.existsByPhoneNumber(userUpdateDto.getPhoneNumber())) {
+    }
+
+    // 휴대폰 번호 중복 체크
+    if (!user.getPhoneNumber().equals(userUpdateDto.getPhoneNumber())
+        && userRepository.existsByPhoneNumber(userUpdateDto.getPhoneNumber())) {
       throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
 
@@ -112,7 +114,6 @@ public class UserService {
     user.setProfileImageUrl(updateProfileImageUrl);
 
     userRepository.save(user);
-    return user.getEmail();
   }
 
   //가입한 이메일 찾기(아이디 찾기)
