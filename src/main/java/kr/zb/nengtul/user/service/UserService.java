@@ -1,6 +1,8 @@
 package kr.zb.nengtul.user.service;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_EMAIL;
+import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_PHONENUMBER;
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
@@ -41,11 +43,15 @@ public class UserService {
   //회원가입 및 이메일 인증 발송
   @Transactional
   public void join(UserJoinDto userJoinDto) {
-    // 이메일 중복 확인
+    // validation
     if (userRepository.existsByEmail(userJoinDto.getEmail())) {
       throw new CustomException(ALREADY_EXIST_EMAIL);
     } else if (userJoinDto.getPassword() == null || userJoinDto.getPassword().length() < 8) {
       throw new CustomException(SHORT_PASSWORD);
+    } else if (userRepository.existsByNickname(userJoinDto.getNickname())) {
+      throw new CustomException(ALREADY_EXIST_NICKNAME);
+    } else if (userRepository.existsByPhoneNumber(userJoinDto.getPhoneNumber())) {
+      throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
 
     User user = User.builder()
@@ -92,6 +98,10 @@ public class UserService {
 
     if (userUpdateDto.getPassword() == null || userUpdateDto.getPassword().length() < 8) {
       throw new CustomException(SHORT_PASSWORD);
+    } else if (userRepository.existsByNickname(userUpdateDto.getNickname())) {
+      throw new CustomException(ALREADY_EXIST_NICKNAME);
+    } else if (userRepository.existsByPhoneNumber(userUpdateDto.getPhoneNumber())) {
+      throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
 
     String updateProfileImageUrl =
