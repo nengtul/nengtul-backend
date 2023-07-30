@@ -1,4 +1,4 @@
-package kr.zb.nengtul.s3bucket.config;
+package s3bucket.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
