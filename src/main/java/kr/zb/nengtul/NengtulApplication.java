@@ -14,7 +14,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableFeignClients //mailgun
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
-@ComponentScan("s3bucket")
+@ComponentScan({
+        "s3bucket", "kr.zb.nengtul"
+})
 public class NengtulApplication {
 
     public static void main(String[] args) {
