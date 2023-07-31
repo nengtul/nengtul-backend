@@ -10,6 +10,7 @@ import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
+import kr.zb.nengtul.user.domain.dto.UserPasswordChangeDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,18 +38,18 @@ public class UserController {
   //회원가입
   @Operation(summary = "회원가입", description = "회원가입 요청을 보냅니다.")
   @PostMapping("/join")
-  public ResponseEntity<Void> join(@RequestBody @Valid UserJoinDto userJoinDto) {
-    userService.join(userJoinDto);
+  public ResponseEntity<Void> joinUser(@RequestBody @Valid UserJoinDto userJoinDto) {
+    userService.joinUser(userJoinDto);
     return ResponseEntity.ok(null);
   }
 
   //이메일 인증 (이메일에서 링크를 클릭하여 put 요청을 보낼 수 없어서 GET요청으로 처리)
   @Operation(summary = "이메일 인증", description = "이메일을 통해 보낸 링크 클릭시 인증이 진행됩니다.")
   @GetMapping("/verify")
-  public ResponseEntity<Void> verify(
+  public ResponseEntity<Void> verifyEmail(
       @Parameter(name = "email", description = "이메일") @RequestParam String email,
       @Parameter(name = "code", description = "인증 코드") @RequestParam String code) {
-    userService.verify(email, code);
+    userService.verifyEmail(email, code);
     return ResponseEntity.ok(null);
   }
 
@@ -90,16 +91,24 @@ public class UserController {
   //회원 탈퇴(상세보기 페이지에서 진행)
   @Operation(summary = "회원 탈퇴", description = "토큰을 통해 회원 탈퇴 요청을 보냅니다.")
   @DeleteMapping("/detail")
-  public ResponseEntity<Void> quit(Principal principal) {
-    userService.quit(principal);
+  public ResponseEntity<Void> quitUser(Principal principal) {
+    userService.quitUser(principal);
     return ResponseEntity.ok(null);
   }
 
   //회원 정보 수정(상세보기 페이지에서 진행)
   @Operation(summary = "회원 정보 수정", description = "토큰을 통해 회원을 인식하고, 회원에 대한 정보를 수정합니다.")
   @PutMapping("/detail")
-  public ResponseEntity<String> update(Principal principal,
+  public ResponseEntity<Void> updateUser(Principal principal,
       @RequestBody @Valid UserUpdateDto userUpdateDto) {
-    return ResponseEntity.ok(userService.update(principal, userUpdateDto));
+    userService.updateUser(principal, userUpdateDto);
+    return ResponseEntity.ok(null);
+  }
+  @Operation(summary = "회원 비밀번호 변경", description = "토큰을 통해 회원을 인식하고, 회원에 대한 비밀번호를 수정합니다.")
+  @PutMapping("/detail/password")
+  public ResponseEntity<Void> changePassword(Principal principal,
+      @RequestBody @Valid UserPasswordChangeDto userPasswordChangeDto) {
+    userService.changePassword(principal, userPasswordChangeDto);
+    return ResponseEntity.ok(null);
   }
 }

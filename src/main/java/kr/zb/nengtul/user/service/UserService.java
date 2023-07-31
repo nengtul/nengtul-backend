@@ -1,22 +1,22 @@
 package kr.zb.nengtul.user.service;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_EMAIL;
+import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_PHONENUMBER;
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
-import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.global.jwt.JwtTokenProvider;
 import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
-import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
+import kr.zb.nengtul.user.domain.dto.UserPasswordChangeDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
@@ -25,6 +25,7 @@ import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.elasticsearch.client.security.ChangePasswordRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,12 +41,14 @@ public class UserService {
 
   //회원가입 및 이메일 인증 발송
   @Transactional
-  public void join(UserJoinDto userJoinDto) {
-    // 이메일 중복 확인
+  public void joinUser(UserJoinDto userJoinDto) {
+    // validation
     if (userRepository.existsByEmail(userJoinDto.getEmail())) {
       throw new CustomException(ALREADY_EXIST_EMAIL);
-    } else if (userJoinDto.getPassword() == null || userJoinDto.getPassword().length() < 8) {
-      throw new CustomException(SHORT_PASSWORD);
+    } else if (userRepository.existsByNickname(userJoinDto.getNickname())) {
+      throw new CustomException(ALREADY_EXIST_NICKNAME);
+    } else if (userRepository.existsByPhoneNumber(userJoinDto.getPhoneNumber())) {
+      throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
 
     User user = User.builder()
@@ -65,7 +68,7 @@ public class UserService {
 
   //이메일 인증
   @Transactional
-  public void verify(String email, String code) {
+  public void verifyEmail(String email, String code) {
     User user = findUserByEmail(email);
     if (user.isEmailVerifiedYn()) {
       throw new CustomException(ALREADY_VERIFIED);
@@ -79,7 +82,7 @@ public class UserService {
 
   //회원 탈퇴
   @Transactional
-  public void quit(Principal principal) {
+  public void quitUser(Principal principal) {
     User user = findUserByEmail(principal.getName());
 
     userRepository.deleteById(user.getId());
@@ -87,25 +90,31 @@ public class UserService {
 
   //회원 정보 수정
   @Transactional
-  public String update(Principal principal, UserUpdateDto userUpdateDto) {
+  public void updateUser(Principal principal, UserUpdateDto userUpdateDto) {
     User user = findUserByEmail(principal.getName());
 
-    if (userUpdateDto.getPassword() == null || userUpdateDto.getPassword().length() < 8) {
-      throw new CustomException(SHORT_PASSWORD);
+    // 닉네임 중복 체크
+    if (!user.getNickname().equals(userUpdateDto.getNickname()) && userRepository.existsByNickname(
+        userUpdateDto.getNickname())) {
+      throw new CustomException(ALREADY_EXIST_NICKNAME);
+    }
+
+    // 휴대폰 번호 중복 체크
+    if (!user.getPhoneNumber().equals(userUpdateDto.getPhoneNumber())
+        && userRepository.existsByPhoneNumber(userUpdateDto.getPhoneNumber())) {
+      throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
 
     String updateProfileImageUrl =
         userUpdateDto.getProfileImageUrl() == null ? "" : userUpdateDto.getProfileImageUrl();
 
     user.setNickname(userUpdateDto.getNickname());
-    user.setPassword(passwordEncoder.encode(userUpdateDto.getPassword()));
     user.setPhoneNumber(userUpdateDto.getPhoneNumber());
     user.setAddress(userUpdateDto.getAddress());
     user.setAddressDetail(userUpdateDto.getAddressDetail());
     user.setProfileImageUrl(updateProfileImageUrl);
 
     userRepository.save(user);
-    return user.getEmail();
   }
 
   //가입한 이메일 찾기(아이디 찾기)
@@ -197,4 +206,13 @@ public class UserService {
     return userRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
   }
+
+  @Transactional
+  public void changePassword(Principal principal, UserPasswordChangeDto userPasswordChangeDto){
+    User user = findUserByEmail(principal.getName());
+
+    user.setPassword(passwordEncoder.encode(userPasswordChangeDto.getPassword()));
+    userRepository.save(user);
+  }
+
 }

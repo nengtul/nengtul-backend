@@ -35,9 +35,9 @@ public class ShareBoardController {
   //생성
   @Operation(summary = "게시글 작성", description = "게시글을 작성합니다.")
   @PostMapping
-  public ResponseEntity<Void> create(@RequestBody @Valid ShareBoardDto shareBoardDto,
+  public ResponseEntity<Void> createShareBoard(@RequestBody @Valid ShareBoardDto shareBoardDto,
       Principal principal) {
-    shareBoardService.create(shareBoardDto, principal);
+    shareBoardService.createShareBoard(shareBoardDto, principal);
     return ResponseEntity.ok(null);
   }
 
@@ -45,12 +45,12 @@ public class ShareBoardController {
   @Operation(summary = "나눔 게시물 조회", description = "내 위치 주변 나눔 게시물을 조회합니다."
       + "closed는 필수가 아니며 기입하지 않을 시 모든 상태에 대한 값이 반환되며, true = 거래완료 , false = 거래대기 상태의 게시물을 가져옵니다.")
   @GetMapping
-  public ResponseEntity<List<ShareBoardListDto>> getList(
+  public ResponseEntity<List<ShareBoardListDto>> getShareBoardList(
       @Parameter(name = "lat", description = "경도") @RequestParam double lat,
       @Parameter(name = "lon", description = "위도") @RequestParam double lon,
       @Parameter(name = "range", description = "반경 범위") @RequestParam double range,
       @Parameter(name = "closed", description = "완료 여부") @RequestParam(required = false) Boolean closed) {
-    return ResponseEntity.ok(shareBoardService.getList(lat, lon, range, closed).stream()
+    return ResponseEntity.ok(shareBoardService.getShareBoardList(lat, lon, range, closed).stream()
         .map(ShareBoardListDto::buildShareBoardListDto)
         .collect(Collectors.toList()));
   }
@@ -58,20 +58,20 @@ public class ShareBoardController {
   //수정
   @Operation(summary = "게시글 수정", description = "토큰을 통해 유저를 조회하고, 게시물 ID를 통해 유저 ID를 조회하여 비교 후 글의 작성자인 경우에 게시물을 수정할 수 있습니다.")
   @PutMapping("/{id}")
-  public ResponseEntity<Void> create(
+  public ResponseEntity<Void> updateShareBoard(
       @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id,
       @RequestBody @Valid ShareBoardDto shareBoardDto,
       Principal principal) {
-    shareBoardService.update(id, shareBoardDto, principal);
+    shareBoardService.updateShareBoard(id, shareBoardDto, principal);
     return ResponseEntity.ok(null);
   }
 
   //삭제
   @Operation(summary = "게시글 삭제", description = "토큰을 통해 유저를 조회하고, 게시물 ID를 통해 유저 ID를 조회하여 비교 후 글의 작성자인 경우에 게시물을 삭제할 수 있습니다.")
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(
+  public ResponseEntity<Void> deleteShareBoard(
       @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id, Principal principal) {
-    shareBoardService.delete(id, principal);
+    shareBoardService.deleteShareBoard(id, principal);
     return ResponseEntity.ok(null);
   }
 }

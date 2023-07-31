@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @NoArgsConstructor
@@ -68,11 +69,11 @@ public class User extends BaseTimeEntity {
   private String refreshToken; // 리프레시 토큰
 
   @JsonBackReference
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<Notice> noticeList;
 
   @JsonBackReference
-  @OneToMany
+  @OneToMany(mappedBy = "user")
   private List<ShareBoard> shareBoardList;
 
   @Builder

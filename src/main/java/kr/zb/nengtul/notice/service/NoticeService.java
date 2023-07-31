@@ -1,18 +1,14 @@
 package kr.zb.nengtul.notice.service;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_NOTICE;
-import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.notice.domain.entity.Notice;
-import kr.zb.nengtul.notice.domain.dto.NoticeDetailDto;
-import kr.zb.nengtul.notice.domain.dto.NoticeListDto;
 import kr.zb.nengtul.notice.domain.dto.NoticeReqDto;
 import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
 import kr.zb.nengtul.user.domain.entity.User;
-import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +26,7 @@ public class NoticeService {
   private final NoticeRepository noticeRepository;
 
   @Transactional
-  public void create(NoticeReqDto noticeReqDto, Principal principal) {
+  public void createNotice(NoticeReqDto noticeReqDto, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
     Notice notice = Notice.builder()
         .title(noticeReqDto.getTitle())
@@ -43,7 +39,7 @@ public class NoticeService {
   }
 
   @Transactional
-  public void update(Long noticeId, NoticeReqDto noticeReqDto, Principal principal) {
+  public void updateNotice(Long noticeId, NoticeReqDto noticeReqDto, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
@@ -61,7 +57,7 @@ public class NoticeService {
 
 
   @Transactional
-  public void delete(Long noticeId, Principal principal) {
+  public void deleteNotice(Long noticeId, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
@@ -72,12 +68,12 @@ public class NoticeService {
     }
   }
 
-  public Page<Notice> getList(Pageable pageable) {
+  public Page<Notice> getNoticeList(Pageable pageable) {
     return noticeRepository.findAll(pageable);
   }
 
   @Transactional
-  public Notice getDetails(Long noticeId) {
+  public Notice getNoticeDetails(Long noticeId) {
     Notice notice = noticeRepository.findById(noticeId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_NOTICE));
     notice.setViewCount(notice.getViewCount() + 1);
