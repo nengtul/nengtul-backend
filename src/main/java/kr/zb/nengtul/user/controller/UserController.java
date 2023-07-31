@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "USER API", description = "회원 관련 API")
 @RestController
@@ -98,10 +100,11 @@ public class UserController {
 
   //회원 정보 수정(상세보기 페이지에서 진행)
   @Operation(summary = "회원 정보 수정", description = "토큰을 통해 회원을 인식하고, 회원에 대한 정보를 수정합니다.")
-  @PutMapping("/detail")
+  @PostMapping("/detail")
   public ResponseEntity<Void> updateUser(Principal principal,
-      @RequestBody @Valid UserUpdateDto userUpdateDto) {
-    userService.updateUser(principal, userUpdateDto);
+      @RequestPart(value = "userUpdateDto")  @Valid UserUpdateDto userUpdateDto,
+      @RequestPart(value = "image", required = false) MultipartFile image) {
+    userService.updateUser(principal, userUpdateDto, image);
     return ResponseEntity.ok(null);
   }
   @Operation(summary = "회원 비밀번호 변경", description = "토큰을 통해 회원을 인식하고, 회원에 대한 비밀번호를 수정합니다.")

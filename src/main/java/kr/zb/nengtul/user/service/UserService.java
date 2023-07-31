@@ -12,7 +12,6 @@ import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
@@ -25,10 +24,12 @@ import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.elasticsearch.client.security.ChangePasswordRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import s3bucket.service.AmazonS3Service;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final MailgunClient mailgunClient;
+  private final AmazonS3Service amazonS3Service;
 
   //회원가입 및 이메일 인증 발송
   @Transactional
@@ -90,7 +92,7 @@ public class UserService {
 
   //회원 정보 수정
   @Transactional
-  public void updateUser(Principal principal, UserUpdateDto userUpdateDto) {
+  public void updateUser(Principal principal, UserUpdateDto userUpdateDto, MultipartFile image) {
     User user = findUserByEmail(principal.getName());
 
     // 닉네임 중복 체크
@@ -105,14 +107,14 @@ public class UserService {
       throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
 
-    String updateProfileImageUrl =
-        userUpdateDto.getProfileImageUrl() == null ? "" : userUpdateDto.getProfileImageUrl();
+//    String updateProfileImageUrl = );
 
     user.setNickname(userUpdateDto.getNickname());
     user.setPhoneNumber(userUpdateDto.getPhoneNumber());
     user.setAddress(userUpdateDto.getAddress());
     user.setAddressDetail(userUpdateDto.getAddressDetail());
-    user.setProfileImageUrl(updateProfileImageUrl);
+    user.setProfileImageUrl(amazonS3Service.uploadFileForProfile(
+        image, principal.getName()));
 
     userRepository.save(user);
   }
@@ -208,7 +210,7 @@ public class UserService {
   }
 
   @Transactional
-  public void changePassword(Principal principal, UserPasswordChangeDto userPasswordChangeDto){
+  public void changePassword(Principal principal, UserPasswordChangeDto userPasswordChangeDto) {
     User user = findUserByEmail(principal.getName());
 
     user.setPassword(passwordEncoder.encode(userPasswordChangeDto.getPassword()));

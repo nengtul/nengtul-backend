@@ -3,7 +3,6 @@ package kr.zb.nengtul.comment.domain.dto;
 import static kr.zb.nengtul.global.exception.ErrorCode.CONTENT_NOT_NULL_MESSAGE;
 
 import jakarta.validation.constraints.NotEmpty;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
