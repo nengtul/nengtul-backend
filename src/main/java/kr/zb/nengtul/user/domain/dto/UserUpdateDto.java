@@ -24,10 +24,6 @@ public class UserUpdateDto {
   @NotEmpty(message = NICKNAME_NOT_NULL_MESSAGE)
   private String nickname;
 
-  @NotEmpty(message = PASSWORD_NOT_NULL_MESSAGE)
-  @Size(min = 8, message = SHORT_PASSWORD_LENGTH_MESSAGE)
-  private String password;
-
   @NotEmpty(message = PHONE_NUMBER_NOT_NULL_MESSAGE)
   @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = PHONE_NUMBER_FORMAT_MESSAGE)
   private String phoneNumber;
