@@ -106,15 +106,15 @@ public class UserService {
         && userRepository.existsByPhoneNumber(userUpdateDto.getPhoneNumber())) {
       throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
-
-//    String updateProfileImageUrl = );
+    String profileImgUrl = (image != null)
+        ? amazonS3Service.uploadFileForProfile(image, principal.getName())
+        : user.getProfileImageUrl();
 
     user.setNickname(userUpdateDto.getNickname());
     user.setPhoneNumber(userUpdateDto.getPhoneNumber());
     user.setAddress(userUpdateDto.getAddress());
     user.setAddressDetail(userUpdateDto.getAddressDetail());
-    user.setProfileImageUrl(amazonS3Service.uploadFileForProfile(
-        image, principal.getName()));
+    user.setProfileImageUrl(profileImgUrl);
 
     userRepository.save(user);
   }
