@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.List;
+import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
@@ -74,6 +75,10 @@ public class User extends BaseTimeEntity {
   @JsonBackReference
   @OneToMany(mappedBy = "user")
   private List<ShareBoard> shareBoardList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
+  private List<Comment> commentList;
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
