@@ -7,15 +7,16 @@ import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
-import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
+import kr.zb.nengtul.user.domain.dto.UserPasswordChangeDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
@@ -24,6 +25,7 @@ import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.elasticsearch.client.security.ChangePasswordRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,7 +109,6 @@ public class UserService {
         userUpdateDto.getProfileImageUrl() == null ? "" : userUpdateDto.getProfileImageUrl();
 
     user.setNickname(userUpdateDto.getNickname());
-    user.setPassword(passwordEncoder.encode(userUpdateDto.getPassword()));
     user.setPhoneNumber(userUpdateDto.getPhoneNumber());
     user.setAddress(userUpdateDto.getAddress());
     user.setAddressDetail(userUpdateDto.getAddressDetail());
@@ -205,4 +206,13 @@ public class UserService {
     return userRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
   }
+
+  @Transactional
+  public void changePassword(Principal principal, UserPasswordChangeDto userPasswordChangeDto){
+    User user = findUserByEmail(principal.getName());
+
+    user.setPassword(passwordEncoder.encode(userPasswordChangeDto.getPassword()));
+    userRepository.save(user);
+  }
+
 }
