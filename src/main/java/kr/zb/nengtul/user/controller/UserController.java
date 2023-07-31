@@ -10,6 +10,7 @@ import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
+import kr.zb.nengtul.user.domain.dto.UserPasswordChangeDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -101,6 +102,13 @@ public class UserController {
   public ResponseEntity<Void> updateUser(Principal principal,
       @RequestBody @Valid UserUpdateDto userUpdateDto) {
     userService.updateUser(principal, userUpdateDto);
+    return ResponseEntity.ok(null);
+  }
+  @Operation(summary = "회원 비밀번호 변경", description = "토큰을 통해 회원을 인식하고, 회원에 대한 비밀번호를 수정합니다.")
+  @PutMapping("/detail/password")
+  public ResponseEntity<Void> changePassword(Principal principal,
+      @RequestBody @Valid UserPasswordChangeDto userPasswordChangeDto) {
+    userService.changePassword(principal, userPasswordChangeDto);
     return ResponseEntity.ok(null);
   }
 }
