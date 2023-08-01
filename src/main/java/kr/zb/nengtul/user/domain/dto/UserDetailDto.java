@@ -14,6 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDetailDto {
+  private Long id;
   private String name;
   private String nickname;
   private String phoneNumber;
@@ -26,6 +27,7 @@ public class UserDetailDto {
 
   public static UserDetailDto buildUserDetailDto(User user){
     return UserDetailDto.builder()
+        .id(user.getId())
         .name(user.getName())
         .nickname(user.getNickname())
         .phoneNumber(user.getPhoneNumber())
