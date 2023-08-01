@@ -29,6 +29,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 public class User extends BaseTimeEntity {
 
   @Id

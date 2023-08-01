@@ -40,7 +40,7 @@ public class AmazonS3Service {
             e.printStackTrace();
         }
 
-        return "파일을 확인해주세요.";
+        return "";
     }
 
     public String uploadFileForRecipeCookingStep(
@@ -73,7 +73,7 @@ public class AmazonS3Service {
             e.printStackTrace();
         }
 
-        return "파일을 확인해주세요.";
+        return "";
     }
 
 }

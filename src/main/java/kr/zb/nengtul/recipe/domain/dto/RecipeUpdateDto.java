@@ -2,12 +2,14 @@ package kr.zb.nengtul.recipe.domain.dto;
 
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RecipeUpdateDto {
 
     private String title;
