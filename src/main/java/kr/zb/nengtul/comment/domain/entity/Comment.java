@@ -23,11 +23,15 @@ public class Comment extends BaseTimeEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long recipeId;
+  private String recipeId;
 
   @JsonManagedReference
   @ManyToOne
   private User user;
 
   private String content;
+
+  public void setContent(String content) {
+    this.content = content;
+  }
 }

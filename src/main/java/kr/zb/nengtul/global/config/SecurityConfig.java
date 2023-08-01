@@ -69,11 +69,13 @@ public class SecurityConfig {
                 "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
                 "/v1/user/findid",//아이디 찾기
                 "/v1/user/verify/**", //이메일 인증
-                "/v1/notice/list/**" //공지사항 조회관련
+                "/v1/notice/list/**", //공지사항 조회관련
+                "/v1/recipe/commentlist/**" //댓글 조회
             ).permitAll()
             .requestMatchers("/v1/user/**",
                 "/v1/shareboard/**",
-                "/v1/recipe/**"
+                "/v1/recipe/**",
+                "/v1/recipe/comment/**"//댓글 작성,수정,삭제
             ).hasAnyRole("USER", "ADMIN")
             .requestMatchers(
                 "/v1/admin/**",
