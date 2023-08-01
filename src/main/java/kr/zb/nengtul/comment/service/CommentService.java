@@ -59,7 +59,9 @@ public class CommentService {
   }
 
   public Page<CommentGetDto> findAllCommentByRecipeId(String recipeId, Pageable pageable){
-    Page<Comment> commentList = commentRepository.findAllByRecipeId(recipeId, pageable);
+    RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+    Page<Comment> commentList = commentRepository.findAllByRecipeId(recipeDocument.getId(), pageable);
     return commentList.map(CommentGetDto::buildCommentGetDto);
   }
 }
