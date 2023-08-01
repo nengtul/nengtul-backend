@@ -38,9 +38,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
-	//crawling
-	implementation 'org.jsoup:jsoup:1.15.3'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	//chatting
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 
 	//spring batch
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
