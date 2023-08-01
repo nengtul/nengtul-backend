@@ -15,6 +15,7 @@ import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -71,6 +72,8 @@ public class SecurityConfig {
                 "/v1/user/verify/**", //이메일 인증
                 "/v1/notice/list/**" //공지사항 조회관련
             ).permitAll()
+                //recipe GET 매핑은 허가
+                .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
             .requestMatchers("/v1/user/**",
                 "/v1/shareboard/**",
                 "/v1/recipe/**"

@@ -9,7 +9,6 @@ import kr.zb.nengtul.recipe.domain.dto.RecipeGetListDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeUpdateDto;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
-import kr.zb.nengtul.s3bucket.service.AmazonS3Service;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import s3bucket.service.AmazonS3Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -34,6 +34,7 @@ public class RecipeService {
 
     private final AmazonS3Service amazonS3Service;
 
+    @Transactional
     public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
                           List<MultipartFile> images) {
 
@@ -143,6 +144,7 @@ public class RecipeService {
         recipeSearchRepository.save(recipeDocument);
     }
 
+    @Transactional
     public void deleteRecipe(Principal principal, String recipeId) {
 
         User user = userRepository.findByEmail(principal.getName())
