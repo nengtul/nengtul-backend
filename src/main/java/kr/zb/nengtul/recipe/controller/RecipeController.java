@@ -82,8 +82,6 @@ public class RecipeController {
                                    @RequestPart List<MultipartFile> images,
                                    @RequestPart MultipartFile thumbnail) {
 
-        //바꿀 url, update 사진  ->  처리
-
         recipeService.updateRecipe(principal, recipeId, recipeUpdateDto,
                 images, thumbnail);
 
