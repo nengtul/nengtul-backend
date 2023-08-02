@@ -8,11 +8,11 @@ spring:
     hikari:
       pool-name: jpa-hikari-pool
       maximum-pool-size: 5
-  # JPA ??
   elasticsearch:
     uris: ${ES_URI}
-#    password: ${ES_PASSWORD}
-#    username: ${ES_USER_NAME}
+    password: ${ES_PASSWORD}
+    username: ${ES_USER_NAME}
+  # JPA ??
   jpa:
     generate-ddl: true
     database-platform: org.hibernate.dialect.MySQL8Dialect

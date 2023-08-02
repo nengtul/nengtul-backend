@@ -72,39 +72,35 @@ public class RecipeDocument {
 
     public void updateRecipe(RecipeUpdateDto recipeUpdateDto) {
 
-        if (recipeUpdateDto.getTitle() != null) {
+        if (!recipeUpdateDto.getTitle().isEmpty()) {
             this.title = recipeUpdateDto.getTitle();
         }
 
-        if (recipeUpdateDto.getIntro() != null) {
+        if (!recipeUpdateDto.getIntro().isEmpty()) {
             this.ingredient = recipeUpdateDto.getIntro();
         }
 
-        if (recipeUpdateDto.getIngredient() != null) {
+        if (!recipeUpdateDto.getIngredient().isEmpty()) {
             this.ingredient = recipeUpdateDto.getIngredient();
         }
 
-        if (recipeUpdateDto.getCookingStep() != null) {
+        if (!recipeUpdateDto.getCookingStep().isEmpty()) {
             this.cookingStep = recipeUpdateDto.getCookingStep();
         }
 
-        if (recipeUpdateDto.getImageUrl() != null) {
-            this.imageUrl = recipeUpdateDto.getImageUrl();
-        }
-
-        if (recipeUpdateDto.getCookingTime() != null) {
+        if (!recipeUpdateDto.getCookingTime().isEmpty()) {
             this.cookingTime = recipeUpdateDto.getCookingTime();
         }
 
-        if (recipeUpdateDto.getServing() != null) {
+        if (!recipeUpdateDto.getServing().isEmpty()) {
             this.serving = recipeUpdateDto.getServing();
         }
 
-        if (recipeUpdateDto.getRecipeCategory() != null) {
+        if (!recipeUpdateDto.getRecipeCategory().equals(RecipeCategory.None)) {
             this.category = recipeUpdateDto.getRecipeCategory();
         }
 
-        if (recipeUpdateDto.getVideoUrl() != null) {
+        if (!recipeUpdateDto.getVideoUrl().isEmpty()) {
             this.videoUrl = recipeUpdateDto.getVideoUrl();
         }
 

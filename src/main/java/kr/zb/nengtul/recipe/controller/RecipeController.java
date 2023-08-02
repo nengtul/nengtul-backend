@@ -28,9 +28,10 @@ public class RecipeController {
     @PostMapping
     ResponseEntity<?> addRecipe(Principal principal,
                                 @RequestPart @Valid RecipeAddDto recipeAddDto,
-                                @RequestPart List<MultipartFile> images) {
+                                @RequestPart List<MultipartFile> images,
+                                @RequestPart MultipartFile thumbnail) {
 
-        recipeService.addRecipe(principal, recipeAddDto, images);
+        recipeService.addRecipe(principal, recipeAddDto, images, thumbnail);
 
         return ResponseEntity.ok(null);
     }
@@ -77,9 +78,14 @@ public class RecipeController {
     @PutMapping("/{recipeId}")
     ResponseEntity<?> updateRecipe(Principal principal,
                                    @PathVariable String recipeId,
-                                   @RequestBody RecipeUpdateDto recipeUpdateDto) {
+                                   @RequestPart RecipeUpdateDto recipeUpdateDto,
+                                   @RequestPart List<MultipartFile> images,
+                                   @RequestPart MultipartFile thumbnail) {
 
-        recipeService.updateRecipe(principal, recipeId, recipeUpdateDto);
+        //바꿀 url, update 사진  ->  처리
+
+        recipeService.updateRecipe(principal, recipeId, recipeUpdateDto,
+                images, thumbnail);
 
         return ResponseEntity.ok(null);
     }

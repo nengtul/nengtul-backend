@@ -47,10 +47,10 @@ public class AmazonS3Service {
     }
 
     public String uploadFileForRecipeCookingStep(
-            List<MultipartFile> files, String recipeId) {
+            List<MultipartFile> files, String uuidRandom) {
 
         try {
-            log.info("[uploadFileForRecipeCookingStep 시작]" + " RecipeId : " + recipeId);
+            log.info("[uploadFileForRecipeCookingStep 시작]" + " UUID : " + uuidRandom);
 
             ObjectMetadata metadata = new ObjectMetadata();
 
@@ -58,10 +58,11 @@ public class AmazonS3Service {
 
             int count = 1;
             for (MultipartFile file : files) {
+
                 metadata.setContentType(file.getContentType());
                 metadata.setContentLength(file.getSize());
 
-                String fileKey = "RecipeCookingStep/" + recipeId + "/" + count++;
+                String fileKey = "RecipeCookingStep/" + uuidRandom + "/" + count++;
 
                 amazonS3Client.putObject(bucket, fileKey, file.getInputStream(), metadata);
 
@@ -69,8 +70,34 @@ public class AmazonS3Service {
                         .append("\\");
             }
 
-            log.info("[uploadFileForRecipeCookingStep 완료]" + " RecipeId : " + recipeId);
+            log.info("[uploadFileForRecipeCookingStep 완료]" + " UUID : " + uuidRandom);
             return stringBuilder.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info(e.getMessage());
+        }
+
+        return "";
+    }
+
+    public String uploadFileForRecipeThumbnail(
+            MultipartFile file, String stringUUID) {
+
+        try {
+            log.info("[uploadFileForRecipeThumbnail 시작]" + " UUID : " + stringUUID);
+
+            ObjectMetadata metadata = new ObjectMetadata();
+
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+
+            String fileKey = "thumbnail/" + stringUUID;
+
+            amazonS3Client.putObject(bucket, fileKey, file.getInputStream(), metadata);
+
+            log.info("[uploadFileForRecipeThumbnail 완료]" + " UUID : " + stringUUID);
+            return amazonS3Client.getUrl(bucket, fileKey).toString();
 
         } catch (IOException e) {
             e.printStackTrace();
