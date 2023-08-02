@@ -11,6 +11,7 @@ public enum ErrorCode {
   ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 사용자입니다."),
   SELF_MESSAGE_FORBIDDEN(HttpStatus.FORBIDDEN, "자신에게 메세지를 보낼 수는 없습니다."),
   NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, "해당하는 채팅방을 찾을 수 없습니다."),
+  NOT_FOUND_CHAT(HttpStatus.NOT_FOUND, "해당하는 채팅을 찾을 수 없습니다."),
   ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 이메일입니다."),
   ALREADY_EXIST_NICKNAME(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 닉네임입니다."),
   ALREADY_EXIST_PHONENUMBER(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 휴대폰 번호입니다."),

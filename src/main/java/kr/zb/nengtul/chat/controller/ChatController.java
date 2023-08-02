@@ -1,20 +1,24 @@
 package kr.zb.nengtul.chat.controller;
 
 import java.util.List;
-import kr.zb.nengtul.chat.dto.ChatDto;
-import kr.zb.nengtul.chat.dto.ChatMessage;
-import kr.zb.nengtul.chat.dto.ChatRoomDto;
-import kr.zb.nengtul.chat.dto.ChatRoomListDto;
+import kr.zb.nengtul.chat.domain.Chat;
+import kr.zb.nengtul.chat.domain.ChatRoom;
+import kr.zb.nengtul.chat.dto.SendMessage;
+import kr.zb.nengtul.chat.dto.SendMessage.Response;
+import kr.zb.nengtul.chat.dto.StartChat;
+import kr.zb.nengtul.chat.service.ChatRoomService;
 import kr.zb.nengtul.chat.service.ChatService;
+import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
+import kr.zb.nengtul.shareboard.service.ShareBoardService;
+import kr.zb.nengtul.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,46 +26,58 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final SimpMessagingTemplate messagingTemplate;
-
+    private final ChatRoomService chatRoomService;
+    private final ShareBoardService shareBoardService;
     private final ChatService chatService;
 
 
-    @Transactional
-    @MessageMapping("/chat/getRoomId") // roomId 생성 요청
-    public void getRoomId(ChatRoomDto chatRoomDto) {
-        Long receiver = chatRoomDto.getReceiver();
-        Long sender = chatRoomDto.getSender();
+    @MessageMapping("/chat/startChat/{shareBoardId}")
+    @SendToUser("/queue/startChat")
+    public StartChat.Response startChat(
+            @AuthenticationPrincipal User sender,
+            @DestinationVariable Long shareBoardId,
+            @Payload String content
+    ) {
+        ShareBoard shareBoard = shareBoardService.findById(shareBoardId);
+        User receiver = shareBoard.getUser();
+        ChatRoom chatRoom = chatRoomService.findOrCreateRoom(sender, receiver, shareBoard);
+        Chat message = chatService.createMessage(sender, chatRoom, content);
 
-        String roomId = chatService.getRoomId(sender, receiver);
-
-        // 해당되거나 새로운 채팅방의 roomId를 보내줍니다.
-        messagingTemplate.convertAndSend("/topic/roomId/" + sender.toString(),
-                roomId);
+        return new StartChat.Response(message);
     }
 
-    @MessageMapping("/chat/join/{roomId}") // 채팅방 입장
-    public void joinChat(@DestinationVariable String roomId) {
+    @MessageMapping("/chat/sendMessage/{roomId}")
+    @SendTo("/topic/room/{roomId}")
+    public SendMessage.Response sendMessage(
+            @AuthenticationPrincipal User sender,
+            @DestinationVariable String roomId,
+            @Payload String content
+    ) {
+        ChatRoom chatRoom = chatRoomService.findById(roomId);
+        Chat message = chatService.createMessage(sender, chatRoom, content);
 
-        List<ChatDto> chatList = chatService.joinChat(roomId); //이전 채팅기록을 전달해줍니다.
-
-        messagingTemplate.convertAndSend("/topic/chatHistory/" + roomId, chatList);
+        return SendMessage.Response.fromEntity(message);
     }
 
-    @GetMapping("v1/chat/list/{userId}") // 유저가 소유한 채팅방 리스트
-    public List<ChatRoomListDto> getUserOwnedChatRoom(@PathVariable Long userId) {
-        return chatService.getUserOwnedChatRoom(userId);
+    @MessageMapping("/chat/previousMessage/{roomId}")
+    @SendToUser("/queue/previousMessage")
+    public List<SendMessage.Response> getPreviousMessages(
+            @DestinationVariable String roomId
+    ) {
+        List<Chat> messages = chatService.getPreviousMessages(roomId);
+        return messages.stream().map(Response::fromEntity).toList();
     }
 
-
-    @MessageMapping("/chat/{roomId}")
-    @SendTo("/topic/messages/{roomId}")
-    public ChatMessage sendChatMessage(@DestinationVariable String roomId, ChatMessage message) {
-        chatService.saveChatMessage(roomId, message);
-        return message;
-
+    @MessageMapping("/chat/markAsRead/{chatId}")
+    public void markAsRead(@AuthenticationPrincipal User reader, @DestinationVariable Long chatId) {
+        chatService.markAsRead(chatId, reader);
     }
 
+    @MessageMapping("/chat/markAllAsRead/{roomId}")
+    public void markAllAsRead(@AuthenticationPrincipal User reader,
+            @DestinationVariable String roomId) {
+        chatService.markAllAsRead(roomId, reader);
+    }
 
 }
 

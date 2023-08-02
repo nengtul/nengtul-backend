@@ -24,11 +24,13 @@ import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -57,8 +59,9 @@ public class ChatRoom {
     @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
-    public ChatRoom() {
+    public ChatRoom(ShareBoard shareBoard) {
         this.roomId = UUID.randomUUID().toString();
+        this.shareBoard = shareBoard;
     }
 
 }
