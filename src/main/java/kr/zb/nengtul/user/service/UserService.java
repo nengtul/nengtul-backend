@@ -106,15 +106,22 @@ public class UserService {
         && userRepository.existsByPhoneNumber(userUpdateDto.getPhoneNumber())) {
       throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
-    String profileImgUrl = (image != null)
-        ? amazonS3Service.uploadFileForProfile(image, principal.getName())
-        : user.getProfileImageUrl();
 
+    if (image != null) {
+      if (user.getProfileImageUrl() != null) {
+        // 이미지가 있을 경우 이미지 업데이트
+        amazonS3Service.updateFile(image, user.getProfileImageUrl());
+      } else {
+        // 이미지가 없을 경우 새 이미지 업로드
+        user.setProfileImageUrl(amazonS3Service.uploadFileForProfile(image, user.getEmail()));
+      }
+    }
+
+    // 사용자 정보 업데이트
     user.setNickname(userUpdateDto.getNickname());
     user.setPhoneNumber(userUpdateDto.getPhoneNumber());
     user.setAddress(userUpdateDto.getAddress());
     user.setAddressDetail(userUpdateDto.getAddressDetail());
-    user.setProfileImageUrl(profileImgUrl);
 
     userRepository.save(user);
   }

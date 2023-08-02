@@ -25,8 +25,6 @@ public class ShareBoardDto {
   @NotEmpty(message = TITLE_NOT_NULL_MESSAGE)
   private String title;
 
-  private String shareImg;
-
   private Long price;
 
   @NotNull(message = LAT_NOT_NULL_MESSAGE)
