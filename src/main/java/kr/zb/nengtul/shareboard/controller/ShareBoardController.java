@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "SHARE BOARD API", description = "나눔 게시판 API")
 @RestController
@@ -35,9 +37,9 @@ public class ShareBoardController {
   //생성
   @Operation(summary = "게시글 작성", description = "게시글을 작성합니다.")
   @PostMapping
-  public ResponseEntity<Void> createShareBoard(@RequestBody @Valid ShareBoardDto shareBoardDto,
-      Principal principal) {
-    shareBoardService.createShareBoard(shareBoardDto, principal);
+  public ResponseEntity<Void> createShareBoard(@RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
+      Principal principal,@RequestPart(value = "image") List<MultipartFile> image) {
+    shareBoardService.createShareBoard(shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
 
@@ -60,7 +62,7 @@ public class ShareBoardController {
   @PutMapping("/{id}")
   public ResponseEntity<Void> updateShareBoard(
       @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id,
-      @RequestBody @Valid ShareBoardDto shareBoardDto,
+      @RequestPart @Valid ShareBoardDto shareBoardDto,
       Principal principal) {
     shareBoardService.updateShareBoard(id, shareBoardDto, principal);
     return ResponseEntity.ok(null);

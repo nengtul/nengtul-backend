@@ -31,6 +31,8 @@ public class ShareBoard extends BaseTimeEntity {
   private User user;
 
   private String title;
+  private String content;
+  private String place;
 
   private String shareImg;
 
