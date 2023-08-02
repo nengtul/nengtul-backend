@@ -33,7 +33,7 @@ spring:
 
     refresh:
       expiration: 1209600000 #  (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> 하루) * 14(2주))
-      header: Authorization-refresh
+      header: RefreshToken
   mailgun:
     secret-key: ${spring.mailgun.secret-key}
     domain: ${spring.mailgun.domain}

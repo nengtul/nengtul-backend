@@ -24,6 +24,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -45,6 +48,7 @@ public class SecurityConfig {
   private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
   private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
   private final CustomOAuth2UserService customOAuth2UserService;
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -59,7 +63,7 @@ public class SecurityConfig {
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
-                "/swagger-ui/**","/swagger-resources/**","/v3/api-docs/**","/v2/api-docs/**",
+                "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
                 "/h2-console/**",
                 "/index.html",
                 "/login/**",
@@ -87,6 +91,10 @@ public class SecurityConfig {
         .oauth2Login(oauth2Login -> oauth2Login
             .successHandler(oAuth2LoginSuccessHandler)
             .failureHandler(oAuth2LoginFailureHandler)
+            .authorizationEndpoint(
+                authorizationEndpoint -> authorizationEndpoint.baseUri("/oauth2/authorize"))
+            .redirectionEndpoint(
+                redirectionEndpoint -> redirectionEndpoint.baseUri("/*/oauth2/code/*"))
             .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
                 customOAuth2UserService)))
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
