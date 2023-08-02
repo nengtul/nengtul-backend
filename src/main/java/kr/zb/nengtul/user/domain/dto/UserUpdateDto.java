@@ -27,7 +27,6 @@ public class UserUpdateDto {
   @NotEmpty(message = PHONE_NUMBER_NOT_NULL_MESSAGE)
   @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = PHONE_NUMBER_FORMAT_MESSAGE)
   private String phoneNumber;
-  private String profileImageUrl;
   private String address;
   private String addressDetail;
 }

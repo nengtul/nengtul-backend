@@ -8,14 +8,15 @@ import kr.zb.nengtul.global.handler.LoginSuccessHandler;
 import kr.zb.nengtul.global.jwt.JwtAuthenticationProcessingFilter;
 import kr.zb.nengtul.global.jwt.JwtTokenProvider;
 import kr.zb.nengtul.global.jwt.service.CustomUserDetailService;
+import kr.zb.nengtul.global.oauth2.exception.RestAuthenticationEntryPoint;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginFailureHandler;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginSuccessHandler;
+import kr.zb.nengtul.global.handler.TokenAccessDeniedHandler;
 import kr.zb.nengtul.global.oauth2.service.CustomOAuth2UserService;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,9 +26,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
-import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -49,25 +47,27 @@ public class SecurityConfig {
   private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
   private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
   private final CustomOAuth2UserService customOAuth2UserService;
-
+  private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
     http
-        .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .csrf(AbstractHttpConfigurer::disable)
-        .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
             SessionCreationPolicy.STATELESS))
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
+        .exceptionHandling(exceptionHandling -> exceptionHandling
+            .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+            .accessDeniedHandler(tokenAccessDeniedHandler))
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
+            .requestMatchers(
+
+                "/css/**", "/images/**", "/js/**", "/favicon.ico",
                 "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
-                "/h2-console/**",
-                "/index.html",
-                "/login/**",
                 "/v1/auth/**",
                 "/v1/user/join",//회원가입
                 "/v1/user/login",//로그인
@@ -77,9 +77,8 @@ public class SecurityConfig {
                 "/v1/notice/list/**", //공지사항 조회관련
                 "/v1/recipe/commentlist/**" //댓글 조회
             ).permitAll()
-                //recipe GET 매핑은 허가
-                .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
-            .requestMatchers("/v1/user/**",
+            .requestMatchers(
+                "/v1/user/**",
                 "/v1/shareboard/**",
                 "/v1/recipe/**",
                 "/v1/recipe/comment/**"//댓글 작성,수정,삭제
@@ -92,14 +91,15 @@ public class SecurityConfig {
         )
         //== 소셜 로그인 설정 ==//
         .oauth2Login(oauth2Login -> oauth2Login
-            .successHandler(oAuth2LoginSuccessHandler)
-            .failureHandler(oAuth2LoginFailureHandler)
             .authorizationEndpoint(
                 authorizationEndpoint -> authorizationEndpoint.baseUri("/oauth2/authorize"))
             .redirectionEndpoint(
                 redirectionEndpoint -> redirectionEndpoint.baseUri("/*/oauth2/code/*"))
             .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
-                customOAuth2UserService)))
+                customOAuth2UserService))
+            .successHandler(oAuth2LoginSuccessHandler)
+            .failureHandler(oAuth2LoginFailureHandler)
+        )
         // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
         .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
         .addFilterBefore(jwtAuthenticationProcessingFilter(),

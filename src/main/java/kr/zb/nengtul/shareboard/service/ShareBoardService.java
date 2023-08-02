@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import s3bucket.service.AmazonS3Service;
 
 @Service
 @RequiredArgsConstructor
@@ -26,22 +28,26 @@ public class ShareBoardService {
   private final UserRepository userRepository;
   private final UserService userService;
   private final ShareBoardRepository shareBoardRepository;
+  private final AmazonS3Service amazonS3Service;
 
   @Transactional
-  public void createShareBoard(ShareBoardDto shareBoardDto, Principal principal) {
+  public void createShareBoard(ShareBoardDto shareBoardDto, Principal principal, List<MultipartFile> image) {
     User user = userService.findUserByEmail(principal.getName());
     if (!user.isEmailVerifiedYn()) {
       throw new CustomException(NOT_VERIFY_EMAIL);
     }
+
     ShareBoard shareBoard = ShareBoard.builder()
         .user(user)
         .title(shareBoardDto.getTitle())
-        .shareImg(shareBoardDto.getShareImg())
         .price(shareBoardDto.getPrice())
+        .content(shareBoardDto.getContent())
+        .place(shareBoardDto.getPlace())
         .lat(shareBoardDto.getLat())
         .lon(shareBoardDto.getLon())
         .closed(false)
         .build();
+    shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image,shareBoard.getId()));
     user.setPointAddShardBoard(user.getPoint());
     userRepository.saveAndFlush(user);
     shareBoardRepository.save(shareBoard);
@@ -56,7 +62,8 @@ public class ShareBoardService {
       throw new CustomException(NO_PERMISSION);
     }
     shareBoard.setTitle(shareBoardDto.getTitle());
-    shareBoard.setShareImg(shareBoardDto.getShareImg());
+    shareBoard.setContent(shareBoard.getContent());
+    shareBoard.setPlace(shareBoard.getPlace());
     shareBoard.setPrice(shareBoardDto.getPrice());
     shareBoard.setLat(shareBoardDto.getLat());
     shareBoard.setLat(shareBoardDto.getLon());
