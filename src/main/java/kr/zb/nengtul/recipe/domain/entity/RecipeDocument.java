@@ -44,7 +44,7 @@ public class RecipeDocument {
     private String cookingStep;
 
     @Field(type = FieldType.Keyword, index = false)
-    private String thumbnail;
+    private String thumbnailUrl;
 
     @Field(type = FieldType.Keyword, index = false)
     private String imageUrl;
