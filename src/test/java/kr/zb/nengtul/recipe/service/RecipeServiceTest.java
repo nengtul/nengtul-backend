@@ -21,10 +21,7 @@ import s3bucket.service.AmazonS3Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -141,6 +138,7 @@ class RecipeServiceTest {
         //given
         RecipeAddDto recipeAddDto = new RecipeAddDto();
         List<MultipartFile> images = Collections.singletonList(mock(MultipartFile.class));
+        MultipartFile thumbnail = mock(MultipartFile.class);
 
         User user = new User();
 
@@ -150,7 +148,7 @@ class RecipeServiceTest {
                 .thenReturn("image_url");
 
         //when
-        recipeService.addRecipe(mock(Principal.class), recipeAddDto, images);
+        recipeService.addRecipe(mock(Principal.class), recipeAddDto, images, thumbnail);
 
         //then
         verify(recipeSearchRepository, times(1))
@@ -282,6 +280,9 @@ class RecipeServiceTest {
                 .title("수정된 타이틀")
                 .ingredient("수정된 재료")
                 .recipeCategory(RecipeCategory.ETC)
+                .imagesUrl("수정된 Url")
+                .intro("")
+                .videoUrl("")
                 .cookingStep("수정된 조리 스텝")
                 .cookingTime("수정된 시간")
                 .serving("수정된 양")
@@ -300,6 +301,7 @@ class RecipeServiceTest {
                 .ingredient("재료1, 재료2, 재료3")
                 .cookingStep("테스트 쿠킹 스텝")
                 .imageUrl("testimageurl1")
+                .thumbnailUrl("testThumbnailUrl")
                 .cookingTime("30분")
                 .serving("1인분")
                 .viewCount(0L)
@@ -317,9 +319,9 @@ class RecipeServiceTest {
         when(recipeSearchRepository.findById(any()))
                 .thenReturn(Optional.of(recipeDocument));
 
-
         //when
-        recipeService.updateRecipe(principal, recipeDocument.getId(), recipeUpdateDto);
+        recipeService.updateRecipe(principal, recipeDocument.getId(), recipeUpdateDto,
+                Collections.singletonList(mock(MultipartFile.class)), mock(MultipartFile.class));
 
         //then
         assertEquals(recipeDocument.getTitle(), recipeUpdateDto.getTitle());
@@ -367,6 +369,5 @@ class RecipeServiceTest {
         verify(recipeSearchRepository, times(1))
                 .delete(any(RecipeDocument.class));
     }
-
 
 }

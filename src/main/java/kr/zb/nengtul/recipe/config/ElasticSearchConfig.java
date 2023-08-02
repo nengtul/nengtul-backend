@@ -26,10 +26,11 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
     public RestHighLevelClient elasticsearchClient() {
 
         ClientConfiguration configuration = ClientConfiguration.builder()
-            .connectedTo(elasticSearchHostUri)
-            .withBasicAuth(userName, password)
-            .build();
+                .connectedTo(elasticSearchHostUri)
+                .withBasicAuth(userName, password)
+                .build();
 
         return RestClients.create(configuration).rest();
     }
+
 }
