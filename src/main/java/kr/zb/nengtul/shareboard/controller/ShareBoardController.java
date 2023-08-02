@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -37,8 +35,9 @@ public class ShareBoardController {
   //생성
   @Operation(summary = "게시글 작성", description = "게시글을 작성합니다.")
   @PostMapping
-  public ResponseEntity<Void> createShareBoard(@RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
-      Principal principal,@RequestPart(value = "image") List<MultipartFile> image) {
+  public ResponseEntity<Void> createShareBoard(
+      @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
+      @RequestPart(value = "images") List<MultipartFile> image, Principal principal) {
     shareBoardService.createShareBoard(shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
@@ -59,12 +58,13 @@ public class ShareBoardController {
 
   //수정
   @Operation(summary = "게시글 수정", description = "토큰을 통해 유저를 조회하고, 게시물 ID를 통해 유저 ID를 조회하여 비교 후 글의 작성자인 경우에 게시물을 수정할 수 있습니다.")
-  @PutMapping("/{id}")
+  @PostMapping("/{id}")
   public ResponseEntity<Void> updateShareBoard(
       @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id,
-      @RequestPart @Valid ShareBoardDto shareBoardDto,
+      @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
+      @RequestPart(value = "images") List<MultipartFile> images,
       Principal principal) {
-    shareBoardService.updateShareBoard(id, shareBoardDto, principal);
+    shareBoardService.updateShareBoard(id, shareBoardDto, principal, images);
     return ResponseEntity.ok(null);
   }
 

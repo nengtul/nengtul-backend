@@ -31,7 +31,8 @@ public class ShareBoardService {
   private final AmazonS3Service amazonS3Service;
 
   @Transactional
-  public void createShareBoard(ShareBoardDto shareBoardDto, Principal principal, List<MultipartFile> image) {
+  public void createShareBoard(ShareBoardDto shareBoardDto, Principal principal,
+      List<MultipartFile> images) {
     User user = userService.findUserByEmail(principal.getName());
     if (!user.isEmailVerifiedYn()) {
       throw new CustomException(NOT_VERIFY_EMAIL);
@@ -47,19 +48,30 @@ public class ShareBoardService {
         .lon(shareBoardDto.getLon())
         .closed(false)
         .build();
-    shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image,shareBoard.getId()));
+    shareBoardRepository.save(shareBoard);
+    shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(images, shareBoard.getId()));
     user.setPointAddShardBoard(user.getPoint());
     userRepository.saveAndFlush(user);
-    shareBoardRepository.save(shareBoard);
   }
 
   @Transactional
-  public void updateShareBoard(Long id, ShareBoardDto shareBoardDto, Principal principal) {
+  public void updateShareBoard(Long id, ShareBoardDto shareBoardDto, Principal principal,
+      List<MultipartFile> images) {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
     if (shareBoard.getUser() != user) {
       throw new CustomException(NO_PERMISSION);
+    }
+    //사진만 그대로 업데이트하기 때문에
+    if (!shareBoard.getShareImg().isEmpty() &&
+        !images.get(0).isEmpty()) {
+
+      String[] imageUrlArr = shareBoard.getShareImg().split("\\\\");
+
+      for (int i = 0; i < imageUrlArr.length; i++) {
+        amazonS3Service.updateFile(images.get(i), imageUrlArr[i]);
+      }
     }
     shareBoard.setTitle(shareBoardDto.getTitle());
     shareBoard.setContent(shareBoard.getContent());
