@@ -41,9 +41,14 @@ dependencies {
 	//chatting
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+	//validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	//spring batch
-	implementation 'org.springframework.boot:spring-boot-starter-batch'
+	//json
+	implementation 'com.google.code.gson:gson:2.8.9'
+
+	//websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
