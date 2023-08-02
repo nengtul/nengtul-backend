@@ -96,7 +96,7 @@ public class RecipeDocument {
             this.serving = recipeUpdateDto.getServing();
         }
 
-        if (!recipeUpdateDto.getRecipeCategory().equals(RecipeCategory.None)) {
+        if (!recipeUpdateDto.getRecipeCategory().equals(RecipeCategory.NONE)) {
             this.category = recipeUpdateDto.getRecipeCategory();
         }
 
