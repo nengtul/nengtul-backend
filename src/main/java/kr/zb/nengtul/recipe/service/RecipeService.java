@@ -23,7 +23,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import s3bucket.service.AmazonS3Service;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,10 +37,12 @@ public class RecipeService {
 
     @Transactional
     public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
-                          List<MultipartFile> images) {
+                          List<MultipartFile> images, MultipartFile thumbnail) {
 
         User user = userRepository.findByEmail(principal.getName()).
                 orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        String uuid = UUID.randomUUID().toString();
 
         recipeSearchRepository.save(RecipeDocument.builder()
                 .userId(user.getId())
@@ -49,8 +51,10 @@ public class RecipeService {
                 .ingredient(recipeAddDto.getIngredient())
                 .cookingStep(recipeAddDto.getCookingStep())
                 .imageUrl(
-                        amazonS3Service.uploadFileForRecipeCookingStep(
-                                images, recipeAddDto.getTitle())
+                        amazonS3Service.uploadFileForRecipeCookingStep(images, uuid)
+                )
+                .thumbnailUrl(
+                        amazonS3Service.uploadFileForRecipeThumbnail(thumbnail, uuid)
                 )
                 .cookingTime(recipeAddDto.getCookingTime())
                 .serving(recipeAddDto.getServing())
@@ -64,7 +68,7 @@ public class RecipeService {
     }
 
     public void addRecipeForCrawling(Principal principal, RecipeAddDto recipeAddDto,
-                          String images) {
+                                     String images, String thumbnail) {
 
         User user = userRepository.findByEmail(principal.getName()).
                 orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -76,6 +80,7 @@ public class RecipeService {
                 .ingredient(recipeAddDto.getIngredient())
                 .cookingStep(recipeAddDto.getCookingStep())
                 .imageUrl(images)
+                .thumbnailUrl(thumbnail)
                 .cookingTime(recipeAddDto.getCookingTime())
                 .serving(recipeAddDto.getServing())
                 .category(recipeAddDto.getCategory())
@@ -128,7 +133,9 @@ public class RecipeService {
     }
 
     @Transactional
-    public void updateRecipe(Principal principal, String recipeId, RecipeUpdateDto recipeUpdateDto) {
+    public void updateRecipe(
+            Principal principal, String recipeId, RecipeUpdateDto recipeUpdateDto,
+            List<MultipartFile> images, MultipartFile thumbnail) {
 
         User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -140,10 +147,25 @@ public class RecipeService {
             throw new CustomException(ErrorCode.NO_PERMISSION);
         }
 
+        if (!thumbnail.isEmpty()) {
+            amazonS3Service.updateFile(thumbnail, recipeDocument.getThumbnailUrl());
+        }
+
+        if (!recipeUpdateDto.getImagesUrl().isEmpty() &&
+                !images.get(0).isEmpty()) {
+
+            String[] imageUrlArr = recipeUpdateDto.getImagesUrl().split("\\\\");
+
+            for (int i = 0; i < imageUrlArr.length; i++) {
+                amazonS3Service.updateFile(images.get(i), imageUrlArr[i]);
+            }
+        }
+
         recipeDocument.updateRecipe(recipeUpdateDto);
 
         recipeSearchRepository.save(recipeDocument);
     }
+
 
     @Transactional
     public void deleteRecipe(Principal principal, String recipeId) {
@@ -157,6 +179,9 @@ public class RecipeService {
         if (!Objects.equals(user.getId(), recipeDocument.getUserId())) {
             throw new CustomException(ErrorCode.NO_PERMISSION);
         }
+
+        deleteRecipeS3UploadFile(
+                recipeDocument.getImageUrl(), recipeDocument.getThumbnailUrl());
 
         recipeSearchRepository.delete(recipeDocument);
     }
@@ -177,6 +202,18 @@ public class RecipeService {
         recipeGetListDto.setNickName(user.getNickname());
 
         return recipeGetListDto;
+
+    }
+
+    private void deleteRecipeS3UploadFile(String imagesUrl, String thumbnailUrl) {
+
+        amazonS3Service.deleteFile(thumbnailUrl);
+
+        String[] imagesUrlArr = imagesUrl.split("\\\\");
+
+        for (String imageUrl : imagesUrlArr) {
+            amazonS3Service.deleteFile(imageUrl);
+        }
 
     }
 
