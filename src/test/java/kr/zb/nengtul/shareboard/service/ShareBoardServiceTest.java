@@ -34,7 +34,6 @@ import s3bucket.service.AmazonS3Service;
 @DisplayName("나눔게시판 서비스 테스트")
 class ShareBoardServiceTest {
 
-  private UserRepository userRepository;
   private ShareBoardService shareBoardService;
   private UserService userService;
   private ShareBoardRepository shareBoardRepository;
@@ -45,7 +44,7 @@ class ShareBoardServiceTest {
     // Mock 객체 초기화
     shareBoardRepository = mock(ShareBoardRepository.class);
     amazonS3Service = mock(AmazonS3Service.class);
-    userRepository = mock(UserRepository.class);
+    UserRepository userRepository = mock(UserRepository.class);
     userService = mock(UserService.class);
 
     shareBoardService = new ShareBoardService(
@@ -55,6 +54,7 @@ class ShareBoardServiceTest {
   @Test
   @DisplayName("나눔 게시판 등록 성공")
   void createShareBoard_SUCCESS() {
+    //given
     User newUser = new User();
     newUser.setEmailVerifiedYn(true);
 
@@ -76,16 +76,17 @@ class ShareBoardServiceTest {
         .lon(1.1)
         .lat(1.1)
         .build();
-
+    //when
     shareBoardService.createShareBoard(shareBoardDto, principal, images);
-
+    //then
     verify(shareBoardRepository, times(1))
         .save(any(ShareBoard.class));
   }
 
   @Test
-  @DisplayName("나눔 게시판 등록 성공")
+  @DisplayName("나눔 게시판 등록 실패 - 이메일 인증 X")
   void createShareBoard_FAIL_Verify_N() {
+    //given
     User newUser = new User();
     newUser.setEmailVerifiedYn(false);
 
@@ -107,6 +108,9 @@ class ShareBoardServiceTest {
         .lon(1.1)
         .lat(1.1)
         .build();
+
+    //when&then
+
     //이메일 인증 안해서 CustomException 발생
     assertThrows(CustomException.class,
         () -> shareBoardService.createShareBoard(shareBoardDto, principal, images));
@@ -115,7 +119,7 @@ class ShareBoardServiceTest {
   @Test
   @DisplayName("나눔 게시판 업데이트 성공")
   void updateShareBoard_SUCCESS() {
-    // Given
+    //given
     User newUser = new User();
     newUser.setEmailVerifiedYn(true);
 
@@ -142,10 +146,10 @@ class ShareBoardServiceTest {
         .lat(2.2)
         .build();
 
-    // When
+    //when
     shareBoardService.updateShareBoard(1L, shareBoardDto, principal, images);
 
-    // Then
+    //then
     verify(shareBoardRepository, times(1)).findById(anyLong());
     verify(shareBoardRepository, times(1)).save(any(ShareBoard.class));
     assertEquals("업데이트된 제목", existingShareBoard.getTitle());
@@ -164,7 +168,8 @@ class ShareBoardServiceTest {
   @Test
   @DisplayName("나눔 게시판 업데이트 실패 - 작성자가 다른 경우")
   void updateShareBoard_FAIL_NotSameUser() {
-    // Given
+    //given
+
     User existingUser = new User();
     existingUser.setEmail("aa@aa.aa");
     existingUser.setEmailVerifiedYn(true);
@@ -197,16 +202,14 @@ class ShareBoardServiceTest {
         .lat(2.2)
         .build();
 
-    // When & Then
+    //when&then
     assertThrows(CustomException.class, () -> shareBoardService.updateShareBoard(1L, shareBoardDto, principal, images));
   }
-
-
-
 
   @Test
   @DisplayName("나눔 게시판 삭제 성공")
   void deleteShareBoard_SUCCESS() {
+    //given
     Long shareBoardId = 1L;
 
     User user = new User();
@@ -217,15 +220,19 @@ class ShareBoardServiceTest {
 
     when(userService.findUserByEmail(any())).thenReturn(user);
     when(shareBoardRepository.findById(shareBoardId)).thenReturn(Optional.of(shareBoard));
+
+    //when
     shareBoardService.deleteShareBoard(shareBoardId,
         new UsernamePasswordAuthenticationToken("aa@aa.aa", null));
-
+    //then
     verify(shareBoardRepository, times(1)).delete(shareBoard);
   }
 
   @Test
   @DisplayName("나눔 게시판 삭제 실패 - 작성자와 다른 유저")
-  void deleteShareBoard_FAIL() {
+  void deleteShareBoard_FAIL_NotSameUser() {
+    //given
+
     Long shareBoardId = 1L;
 
     String authorEmail = "aa@aa.aa";
@@ -246,20 +253,19 @@ class ShareBoardServiceTest {
 
     when(shareBoardRepository.findById(shareBoardId)).thenReturn(Optional.of(shareBoard));
 
-    // 다른 유저로 로그인한 상태에서 삭제를 시도할 때 오류를 확인하는지 테스트
+    //when&then
     assertThrows(CustomException.class, () -> shareBoardService.deleteShareBoard(shareBoardId,
         new UsernamePasswordAuthenticationToken(otherUserEmail, null)));
   }
 
   @Test
   @DisplayName("나눔 게시판 목록 조회 성공 - closed가 null인 경우")
-  void getShareBoardList_Success_ClosedNull() {
-    // 가상의 위치 정보와 범위 설정
+  void getShareBoardList_SUCCESS_ClosedNull() {
+    //given
     double lat = 37.12345;
     double lon = 127.98765;
     double range = 0.1;
 
-    // 가상의 ShareBoard 목록
     List<ShareBoard> expectedShareBoardList = new ArrayList<>();
     ShareBoard shareBoard1 = new ShareBoard();
     shareBoard1.setId(1L);
@@ -289,25 +295,23 @@ class ShareBoardServiceTest {
         lat - range, lat + range, lon - range, lon + range))
         .thenReturn(expectedShareBoardList);
 
-    // Service 메서드 호출
+    //when
     List<ShareBoard> actualShareBoardList = shareBoardService.getShareBoardList(lat, lon, range,
         null);
-
-    // 결과 확인
+    //then
     assertEquals(expectedShareBoardList, actualShareBoardList);
   }
 
 
   @Test
   @DisplayName("나눔 게시판 목록 조회 성공 - closed가 true인 경우")
-  void getShareBoardList_Success_ClosedTrue() {
-    // 가상의 위치 정보와 범위 설정
+  void getShareBoardList_SUCCESS_ClosedTrue() {
+    //given
     double lat = 37.12345;
     double lon = 127.98765;
     double range = 0.1;
     boolean closed = true; // closed 값을 true로 설정
 
-    // 가상의 ShareBoard 목록
     List<ShareBoard> expectedShareBoardList = new ArrayList<>();
     ShareBoard shareBoard1 = new ShareBoard();
     shareBoard1.setId(1L);
@@ -321,24 +325,23 @@ class ShareBoardServiceTest {
         lat - range, lat + range, lon - range, lon + range, closed))
         .thenReturn(expectedShareBoardList);
 
-    // Service 메서드 호출
+    //when
     List<ShareBoard> actualShareBoardList = shareBoardService.getShareBoardList(lat, lon, range,
         closed);
 
-    // 결과 확인
+    //then
     assertEquals(expectedShareBoardList, actualShareBoardList);
   }
 
   @Test
   @DisplayName("나눔 게시판 목록 조회 성공 - closed가 true인 경우")
-  void getShareBoardList_Success_ClosedFalse() {
-    // 가상의 위치 정보와 범위 설정
+  void getShareBoardList_SUCCESS_ClosedFalse() {
+    //given
     double lat = 37.12345;
     double lon = 127.98765;
     double range = 0.1;
     boolean closed = false; // closed 값을 true로 설정
 
-    // 가상의 ShareBoard 목록
     List<ShareBoard> expectedShareBoardList = new ArrayList<>();
     ShareBoard shareBoard1 = new ShareBoard();
     shareBoard1.setId(1L);
@@ -352,11 +355,11 @@ class ShareBoardServiceTest {
         lat - range, lat + range, lon - range, lon + range, closed))
         .thenReturn(expectedShareBoardList);
 
-    // Service 메서드 호출
+    //when
     List<ShareBoard> actualShareBoardList = shareBoardService.getShareBoardList(lat, lon, range,
         closed);
 
-    // 결과 확인
+    // then
     assertEquals(expectedShareBoardList, actualShareBoardList);
   }
 
