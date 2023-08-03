@@ -25,7 +25,7 @@ public class LikesService {
 
   private final RecipeSearchRepository recipeSearchRepository;
 
-  public void addLike(Principal principal, String recipeId) {
+  public void addLikes(Principal principal, String recipeId) {
 
     User user = userRepository.findByEmail(principal.getName())
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -45,7 +45,7 @@ public class LikesService {
   }
 
 
-  public Page<LikesDto> getLike(Principal principal, Pageable pageable) {
+  public Page<LikesDto> getLikes(Principal principal, Pageable pageable) {
 
     User user = userRepository.findByEmail(principal.getName())
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -70,7 +70,7 @@ public class LikesService {
         });
   }
 
-  public void deleteLike(Principal principal, Long likeId) {
+  public void deleteLikes(Principal principal, Long likeId) {
 
     User user = userRepository.findByEmail(principal.getName())
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));

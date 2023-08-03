@@ -23,7 +23,7 @@ public class LikesController {
   ResponseEntity<?> addLike(Principal principal,
       @PathVariable String recipeId) {
 
-    likesService.addLike(principal, recipeId);
+    likesService.addLikes(principal, recipeId);
 
     return ResponseEntity.ok(null);
   }
@@ -31,13 +31,13 @@ public class LikesController {
   @GetMapping
   ResponseEntity<?> getLike(Principal principal, Pageable pageable) {
 
-    return ResponseEntity.ok(likesService.getLike(principal, pageable));
+    return ResponseEntity.ok(likesService.getLikes(principal, pageable));
   }
 
   @DeleteMapping("/{likeId}")
   ResponseEntity<?> deleteLike(Principal principal,
       @PathVariable Long likeId) {
-    likesService.deleteLike(principal, likeId);
+    likesService.deleteLikes(principal, likeId);
 
     return ResponseEntity.ok(null);
   }

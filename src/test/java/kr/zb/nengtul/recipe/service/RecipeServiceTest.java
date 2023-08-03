@@ -29,8 +29,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("레시피 서비스 테스트")
 class RecipeServiceTest {
 
-
     private RecipeService recipeService;
+
     private RecipeSearchRepository recipeSearchRepository;
 
     private UserRepository userRepository;
