@@ -17,6 +17,7 @@ import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -65,6 +66,7 @@ public class SecurityConfig {
             .accessDeniedHandler(tokenAccessDeniedHandler))
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
             .requestMatchers(
                 "/css/**", "/images/**", "/js/**", "/favicon.ico",
                 "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
