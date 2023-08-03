@@ -48,6 +48,7 @@ public class SecurityConfig {
   private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -65,7 +66,6 @@ public class SecurityConfig {
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
-
                 "/css/**", "/images/**", "/js/**", "/favicon.ico",
                 "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
                 "/v1/auth/**",
@@ -87,8 +87,8 @@ public class SecurityConfig {
                 "/v1/admin/**",
                 "/v1/notice/**"
             ).hasRole("ADMIN")
-            .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
-        )
+            .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+        .logout(logout -> logout.logoutSuccessUrl("/"))
         //== 소셜 로그인 설정 ==//
         .oauth2Login(oauth2Login -> oauth2Login
             .authorizationEndpoint(
