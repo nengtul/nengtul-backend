@@ -27,7 +27,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import s3bucket.service.AmazonS3Service;
 
@@ -64,8 +63,6 @@ public class UserService {
         .profileImageUrl(null)
         .build();
     userRepository.save(user);
-
-    verifyEmailForm(user, userJoinDto.getEmail(), userJoinDto.getName());
   }
 
   //이메일 인증
@@ -172,13 +169,13 @@ public class UserService {
     //유저 정보페이지에서 가져오기때문에 바로 get
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-    verifyEmailForm(user, user.getEmail(), user.getName());
+    verifyEmailForm(user.getEmail(), user.getName());
   }
 
   //이메일 인증 폼
-  private void verifyEmailForm(User user, String email, String name) {
+  public void verifyEmailForm(String email, String name) {
     String code = RandomStringUtils.random(10, true, true);
-
+    User user = findUserByEmail(email);
     SendMailForm sendMailForm = SendMailForm.builder()
         .from("lvet0330@gmail.com")
         .to(email)

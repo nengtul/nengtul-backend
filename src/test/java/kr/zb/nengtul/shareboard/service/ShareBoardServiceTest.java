@@ -31,7 +31,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.multipart.MultipartFile;
 import s3bucket.service.AmazonS3Service;
 
-@DisplayName("나눔게시판 서비스 테스트")
+@DisplayName("나눔게시판 테스트")
 class ShareBoardServiceTest {
 
   private ShareBoardService shareBoardService;
