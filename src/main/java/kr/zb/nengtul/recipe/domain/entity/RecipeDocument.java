@@ -96,8 +96,8 @@ public class RecipeDocument {
             this.serving = recipeUpdateDto.getServing();
         }
 
-        if (!recipeUpdateDto.getRecipeCategory().equals(RecipeCategory.NONE)) {
-            this.category = recipeUpdateDto.getRecipeCategory();
+        if (!recipeUpdateDto.getCategory().equals(RecipeCategory.NONE)) {
+            this.category = recipeUpdateDto.getCategory();
         }
 
         if (!recipeUpdateDto.getVideoUrl().isEmpty()) {

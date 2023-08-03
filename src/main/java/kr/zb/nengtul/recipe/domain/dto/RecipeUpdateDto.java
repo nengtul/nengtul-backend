@@ -26,7 +26,7 @@ public class RecipeUpdateDto {
 
     private String serving;
 
-    private RecipeCategory recipeCategory;
+    private RecipeCategory category;
 
     private String videoUrl;
 

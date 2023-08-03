@@ -279,7 +279,7 @@ class RecipeServiceTest {
         RecipeUpdateDto recipeUpdateDto = RecipeUpdateDto.builder()
                 .title("수정된 타이틀")
                 .ingredient("수정된 재료")
-                .recipeCategory(RecipeCategory.ETC)
+                .category(RecipeCategory.ETC)
                 .imagesUrl("수정된 Url")
                 .intro("")
                 .videoUrl("")
@@ -289,7 +289,6 @@ class RecipeServiceTest {
                 .build();
 
         User user = User.builder()
-                .id(1L)
                 .name("테스트이름")
                 .build();
 
@@ -332,7 +331,6 @@ class RecipeServiceTest {
     void deleteRecipe() {
         //given
         User user = User.builder()
-                .id(1L)
                 .name("테스트이름")
                 .build();
 
