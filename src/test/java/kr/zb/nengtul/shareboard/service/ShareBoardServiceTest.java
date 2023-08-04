@@ -11,6 +11,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +29,7 @@ import kr.zb.nengtul.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.multipart.MultipartFile;
 import s3bucket.service.AmazonS3Service;
@@ -64,7 +67,7 @@ class ShareBoardServiceTest {
     when(shareBoardRepository.findById(any()))
         .thenReturn(Optional.of(new ShareBoard()));
 
-    List<MultipartFile> images = Collections.singletonList(mock(MultipartFile.class));
+    MultipartFile image = mock(MultipartFile.class);
     Principal principal = new UsernamePasswordAuthenticationToken(
         "aa@aa.aa", null);
 
@@ -77,7 +80,7 @@ class ShareBoardServiceTest {
         .lat(1.1)
         .build();
     //when
-    shareBoardService.createShareBoard(shareBoardDto, principal, images);
+    shareBoardService.createShareBoard(shareBoardDto, principal, image);
     //then
     verify(shareBoardRepository, times(1))
         .save(any(ShareBoard.class));
@@ -96,7 +99,7 @@ class ShareBoardServiceTest {
     when(shareBoardRepository.findById(any()))
         .thenReturn(Optional.of(new ShareBoard()));
 
-    List<MultipartFile> images = Collections.singletonList(mock(MultipartFile.class));
+    MultipartFile image = mock(MultipartFile.class);
     Principal principal = new UsernamePasswordAuthenticationToken(
         "aa@aa.aa", null);
 
@@ -113,7 +116,7 @@ class ShareBoardServiceTest {
 
     //이메일 인증 안해서 CustomException 발생
     assertThrows(CustomException.class,
-        () -> shareBoardService.createShareBoard(shareBoardDto, principal, images));
+        () -> shareBoardService.createShareBoard(shareBoardDto, principal, image));
   }
 
   @Test
@@ -129,12 +132,13 @@ class ShareBoardServiceTest {
     // shareBoardRepository.findById 메서드에 대한 mock 설정
     ShareBoard existingShareBoard = new ShareBoard();
     existingShareBoard.setUser(newUser); // 업데이트 시 user 비교를 위해 설정
-    existingShareBoard.setShareImg("이미지1.jpg\\이미지2.jpg\\이미지3.jpg"); // 이미지 경로 설정
+    existingShareBoard.setShareImg("이미지1.jpg"); // 사진 한 장만 올리기
     when(shareBoardRepository.findById(any()))
         .thenReturn(Optional.of(existingShareBoard));
 
-    List<MultipartFile> images = Arrays.asList(mock(MultipartFile.class),
-        mock(MultipartFile.class), mock(MultipartFile.class));
+    // 이미지 리턴값 ""
+    when(amazonS3Service.uploadFileForShareBoard(eq(null), anyLong())).thenReturn("");
+
     Principal principal = new UsernamePasswordAuthenticationToken("aa@aa.aa", null);
 
     ShareBoardDto shareBoardDto = ShareBoardDto.builder()
@@ -147,7 +151,7 @@ class ShareBoardServiceTest {
         .build();
 
     //when
-    shareBoardService.updateShareBoard(1L, shareBoardDto, principal, images);
+    shareBoardService.updateShareBoard(1L, shareBoardDto, principal, null);
 
     //then
     verify(shareBoardRepository, times(1)).findById(anyLong());
@@ -158,11 +162,7 @@ class ShareBoardServiceTest {
     assertEquals(10000L, existingShareBoard.getPrice());
     assertEquals(2.2, existingShareBoard.getLat(), 0.0001);
     assertEquals(2.2, existingShareBoard.getLon(), 0.0001);
-
-    // 이미지 업데이트 시 AmazonS3Service의 updateFile 메서드를 호출했는지 확인
-    for (MultipartFile image : images) {
-      verify(amazonS3Service, times(1)).updateFile(eq(image), anyString());
-    }
+    assertEquals("이미지1.jpg", existingShareBoard.getShareImg());
   }
 
   @Test
@@ -189,8 +189,7 @@ class ShareBoardServiceTest {
     when(shareBoardRepository.findById(any()))
         .thenReturn(Optional.of(existingShareBoard));
 
-    List<MultipartFile> images = Arrays.asList(mock(MultipartFile.class),
-        mock(MultipartFile.class), mock(MultipartFile.class));
+    MultipartFile image = mock(MultipartFile.class);
     Principal principal = new UsernamePasswordAuthenticationToken("bb@aa.aa", null);
 
     ShareBoardDto shareBoardDto = ShareBoardDto.builder()
@@ -203,7 +202,8 @@ class ShareBoardServiceTest {
         .build();
 
     //when&then
-    assertThrows(CustomException.class, () -> shareBoardService.updateShareBoard(1L, shareBoardDto, principal, images));
+    assertThrows(CustomException.class,
+        () -> shareBoardService.updateShareBoard(1L, shareBoardDto, principal, image));
   }
 
   @Test

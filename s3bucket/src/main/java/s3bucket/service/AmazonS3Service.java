@@ -106,8 +106,34 @@ public class AmazonS3Service {
 
         return "";
     }
+    //shareboard 사진 한장 올리기
+    public String uploadFileForShareBoard(MultipartFile file, Long shareBoardId) {
 
-    public String uploadFileForShareBoard(
+        try {
+            log.info("[uploadFileForProfile 시작]" + " shareBoardId : " + shareBoardId);
+
+            ObjectMetadata metadata = new ObjectMetadata();
+
+            metadata.setContentType(file.getContentType());
+            metadata.setContentLength(file.getSize());
+
+            String fileKey = "shareBoard/" + shareBoardId;
+
+            amazonS3Client.putObject(bucket, fileKey, file.getInputStream(), metadata);
+
+            log.info("[uploadFileForProfile 완료]" + " shareBoardId : " + shareBoardId);
+            return amazonS3Client.getUrl(bucket, fileKey).toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info(e.getMessage());
+        }
+
+        return "";
+    }
+
+    //shareboard 사진 여러장 올리기
+    public String uploadFilesForShareBoard(
             List<MultipartFile> files, Long shareBoardId) {
 
         try {
