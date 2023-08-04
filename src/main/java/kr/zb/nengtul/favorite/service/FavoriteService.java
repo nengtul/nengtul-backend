@@ -44,8 +44,7 @@ public class FavoriteService {
 
     }
 
-    @Transactional(readOnly = true)
-    public Page<?> getFavorite(Principal principal, Pageable pageable) {
+    public Page<FavoriteDto> getFavorite(Principal principal, Pageable pageable) {
 
         User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
