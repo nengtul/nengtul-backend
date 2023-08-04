@@ -1,8 +1,11 @@
 package kr.zb.nengtul.likes.controller;
 
 import java.security.Principal;
+
+import kr.zb.nengtul.likes.domain.dto.LikesDto;
 import kr.zb.nengtul.likes.service.LikesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +23,7 @@ public class LikesController {
   private final LikesService likesService;
 
   @PostMapping("/{recipeId}")
-  ResponseEntity<?> addLike(Principal principal,
+  ResponseEntity<Void> addLike(Principal principal,
       @PathVariable String recipeId) {
 
     likesService.addLikes(principal, recipeId);
@@ -29,13 +32,13 @@ public class LikesController {
   }
 
   @GetMapping
-  ResponseEntity<?> getLike(Principal principal, Pageable pageable) {
+  ResponseEntity<Page<LikesDto>> getLike(Principal principal, Pageable pageable) {
 
     return ResponseEntity.ok(likesService.getLikes(principal, pageable));
   }
 
   @DeleteMapping("/{likeId}")
-  ResponseEntity<?> deleteLike(Principal principal,
+  ResponseEntity<Void> deleteLike(Principal principal,
       @PathVariable Long likeId) {
     likesService.deleteLikes(principal, likeId);
 
