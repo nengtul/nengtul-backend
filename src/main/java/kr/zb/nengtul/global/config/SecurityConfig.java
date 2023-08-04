@@ -68,7 +68,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
             .requestMatchers(
-                "/css/**", "/images/**", "/js/**", "/favicon.ico",
+                "/","/**",
                 "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
                 "/v1/auth/**",
                 "/v1/user/join",//회원가입
