@@ -8,7 +8,6 @@ import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.*;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
