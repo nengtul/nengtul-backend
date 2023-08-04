@@ -37,7 +37,7 @@ public class ShareBoardController {
   @PostMapping
   public ResponseEntity<Void> createShareBoard(
       @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
-      @RequestPart(value = "images") List<MultipartFile> image, Principal principal) {
+      @RequestPart(value = "image") MultipartFile image, Principal principal) {
     shareBoardService.createShareBoard(shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
@@ -62,9 +62,9 @@ public class ShareBoardController {
   public ResponseEntity<Void> updateShareBoard(
       @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id,
       @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
-      @RequestPart(value = "images") List<MultipartFile> images,
+      @RequestPart(value = "image") MultipartFile image,
       Principal principal) {
-    shareBoardService.updateShareBoard(id, shareBoardDto, principal, images);
+    shareBoardService.updateShareBoard(id, shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
 

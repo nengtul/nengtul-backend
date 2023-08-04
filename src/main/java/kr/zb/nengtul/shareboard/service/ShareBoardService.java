@@ -32,9 +32,8 @@ public class ShareBoardService {
 
   @Transactional
   public void createShareBoard(ShareBoardDto shareBoardDto, Principal principal,
-      List<MultipartFile> images) {
+      MultipartFile image) {
     User user = userService.findUserByEmail(principal.getName());
-//    User user = userRepository.findByEmail(principal.getName()).get();
     if (!user.isEmailVerifiedYn()) {
       throw new CustomException(NOT_VERIFY_EMAIL);
     }
@@ -50,28 +49,27 @@ public class ShareBoardService {
         .closed(false)
         .build();
     shareBoardRepository.save(shareBoard);
-    shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(images, shareBoard.getId()));
+    shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image, shareBoard.getId()));
     user.setPointAddShardBoard(user.getPoint());
     userRepository.saveAndFlush(user);
   }
 
   @Transactional
   public void updateShareBoard(Long id, ShareBoardDto shareBoardDto, Principal principal,
-      List<MultipartFile> images) {
+      MultipartFile image) {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
     if (!shareBoard.getUser().equals(user)){
       throw new CustomException(NO_PERMISSION);
     }
-    //사진만 그대로 업데이트하기 때문에
-    if (!shareBoard.getShareImg().isEmpty() &&
-        !images.get(0).isEmpty()) {
-
-      String[] imageUrlArr = shareBoard.getShareImg().split("\\\\");
-
-      for (int i = 0; i < imageUrlArr.length; i++) {
-        amazonS3Service.updateFile(images.get(i), imageUrlArr[i]);
+    if (image != null) {
+      if (user.getProfileImageUrl() != null) {
+        // 이미지가 있을 경우 이미지 업데이트
+        amazonS3Service.updateFile(image, shareBoard.getShareImg());
+      } else {
+        // 이미지가 없을 경우 새 이미지 업로드
+        user.setProfileImageUrl(amazonS3Service.uploadFileForShareBoard(image, shareBoard.getId()));
       }
     }
     shareBoard.setTitle(shareBoardDto.getTitle());
