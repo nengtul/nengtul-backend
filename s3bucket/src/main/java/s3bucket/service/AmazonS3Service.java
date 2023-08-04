@@ -110,7 +110,7 @@ public class AmazonS3Service {
     public String uploadFileForShareBoard(MultipartFile file, Long shareBoardId) {
 
         try {
-            log.info("[uploadFileForProfile 시작]" + " shareBoardId : " + shareBoardId);
+            log.info("[uploadFileForShareBoard 시작]" + " shareBoardId : " + shareBoardId);
 
             ObjectMetadata metadata = new ObjectMetadata();
 
@@ -121,7 +121,7 @@ public class AmazonS3Service {
 
             amazonS3Client.putObject(bucket, fileKey, file.getInputStream(), metadata);
 
-            log.info("[uploadFileForProfile 완료]" + " shareBoardId : " + shareBoardId);
+            log.info("[uploadFileForShareBoard 완료]" + " shareBoardId : " + shareBoardId);
             return amazonS3Client.getUrl(bucket, fileKey).toString();
 
         } catch (IOException e) {
