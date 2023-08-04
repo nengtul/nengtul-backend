@@ -49,7 +49,9 @@ public class ShareBoardService {
         .closed(false)
         .build();
     shareBoardRepository.save(shareBoard);
-    shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image, shareBoard.getId()));
+    if (image != null) {
+      shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image, shareBoard.getId()));
+    }
     user.setPointAddShardBoard(user.getPoint());
     userRepository.saveAndFlush(user);
   }
@@ -60,7 +62,7 @@ public class ShareBoardService {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
-    if (!shareBoard.getUser().equals(user)){
+    if (!shareBoard.getUser().equals(user)) {
       throw new CustomException(NO_PERMISSION);
     }
     if (image != null) {
