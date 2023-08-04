@@ -107,4 +107,8 @@ public class ShareBoardService {
     return shareBoardList;
   }
 
+  public List<ShareBoard> getMyShareBoard(Principal principal) {
+    User user = userService.findUserByEmail(principal.getName());
+    return shareBoardRepository.findAllByUser(user);
+  }
 }
