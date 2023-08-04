@@ -34,6 +34,7 @@ public class ShareBoardService {
   public void createShareBoard(ShareBoardDto shareBoardDto, Principal principal,
       List<MultipartFile> images) {
     User user = userService.findUserByEmail(principal.getName());
+//    User user = userRepository.findByEmail(principal.getName()).get();
     if (!user.isEmailVerifiedYn()) {
       throw new CustomException(NOT_VERIFY_EMAIL);
     }
@@ -60,7 +61,7 @@ public class ShareBoardService {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
-    if (shareBoard.getUser() != user) {
+    if (!shareBoard.getUser().equals(user)){
       throw new CustomException(NO_PERMISSION);
     }
     //사진만 그대로 업데이트하기 때문에
@@ -74,11 +75,11 @@ public class ShareBoardService {
       }
     }
     shareBoard.setTitle(shareBoardDto.getTitle());
-    shareBoard.setContent(shareBoard.getContent());
-    shareBoard.setPlace(shareBoard.getPlace());
+    shareBoard.setContent(shareBoardDto.getContent());
+    shareBoard.setPlace(shareBoardDto.getPlace());
     shareBoard.setPrice(shareBoardDto.getPrice());
     shareBoard.setLat(shareBoardDto.getLat());
-    shareBoard.setLat(shareBoardDto.getLon());
+    shareBoard.setLon(shareBoardDto.getLon());
     shareBoardRepository.save(shareBoard);
   }
 

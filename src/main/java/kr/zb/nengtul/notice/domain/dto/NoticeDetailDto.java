@@ -16,7 +16,7 @@ import lombok.Setter;
 public class NoticeDetailDto {
   private Long id;
   private Long userId;
-  private String userName;
+  private String nickname;
   private String title;
   private String content;
   private String noticeImg;
@@ -28,7 +28,7 @@ public class NoticeDetailDto {
     return NoticeDetailDto.builder()
         .id(notice.getId())
         .userId(notice.getUser().getId())
-        .userName(notice.getUser().getName())
+        .nickname(notice.getUser().getNickname())
         .title(notice.getTitle())
         .content(notice.getContent())
         .noticeImg(notice.getNoticeImg())

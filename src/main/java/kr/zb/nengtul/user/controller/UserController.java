@@ -42,6 +42,8 @@ public class UserController {
   @PostMapping("/join")
   public ResponseEntity<Void> joinUser(@RequestBody @Valid UserJoinDto userJoinDto) {
     userService.joinUser(userJoinDto);
+    userService.verifyEmailForm(userJoinDto.getEmail(), userJoinDto.getName());
+
     return ResponseEntity.ok(null);
   }
 

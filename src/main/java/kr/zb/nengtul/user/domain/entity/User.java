@@ -153,9 +153,16 @@ public class User extends BaseTimeEntity {
   public void setAddress(String address) {
     this.address = address;
   }
+  public void setEmail(String email) {
+    this.address = email;
+  }
+
 
   public void setAddressDetail(String addressDetail) {
     this.addressDetail = addressDetail;
+  }
+  public void setRoles(RoleType roles) {
+    this.roles = roles;
   }
 
   public void setEmailVerifiedYn(boolean emailVerifiedYn) {
