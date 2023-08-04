@@ -26,7 +26,7 @@ public class ShareBoardListDto {
   private String title; //제목
   private String content; //글 내용
   private String place; //위치
-  private String shareImgList; //사진 목록
+  private String shareImg; //사진 목록
   private Long price; //가격
   private double lat; //위도
   private double lon; //경도
@@ -40,7 +40,7 @@ public class ShareBoardListDto {
         .userId(shareBoard.getUser().getId())
         .userNickname(shareBoard.getUser().getNickname())
         .title(shareBoard.getTitle())
-        .shareImgList(shareBoard.getShareImg())
+        .shareImg(shareBoard.getShareImg())
         .price(shareBoard.getPrice())
         .lat(shareBoard.getLat())
         .lon(shareBoard.getLon())
