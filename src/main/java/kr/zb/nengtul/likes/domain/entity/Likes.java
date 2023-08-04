@@ -1,4 +1,4 @@
-package kr.zb.nengtul.like.domain.entity;
+package kr.zb.nengtul.likes.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;

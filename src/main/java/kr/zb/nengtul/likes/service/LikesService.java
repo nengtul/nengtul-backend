@@ -1,11 +1,11 @@
-package kr.zb.nengtul.like.service;
+package kr.zb.nengtul.likes.service;
 
 import java.security.Principal;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
-import kr.zb.nengtul.like.domain.dto.LikesDto;
-import kr.zb.nengtul.like.domain.entity.Likes;
-import kr.zb.nengtul.like.domain.repository.LikesRepository;
+import kr.zb.nengtul.likes.domain.dto.LikesDto;
+import kr.zb.nengtul.likes.domain.entity.Likes;
+import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.user.domain.entity.User;
