@@ -171,6 +171,7 @@ class UserServiceTest {
     User user = User.builder()
         .email(email)
         .build();
+    user.setEmailVerifiedYn(false);
     user.setVerificationCode(code);
     user.setVerifyExpiredAt(LocalDateTime.now().plusDays(1));
 
