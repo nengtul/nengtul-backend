@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardListDto;
+import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.service.ShareBoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class ShareBoardController {
   @PostMapping
   public ResponseEntity<Void> createShareBoard(
       @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
-      @RequestPart(value = "images") List<MultipartFile> image, Principal principal) {
+      @RequestPart(value = "image", required = false) MultipartFile image, Principal principal) {
     shareBoardService.createShareBoard(shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
@@ -62,9 +63,9 @@ public class ShareBoardController {
   public ResponseEntity<Void> updateShareBoard(
       @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id,
       @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
-      @RequestPart(value = "images") List<MultipartFile> images,
+      @RequestPart(value = "image", required = false) MultipartFile image,
       Principal principal) {
-    shareBoardService.updateShareBoard(id, shareBoardDto, principal, images);
+    shareBoardService.updateShareBoard(id, shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
 
@@ -75,6 +76,14 @@ public class ShareBoardController {
       @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id, Principal principal) {
     shareBoardService.deleteShareBoard(id, principal);
     return ResponseEntity.ok(null);
+  }
+
+  //내 나눔게시물 리스트 조회
+  @Operation(summary = "내 나눔게시물 조회", description = "토큰을 통해 유저를 조회하고, 내가 작성한 나눔게시물을 조회합니다.")
+  @GetMapping("/mylist")
+  public ResponseEntity<List<ShareBoard>> myShareBoard(Principal principal) {
+
+    return ResponseEntity.ok(shareBoardService.getMyShareBoard(principal));
   }
 }
 

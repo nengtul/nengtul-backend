@@ -1,7 +1,7 @@
-package kr.zb.nengtul.like.domain.repository;
+package kr.zb.nengtul.likes.domain.repository;
 
 import java.util.Optional;
-import kr.zb.nengtul.like.domain.entity.Likes;
+import kr.zb.nengtul.likes.domain.entity.Likes;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

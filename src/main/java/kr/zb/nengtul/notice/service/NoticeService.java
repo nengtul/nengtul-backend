@@ -42,7 +42,9 @@ public class NoticeService {
         .build();
 
     noticeRepository.save(notice);
-    notice.setNoticeImg(amazonS3Service.uploadFileForNotice(images, notice.getId()));
+    if (images != null) {
+      notice.setNoticeImg(amazonS3Service.uploadFileForNotice(images, notice.getId()));
+    }
 
   }
 
