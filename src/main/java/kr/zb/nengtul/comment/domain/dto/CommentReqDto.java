@@ -16,5 +16,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CommentReqDto {
   @NotEmpty(message = CONTENT_NOT_NULL_MESSAGE)
-  private String content;
+  private String comment;
 }
