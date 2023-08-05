@@ -85,7 +85,6 @@ class FavoriteServiceTest {
 
     @Test
     @DisplayName("즐겨찾기 가져오기 성공")
-    @Disabled
     void getFavorite_SUCCESS() {
         //given
         User publisher = User.builder()
