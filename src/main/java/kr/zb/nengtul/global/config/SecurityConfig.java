@@ -84,7 +84,9 @@ public class SecurityConfig {
                 "/v1/shareboard/**",
                 "/v1/recipe/**",
                 "/v1/recipe/comment/**",//댓글 작성,수정,삭제
-                "/v1/likes/**"
+                "/v1/likes/**",
+                "/v1/favorite/**",
+                "/v1/saved-recipe/**"
             ).hasAnyRole("USER", "ADMIN")
             .requestMatchers(
                 "/v1/admin/**",
