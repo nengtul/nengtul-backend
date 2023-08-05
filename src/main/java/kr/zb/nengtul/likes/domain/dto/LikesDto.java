@@ -1,4 +1,4 @@
-package kr.zb.nengtul.like.domain.dto;
+package kr.zb.nengtul.likes.domain.dto;
 
 import java.time.LocalDateTime;
 import lombok.Builder;

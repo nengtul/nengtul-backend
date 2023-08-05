@@ -1,7 +1,7 @@
-package kr.zb.nengtul.like.controller;
+package kr.zb.nengtul.likes.controller;
 
 import java.security.Principal;
-import kr.zb.nengtul.like.service.LikesService;
+import kr.zb.nengtul.likes.service.LikesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

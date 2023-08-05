@@ -1,11 +1,11 @@
-package kr.zb.nengtul.like.service;
+package kr.zb.nengtul.likes.service;
 
 import java.security.Principal;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
-import kr.zb.nengtul.like.domain.dto.LikesDto;
-import kr.zb.nengtul.like.domain.entity.Likes;
-import kr.zb.nengtul.like.domain.repository.LikesRepository;
+import kr.zb.nengtul.likes.domain.dto.LikesDto;
+import kr.zb.nengtul.likes.domain.entity.Likes;
+import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.user.domain.entity.User;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class LikesService {
 
   private final RecipeSearchRepository recipeSearchRepository;
 
+  @Transactional
   public void addLikes(Principal principal, String recipeId) {
 
     User user = userRepository.findByEmail(principal.getName())
@@ -43,7 +45,6 @@ public class LikesService {
         .user(user)
         .build());
   }
-
 
   public Page<LikesDto> getLikes(Principal principal, Pageable pageable) {
 
@@ -69,6 +70,7 @@ public class LikesService {
               .build();
         });
   }
+
 
   public void deleteLikes(Principal principal, Long likeId) {
 
