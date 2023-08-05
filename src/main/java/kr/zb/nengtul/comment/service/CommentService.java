@@ -1,12 +1,16 @@
 package kr.zb.nengtul.comment.service;
 
+import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 import kr.zb.nengtul.comment.domain.dto.CommentGetDto;
 import kr.zb.nengtul.comment.domain.dto.CommentReqDto;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
+import kr.zb.nengtul.comment.replycomment.service.ReplyCommentService;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
@@ -28,6 +32,7 @@ public class CommentService {
   private final RecipeSearchRepository recipeSearchRepository;
   private final CommentRepository commentRepository;
   private final UserService userService;
+  private final ReplyCommentService replyCommentService;
 
   @Transactional
   public void createComment(String recipeId, CommentReqDto commentReqDto, Principal principal) {
@@ -37,7 +42,7 @@ public class CommentService {
     Comment comment = Comment.builder()
         .recipeId(recipeDocument.getId())
         .user(user)
-        .content(commentReqDto.getContent())
+        .comment(commentReqDto.getComment())
         .build();
     commentRepository.save(comment);
   }
@@ -46,22 +51,36 @@ public class CommentService {
   public void updateComment(Long commentId, CommentReqDto commentReqDto, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
     Comment comment = commentRepository.findByIdAndUser(commentId, user)
-        .orElseThrow(() -> new CustomException(NO_PERMISSION));
-    comment.setContent(commentReqDto.getContent());
+        .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
+    comment.setComment(commentReqDto.getComment());
     commentRepository.save(comment);
   }
   @Transactional
   public void deleteComment(Long commentId, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
     Comment comment = commentRepository.findByIdAndUser(commentId, user)
-        .orElseThrow(() -> new CustomException(NO_PERMISSION));
+        .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
     commentRepository.delete(comment);
   }
 
-  public Page<CommentGetDto> findAllCommentByRecipeId(String recipeId, Pageable pageable){
+  public List<CommentGetDto> findAllCommentByRecipeId(String recipeId){
     RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
-    Page<Comment> commentList = commentRepository.findAllByRecipeId(recipeDocument.getId(), pageable);
-    return commentList.map(CommentGetDto::buildCommentGetDto);
+    List<Comment> commentList = commentRepository.findAllByRecipeId(recipeDocument.getId());
+
+    return commentList.stream().map(this::buildCommentGetDto).collect(Collectors.toList());
+  }
+
+  public CommentGetDto buildCommentGetDto(Comment comment) {
+    return CommentGetDto.builder()
+        .recipeId(comment.getRecipeId())
+        .commentId(comment.getId())
+        .userId(comment.getUser().getId())
+        .userNickname(comment.getUser().getNickname())
+        .comment(comment.getComment())
+        .createdAt(comment.getCreatedAt())
+        .modifiedAt(comment.getModifiedAt())
+        .replyCommentGetDtoList(replyCommentService.getReplyCommentByComment(comment.getId()))
+        .build();
   }
 }
