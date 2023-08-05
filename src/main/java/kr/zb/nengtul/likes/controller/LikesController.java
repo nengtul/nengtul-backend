@@ -22,7 +22,7 @@ public class LikesController {
 
   private final LikesService likesService;
 
-  @PostMapping("/{recipeId}")
+  @PostMapping("/recipe/{recipeId}")
   ResponseEntity<Void> addLike(Principal principal,
       @PathVariable String recipeId) {
 

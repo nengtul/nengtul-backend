@@ -17,7 +17,7 @@ public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
-    @PostMapping("/{publisherId}")
+    @PostMapping("/publisher/{publisherId}")
     ResponseEntity<Void> addFavorite(Principal principal,
                               @PathVariable Long publisherId) {
 
