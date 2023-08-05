@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface SavedRecipeRepository extends JpaRepository<SavedRecipe, Long> {
 
   Optional<SavedRecipe> findByUserIdAndRecipeId(Long userId, String recipeId);
+
   Page<SavedRecipe> findAllByUserId(Long userId, Pageable pageable);
 
 }
