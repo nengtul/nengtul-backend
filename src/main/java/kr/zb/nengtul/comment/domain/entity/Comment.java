@@ -43,4 +43,8 @@ public class Comment extends BaseTimeEntity {
   public void setComment(String comment) {
     this.comment = comment;
   }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 }
