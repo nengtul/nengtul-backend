@@ -38,6 +38,10 @@ public enum ErrorCode {
   NOT_FOUND_FAVORITE(HttpStatus.NOT_FOUND, "츨겨찾기를 찾을 수 없습니다."),
   ALREADY_ADDED_FAVORITE(HttpStatus.NOT_FOUND, "이미 즐겨찾기된 유저 입니다."),
 
+  //레시피 저장
+  NOT_FOUND_SAVED_RECIPE(HttpStatus.NOT_FOUND, "저장된 레시피를 찾을 수 없습니다."),
+  ALREADY_ADDED_SAVED_RECIPE(HttpStatus.NOT_FOUND, "이미 저장된 레시피 입니다."),
+
   //공통
   NOT_NULL_TITLE(HttpStatus.BAD_REQUEST, "제목을 입력해 주세요."),
   NOT_NULL_CONTENT(HttpStatus.BAD_REQUEST, "내용을 입력해 주세요."),

@@ -1,4 +1,4 @@
-package kr.zb.nengtul.likes.service;
+package kr.zb.nengtul.savedrecipe.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Optional;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
-import kr.zb.nengtul.likes.domain.dto.LikesDto;
-import kr.zb.nengtul.likes.domain.entity.Likes;
-import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
+import kr.zb.nengtul.savedrecipe.domain.dto.SavedRecipeDto;
+import kr.zb.nengtul.savedrecipe.domain.entity.SavedRecipe;
+import kr.zb.nengtul.savedrecipe.domain.repository.SavedRecipeRepository;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -29,12 +29,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-@DisplayName("좋아요 서비스 테스트")
-class LikesServiceTest {
+@DisplayName("레피시 저장 테스트")
+class SavedRecipeServiceTest {
 
-  private LikesService likesService;
+  private SavedRecipeService savedRecipeService;
 
-  private LikesRepository likesRepository;
+  private SavedRecipeRepository savedRecipeRepository;
 
   private UserRepository userRepository;
 
@@ -42,18 +42,18 @@ class LikesServiceTest {
 
   @BeforeEach
   void setUp() {
-    likesRepository = mock(LikesRepository.class);
+    savedRecipeRepository = mock(SavedRecipeRepository.class);
     userRepository = mock(UserRepository.class);
     recipeSearchRepository = mock(RecipeSearchRepository.class);
 
-    likesService = new LikesService(
-        likesRepository, userRepository, recipeSearchRepository);
+    savedRecipeService = new SavedRecipeService(
+        savedRecipeRepository, userRepository, recipeSearchRepository);
 
   }
 
   @Test
-  @DisplayName("좋아요 등록 성공")
-  void addLikes_SUCCESS() {
+  @DisplayName("레시피 저장 성공")
+  void addSavedRecipe_SUCCESS() {
     //given
     when(userRepository.findByEmail(any()))
         .thenReturn(Optional.of(new User()));
@@ -65,16 +65,16 @@ class LikesServiceTest {
         "test@test.com", null);
 
     //when
-    likesService.addLikes(principal, "recipeId");
+    savedRecipeService.addSavedRecipe(principal, "recipeId");
 
     //then
-    verify(likesRepository, times(1))
-        .save(any(Likes.class));
+    verify(savedRecipeRepository, times(1))
+        .save(any(SavedRecipe.class));
   }
 
   @Test
-  @DisplayName("좋아요 등록 실패 - 이미 좋아요 누름")
-  void addLikes_FAIL_Already_Like_Recipe() {
+  @DisplayName("레시피 저장 실패 - 이미 저장된 레시피")
+  void addSavedRecipe_FAIL_Already_Saved_Recipe() {
     //given
     when(userRepository.findByEmail(any()))
         .thenReturn(Optional.of(new User()));
@@ -82,8 +82,8 @@ class LikesServiceTest {
     when(recipeSearchRepository.findById(any()))
         .thenReturn(Optional.of(new RecipeDocument()));
 
-    when(likesRepository.findByUserIdAndRecipeId(any(), any()))
-        .thenReturn(Optional.of(new Likes()));
+    when(savedRecipeRepository.findByUserIdAndRecipeId(any(), any()))
+        .thenReturn(Optional.of(new SavedRecipe()));
 
     Principal principal = new UsernamePasswordAuthenticationToken(
         "test@test.com", null);
@@ -91,15 +91,15 @@ class LikesServiceTest {
     //when
     CustomException customException =
         Assertions.assertThrows(CustomException.class,
-            () -> likesService.addLikes(principal, "recipeId"));
+            () -> savedRecipeService.addSavedRecipe(principal, "recipeId"));
 
     //then
-    assertEquals(customException.getErrorCode(), ErrorCode.ALREADY_LIKES_RECIPE);
+    assertEquals(customException.getErrorCode(), ErrorCode.ALREADY_ADDED_SAVED_RECIPE);
   }
 
   @Test
-  @DisplayName("좋아요 가져오기 성공")
-  void getLikes_SUCCESS() {
+  @DisplayName("레시피 저장 가져오기 성공")
+  void getSavedRecipe_SUCCESS() {
     //given
     RecipeDocument recipeDocument = RecipeDocument.builder()
         .id("recipeId")
@@ -107,20 +107,20 @@ class LikesServiceTest {
         .thumbnailUrl("testThumbnailUrl")
         .build();
 
-    Likes likes = Likes.builder()
+    SavedRecipe savedRecipe = SavedRecipe.builder()
         .id(1L)
         .recipeId(recipeDocument.getId())
         .createdAt(LocalDateTime.now())
         .build();
 
-    List<Likes> likesList = new ArrayList<>();
-    likesList.add(likes);
+    List<SavedRecipe> savedRecipes = new ArrayList<>();
+    savedRecipes.add(savedRecipe);
 
     when(userRepository.findByEmail(any()))
         .thenReturn(Optional.of(new User()));
 
-    when(likesRepository.findAllByUserId(any(), any()))
-        .thenReturn(new PageImpl<>(likesList));
+    when(savedRecipeRepository.findAllByUserId(any(), any()))
+        .thenReturn(new PageImpl<>(savedRecipes));
 
     when(recipeSearchRepository.findById(any()))
         .thenReturn(Optional.of(recipeDocument));
@@ -129,29 +129,29 @@ class LikesServiceTest {
         "test@test.com", null);
 
     //when
-    LikesDto likesDto =
-        likesService.getLikes(principal, Pageable.unpaged())
+    SavedRecipeDto savedRecipeDto =
+        savedRecipeService.getSavedRecipe(principal, Pageable.unpaged())
             .getContent().get(0);
 
     //then
-    assertEquals(likesDto.getTitle(), recipeDocument.getTitle());
-    assertEquals(likesDto.getThumbnailUrl(), recipeDocument.getThumbnailUrl());
-    assertEquals(likesDto.getRecipeId(), recipeDocument.getId());
+    assertEquals(savedRecipeDto.getTitle(), recipeDocument.getTitle());
+    assertEquals(savedRecipeDto.getThumbnailUrl(), recipeDocument.getThumbnailUrl());
+    assertEquals(savedRecipeDto.getRecipeId(), recipeDocument.getId());
   }
 
   @Test
-  @DisplayName("좋아요 삭제 성공")
-  void deleteLikes_SUCCESS() {
+  @DisplayName("레피시 저장 삭제 성공")
+  void deleteSavedRecipe_SUCCESS() {
     //given
     User user = mock(User.class);
 
-    Likes likes = Likes.builder().user(user).build();
+    SavedRecipe savedRecipe = SavedRecipe.builder().user(user).build();
 
     when(userRepository.findByEmail(any()))
         .thenReturn(Optional.of(user));
 
-    when(likesRepository.findById(any()))
-        .thenReturn(Optional.of(likes));
+    when(savedRecipeRepository.findById(any()))
+        .thenReturn(Optional.of(savedRecipe));
 
     when(user.getId())
         .thenReturn(1L);
@@ -160,12 +160,11 @@ class LikesServiceTest {
         "test@test.com", null);
 
     //when
-    likesService.deleteLikes(principal, 1L);
+    savedRecipeService.deleteSavedRecipe(principal, 1L);
 
     //then
-    verify(likesRepository, times(1))
-        .delete(any(Likes.class));
+    verify(savedRecipeRepository, times(1))
+        .delete(any(SavedRecipe.class));
   }
-
 
 }
