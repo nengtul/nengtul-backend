@@ -1,4 +1,4 @@
-package kr.zb.nengtul.comment.domain.dto;
+package kr.zb.nengtul.comment.replycomment.domain.dto;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.CONTENT_NOT_NULL_MESSAGE;
 
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentReqDto {
+public class ReplyCommentReqDto {
   @NotEmpty(message = CONTENT_NOT_NULL_MESSAGE)
-  private String comment;
+  private String replyComment;
 }

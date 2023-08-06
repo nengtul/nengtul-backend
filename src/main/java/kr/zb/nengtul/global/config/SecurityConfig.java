@@ -67,8 +67,10 @@ public class SecurityConfig {
         //== URL별 권한 관리 옵션 ==//
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/v1/recipes/**").permitAll() //댓글
+            .requestMatchers(HttpMethod.GET, "/v1/comments/**").permitAll()//대댓글
             .requestMatchers(
-                "/","/**",
+                "/", "/**",
                 "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
                 "/v1/auth/**",
                 "/v1/user/join",//회원가입
@@ -83,7 +85,8 @@ public class SecurityConfig {
                 "/v1/user/**",
                 "/v1/shareboard/**",
                 "/v1/recipe/**",
-                "/v1/recipe/comment/**",//댓글 작성,수정,삭제
+                "/v1/comments/**",//대댓글
+                "/v1/recipes/comment/**",//댓글 작성,수정,삭제
                 "/v1/likes/**",
                 "/v1/favorite/**",
                 "/v1/saved-recipe/**"

@@ -86,12 +86,17 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   public void checkAccessTokenAndAuthentication(HttpServletRequest request,
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    jwtTokenProvider.extractAccessToken(request)
-        .filter(jwtTokenProvider::isTokenValid)
-        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
-            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
-
-    filterChain.doFilter(request, response);
+    String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
+    if (accessToken != null && jwtTokenProvider.isTokenValid(accessToken)) {
+      // 토큰 검증, 토큰 유효할 때
+      jwtTokenProvider.extractEmail(accessToken)
+          .flatMap(userRepository::findByEmail)
+          .ifPresent(this::saveAuthentication);
+      filterChain.doFilter(request, response);
+    } else {
+      // 토큰 검증, 토큰 유효하지 않을 때 토큰 만료 메세지 출력
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid access token");
+    }
   }
 
   //인증 허가
