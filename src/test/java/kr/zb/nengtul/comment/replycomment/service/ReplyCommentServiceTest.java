@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+@DisplayName("대댓글 테스트")
 class ReplyCommentServiceTest {
 
   private CommentRepository commentRepository;
