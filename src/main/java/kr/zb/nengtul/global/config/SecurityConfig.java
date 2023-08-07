@@ -69,21 +69,21 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/v1/recipes/**").permitAll() //댓글
             .requestMatchers(HttpMethod.GET, "/v1/comments/**").permitAll()//대댓글
+            .requestMatchers(HttpMethod.GET, "/v1/notices/**").permitAll()//공지사항 조회
             .requestMatchers(
                 "/", "/**",
                 "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
                 "/v1/auth/**",
-                "/v1/user/join",//회원가입
-                "/v1/user/login",//로그인
-                "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
-                "/v1/user/findid",//아이디 찾기
-                "/v1/user/verify/**", //이메일 인증
-                "/v1/notice/list/**", //공지사항 조회관련
+                "/v1/users/join",//회원가입
+                "/v1/users/login",//로그인
+                "/v1/users/findpw",//비밀번호 찾기 (비밀번호 재발급)
+                "/v1/users/findid",//아이디 찾기
+                "/v1/users/verify/**", //이메일 인증
                 "/v1/recipe/commentlist/**" //댓글 조회
             ).permitAll()
             .requestMatchers(
-                "/v1/user/**",
-                "/v1/shareboard/**",
+                "/v1/users/**",
+                "/v1/shareboards/**",
                 "/v1/recipe/**",
                 "/v1/comments/**",//대댓글
                 "/v1/recipes/comment/**",//댓글 작성,수정,삭제
@@ -93,7 +93,7 @@ public class SecurityConfig {
             ).hasAnyRole("USER", "ADMIN")
             .requestMatchers(
                 "/v1/admin/**",
-                "/v1/notice/**"
+                "/v1/notices/**"
             ).hasRole("ADMIN")
             .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         .logout(logout -> logout.logoutSuccessUrl("/"))

@@ -33,6 +33,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import s3bucket.service.AmazonS3Service;
 
+@DisplayName("댓글 테스트")
 class CommentServiceTest {
 
   private CommentService commentService;

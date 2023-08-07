@@ -32,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/user")
+@RequestMapping("/v1/users")
 public class UserController {
 
   private final UserService userService;
@@ -59,7 +59,7 @@ public class UserController {
 
   //이메일 인증번호 재발급 요청
   @Operation(summary = "이메일 인증번호 재발급", description = "이메일 인증 시간을 증가시키며, 인증번호를 재발급합니다.")
-  @PostMapping("/verify/reset/{userId}")
+  @PostMapping("/{userId}/verify/reset")
   public ResponseEntity<Void> resetVerify(
       @Parameter(name = "userId", description = "회원 아이디") @PathVariable Long userId) {
     userService.resetVerify(userId);

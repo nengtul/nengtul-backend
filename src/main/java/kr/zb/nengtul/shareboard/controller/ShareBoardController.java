@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/shareboard")
+@RequestMapping("/v1/shareboards")
 public class ShareBoardController {
 
   private final ShareBoardService shareBoardService;
@@ -59,22 +59,23 @@ public class ShareBoardController {
 
   //수정
   @Operation(summary = "게시글 수정", description = "토큰을 통해 유저를 조회하고, 게시물 ID를 통해 유저 ID를 조회하여 비교 후 글의 작성자인 경우에 게시물을 수정할 수 있습니다.")
-  @PostMapping("/{id}")
+  @PostMapping("/{shareboardId}")
   public ResponseEntity<Void> updateShareBoard(
-      @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id,
+      @Parameter(name = "shareboardId", description = "게시물 ID") @PathVariable Long shareboardId,
       @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
       @RequestPart(value = "image", required = false) MultipartFile image,
       Principal principal) {
-    shareBoardService.updateShareBoard(id, shareBoardDto, principal, image);
+    shareBoardService.updateShareBoard(shareboardId, shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
 
   //삭제
   @Operation(summary = "게시글 삭제", description = "토큰을 통해 유저를 조회하고, 게시물 ID를 통해 유저 ID를 조회하여 비교 후 글의 작성자인 경우에 게시물을 삭제할 수 있습니다.")
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{shareboardId}")
   public ResponseEntity<Void> deleteShareBoard(
-      @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id, Principal principal) {
-    shareBoardService.deleteShareBoard(id, principal);
+      @Parameter(name = "shareboardId", description = "게시물 ID") @PathVariable Long shareboardId,
+      Principal principal) {
+    shareBoardService.deleteShareBoard(shareboardId, principal);
     return ResponseEntity.ok(null);
   }
 

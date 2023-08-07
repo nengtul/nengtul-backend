@@ -1,6 +1,7 @@
 package kr.zb.nengtul.comment.replycomment.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -36,8 +37,10 @@ public class ReplyCommentController {
 
   @Operation(summary = "대댓글 수정", description = "토큰을 통해 회원 정보를 얻은 후 자신이 작성한 대댓글을 수정한다.")
   @PutMapping("/replycommets/{replyCommentId}")
-  public ResponseEntity<Void> updateReplyComment(@PathVariable Long commentId,
-      @PathVariable Long replyCommentId, @RequestBody @Valid ReplyCommentReqDto replyCommentReqDto,
+  public ResponseEntity<Void> updateReplyComment(
+      @Parameter(name = "commentId", description = "댓글 ID") @PathVariable Long commentId,
+      @Parameter(name = "replyCommentId", description = "대댓글 ID") @PathVariable Long replyCommentId,
+      @RequestBody @Valid ReplyCommentReqDto replyCommentReqDto,
       Principal principal) {
     replyCommentService.updateReplyComment(commentId, replyCommentId, replyCommentReqDto,
         principal);
@@ -46,8 +49,10 @@ public class ReplyCommentController {
 
   @Operation(summary = "대댓글 삭제", description = "토큰을 통해 회원 정보를 얻은 후 자신이 작성한 대댓글을 삭제한다.")
   @DeleteMapping("/replycommets/{replyCommentId}")
-  public ResponseEntity<Void> deleteReplyComment(@PathVariable Long commentId,
-      @PathVariable Long replyCommentId, Principal principal) {
+  public ResponseEntity<Void> deleteReplyComment(
+      @Parameter(name = "commentId", description = "댓글 ID") @PathVariable Long commentId,
+      @Parameter(name = "replyCommentId", description = "대댓글 ID") @PathVariable Long replyCommentId,
+      Principal principal) {
     replyCommentService.deleteReplyComment(commentId, replyCommentId, principal);
     return ResponseEntity.ok(null);
   }

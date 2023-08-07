@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/notice")
+@RequestMapping("/v1/notices")
 public class NoticeController {
 
   private final NoticeService noticeService;
@@ -76,7 +76,7 @@ public class NoticeController {
 
   //상세 조회
   @Operation(summary = "공지사항 상세", description = "공지사항을 상세 조회합니다.")
-  @GetMapping("/list/{noticeId}")
+  @GetMapping("/{noticeId}")
   public ResponseEntity<NoticeDetailDto> getNoticeDetails(
       @Parameter(name = "id)", description = "공지사항 ID") @PathVariable Long noticeId) {
     return ResponseEntity.ok(
