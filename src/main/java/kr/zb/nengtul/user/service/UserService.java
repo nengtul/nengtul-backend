@@ -1,23 +1,23 @@
 package kr.zb.nengtul.user.service;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_EMAIL;
+import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
+import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_EXIST_PHONENUMBER;
 import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_VERIFIED;
 import static kr.zb.nengtul.global.exception.ErrorCode.EXPIRED_CODE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
-import static kr.zb.nengtul.global.exception.ErrorCode.SHORT_PASSWORD;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.user.domain.entity.User;
-import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
-import kr.zb.nengtul.user.domain.dto.UserFindEmailResDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
+import kr.zb.nengtul.user.domain.dto.UserPasswordChangeDto;
 import kr.zb.nengtul.user.domain.dto.UserUpdateDto;
+import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.mailgun.client.MailgunClient;
 import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
@@ -27,6 +27,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import s3bucket.service.AmazonS3Service;
 
 @Service
 @RequiredArgsConstructor
@@ -36,15 +38,18 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final MailgunClient mailgunClient;
+  private final AmazonS3Service amazonS3Service;
 
   //회원가입 및 이메일 인증 발송
   @Transactional
-  public void join(UserJoinDto userJoinDto) {
-    // 이메일 중복 확인
+  public void joinUser(UserJoinDto userJoinDto) {
+    // validation
     if (userRepository.existsByEmail(userJoinDto.getEmail())) {
       throw new CustomException(ALREADY_EXIST_EMAIL);
-    } else if (userJoinDto.getPassword() == null || userJoinDto.getPassword().length() < 8) {
-      throw new CustomException(SHORT_PASSWORD);
+    } else if (userRepository.existsByNickname(userJoinDto.getNickname())) {
+      throw new CustomException(ALREADY_EXIST_NICKNAME);
+    } else if (userRepository.existsByPhoneNumber(userJoinDto.getPhoneNumber())) {
+      throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
 
     User user = User.builder()
@@ -58,13 +63,11 @@ public class UserService {
         .profileImageUrl(null)
         .build();
     userRepository.save(user);
-
-    verifyEmailForm(user, userJoinDto.getEmail(), userJoinDto.getName());
   }
 
   //이메일 인증
   @Transactional
-  public void verify(String email, String code) {
+  public void verifyEmail(String email, String code) {
     User user = findUserByEmail(email);
     if (user.isEmailVerifiedYn()) {
       throw new CustomException(ALREADY_VERIFIED);
@@ -76,16 +79,9 @@ public class UserService {
     user.setEmailVerifiedYn(true);
   }
 
-  //유저 상세보기
-  public UserDetailDto getUserDetail(Principal principal) {
-    User user = findUserByEmail(principal.getName());
-
-    return UserDetailDto.buildUserDetailDto(user);
-  }
-
   //회원 탈퇴
   @Transactional
-  public void quit(Principal principal) {
+  public void quitUser(Principal principal) {
     User user = findUserByEmail(principal.getName());
 
     userRepository.deleteById(user.getId());
@@ -93,33 +89,45 @@ public class UserService {
 
   //회원 정보 수정
   @Transactional
-  public String update(Principal principal, UserUpdateDto userUpdateDto) {
+  public void updateUser(Principal principal, UserUpdateDto userUpdateDto, MultipartFile image) {
     User user = findUserByEmail(principal.getName());
 
-    if (userUpdateDto.getPassword() == null || userUpdateDto.getPassword().length() < 8) {
-      throw new CustomException(SHORT_PASSWORD);
+    // 닉네임 중복 체크
+    if (!user.getNickname().equals(userUpdateDto.getNickname()) && userRepository.existsByNickname(
+        userUpdateDto.getNickname())) {
+      throw new CustomException(ALREADY_EXIST_NICKNAME);
     }
 
-    String updateProfileImageUrl =
-        userUpdateDto.getProfileImageUrl() == null ? "" : userUpdateDto.getProfileImageUrl();
+    // 휴대폰 번호 중복 체크
+    if (!user.getPhoneNumber().equals(userUpdateDto.getPhoneNumber())
+        && userRepository.existsByPhoneNumber(userUpdateDto.getPhoneNumber())) {
+      throw new CustomException(ALREADY_EXIST_PHONENUMBER);
+    }
 
+    if (image != null) {
+      if (user.getProfileImageUrl() != null) {
+        // 이미지가 있을 경우 이미지 업데이트
+        amazonS3Service.updateFile(image, user.getProfileImageUrl());
+      } else {
+        // 이미지가 없을 경우 새 이미지 업로드
+        user.setProfileImageUrl(amazonS3Service.uploadFileForProfile(image, user.getEmail()));
+      }
+    }
+
+    // 사용자 정보 업데이트
     user.setNickname(userUpdateDto.getNickname());
-    user.setPassword(passwordEncoder.encode(userUpdateDto.getPassword()));
     user.setPhoneNumber(userUpdateDto.getPhoneNumber());
     user.setAddress(userUpdateDto.getAddress());
     user.setAddressDetail(userUpdateDto.getAddressDetail());
-    user.setProfileImageUrl(updateProfileImageUrl);
 
     userRepository.save(user);
-    return user.getEmail();
   }
 
   //가입한 이메일 찾기(아이디 찾기)
-  public UserFindEmailResDto findEmail(UserFindEmailReqDto userFindEmailReqDto) {
-    User user = userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
+  public User findEmail(UserFindEmailReqDto userFindEmailReqDto) {
+    return userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
             userFindEmailReqDto.getPhoneNumber())
         .orElseThrow(() -> new CustomException(NO_CONTENT));
-    return UserFindEmailResDto.buildUserFindEmailResDto(user.getEmail());
   }
 
   //임시 비밀번호 발급(비밀번호 찾기)
@@ -161,13 +169,13 @@ public class UserService {
     //유저 정보페이지에서 가져오기때문에 바로 get
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-    verifyEmailForm(user, user.getEmail(), user.getName());
+    verifyEmailForm(user.getEmail(), user.getName());
   }
 
   //이메일 인증 폼
-  private void verifyEmailForm(User user, String email, String name) {
+  public void verifyEmailForm(String email, String name) {
     String code = RandomStringUtils.random(10, true, true);
-
+    User user = findUserByEmail(email);
     SendMailForm sendMailForm = SendMailForm.builder()
         .from("lvet0330@gmail.com")
         .to(email)
@@ -204,4 +212,13 @@ public class UserService {
     return userRepository.findByEmail(email)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
   }
+
+  @Transactional
+  public void changePassword(Principal principal, UserPasswordChangeDto userPasswordChangeDto) {
+    User user = findUserByEmail(principal.getName());
+
+    user.setPassword(passwordEncoder.encode(userPasswordChangeDto.getPassword()));
+    userRepository.save(user);
+  }
+
 }

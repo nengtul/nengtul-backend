@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
@@ -38,7 +39,7 @@ public class Notice extends BaseTimeEntity {
 
   private String noticeImg;
 
-  @Column(columnDefinition = "default 0", nullable = false)
+  @Column(columnDefinition = "bigint default 0", nullable = false)
   private Long viewCount;
 
   public void setTitle(String title) {

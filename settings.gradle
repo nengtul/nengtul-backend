@@ -1,3 +1,4 @@
 rootProject.name = 'nengtul'
 include 'crawling'
+include 's3bucket'
 

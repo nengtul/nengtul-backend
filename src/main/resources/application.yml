@@ -8,6 +8,10 @@ spring:
     hikari:
       pool-name: jpa-hikari-pool
       maximum-pool-size: 5
+  elasticsearch:
+    uris: ${ES_URI}
+    password: ${ES_PASSWORD}
+    username: ${ES_USER_NAME}
   # JPA ??
   jpa:
     generate-ddl: true
@@ -29,7 +33,7 @@ spring:
 
     refresh:
       expiration: 1209600000 #  (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> 하루) * 14(2주))
-      header: Authorization-refresh
+      header: RefreshToken
   mailgun:
     secret-key: ${spring.mailgun.secret-key}
     domain: ${spring.mailgun.domain}
@@ -69,9 +73,18 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-  batch:
-    job.enabled: false
-    jdbc:
-      initialize-schema: always
-    job:
-      name: crawlingJob
+
+  servlet:
+    multipart:
+      max-file-size: 1MB # 요청한 파일 한 개의 크기
+      max-request-size: 1MB # 요청한 파일 전체의 크기
+
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET_NAME}
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: ${BUCKET_ACCESS_KEY}
+      secretKey: ${BUCKET_SECRET_KEY}

@@ -2,7 +2,6 @@ package kr.zb.nengtul.user.domain.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,14 +13,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.List;
+import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.notice.domain.entity.Notice;
+import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @NoArgsConstructor
@@ -29,7 +31,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class User extends BaseTimeEntity {
 
-  @JsonIgnore
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -68,8 +69,16 @@ public class User extends BaseTimeEntity {
   private String refreshToken; // 리프레시 토큰
 
   @JsonBackReference
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<Notice> noticeList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
+  private List<ShareBoard> shareBoardList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
+  private List<Comment> commentList;
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
@@ -144,9 +153,16 @@ public class User extends BaseTimeEntity {
   public void setAddress(String address) {
     this.address = address;
   }
+  public void setEmail(String email) {
+    this.address = email;
+  }
+
 
   public void setAddressDetail(String addressDetail) {
     this.addressDetail = addressDetail;
+  }
+  public void setRoles(RoleType roles) {
+    this.roles = roles;
   }
 
   public void setEmailVerifiedYn(boolean emailVerifiedYn) {
@@ -159,5 +175,13 @@ public class User extends BaseTimeEntity {
 
   public void setVerificationCode(String verificationCode) {
     this.verificationCode = verificationCode;
+  }
+
+  public void setPointAddShardBoard(int point) {
+    this.point += 3;
+  }
+
+  public boolean isEmailVerifiedYn() {
+    return emailVerifiedYn;
   }
 }

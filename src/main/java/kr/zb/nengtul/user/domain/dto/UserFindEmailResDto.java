@@ -14,12 +14,6 @@ import lombok.Setter;
 public class UserFindEmailResDto {
 
   private String email;
-
-  public static UserFindEmailResDto buildUserFindEmailResDto(String email) {
-    return UserFindEmailResDto.builder()
-        .email(email)
-        .build();
-  }
 }
 
 
