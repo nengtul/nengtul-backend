@@ -1,5 +1,6 @@
 package kr.zb.nengtul.recipe.service;
 
+import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.dto.RecipeAddDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeGetDetailDto;
@@ -37,6 +38,8 @@ class RecipeServiceTest {
 
     private AmazonS3Service amazonS3Service;
 
+    private LikesRepository likesRepository;
+
     private List<RecipeDocument> recipeDocuments;
 
     @BeforeEach
@@ -45,9 +48,10 @@ class RecipeServiceTest {
         recipeSearchRepository = mock(RecipeSearchRepository.class);
         amazonS3Service = mock(AmazonS3Service.class);
         userRepository = mock(UserRepository.class);
+        likesRepository = mock(LikesRepository.class);
 
         recipeService = new RecipeService(
-                recipeSearchRepository, userRepository, amazonS3Service);
+                recipeSearchRepository, userRepository, likesRepository, amazonS3Service);
 
         recipeDocuments = new ArrayList<>();
 
@@ -176,7 +180,6 @@ class RecipeServiceTest {
     @DisplayName("레시피 상세 내역 가져오기")
     void getRecipeDetailById() {
         //given
-
         RecipeDocument recipeDocument = RecipeDocument.builder()
                 .id("userId1")
                 .userId(1L)
@@ -210,6 +213,7 @@ class RecipeServiceTest {
         assertEquals(recipeDetailById.getCookingTime(), recipeDocument.getCookingTime());
         assertEquals(recipeDetailById.getServing(), recipeDocument.getServing());
         assertEquals(recipeDetailById.getViewCount(), recipeDocument.getViewCount());
+        assertEquals(recipeDetailById.getViewCount(), 1L);
         assertEquals(recipeDetailById.getCreatedAt(), recipeDocument.getCreatedAt());
         assertEquals(recipeDetailById.getModifiedAt(), recipeDocument.getModifiedAt());
         assertEquals(recipeDetailById.getCategory(), recipeDocument.getCategory().getKorean());
