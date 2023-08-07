@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.Date;
 
 import java.util.Optional;
+import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -65,14 +65,25 @@ public class SecurityConfig {
             .authenticationEntryPoint(new RestAuthenticationEntryPoint())
             .accessDeniedHandler(tokenAccessDeniedHandler))
         //== URL별 권한 관리 옵션 ==//
-        .authorizeHttpRequests(auth -> auth
+        .authorizeHttpRequests(authorizationHttpRequests -> authorizationHttpRequests
             .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/v1/recipes/**").permitAll() //댓글
             .requestMatchers(HttpMethod.GET, "/v1/comments/**").permitAll()//대댓글
             .requestMatchers(HttpMethod.GET, "/v1/notices/**").permitAll()//공지사항 조회
             .requestMatchers(
+                // -- Swagger UI v2
+                "/v2/api-docs",
+                "/swagger-resources",
+                "/swagger-resources/**",
+                "/configuration/ui",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/webjars/**",
+                // -- Swagger UI v3 (OpenAPI)
+                "/v3/api-docs/**",
+                "/swagger-ui/**").permitAll()
+            .requestMatchers(
                 "/", "/**",
-                "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v2/api-docs/**",
                 "/v1/auth/**",
                 "/v1/users/join",//회원가입
                 "/v1/users/login",//로그인
@@ -91,10 +102,7 @@ public class SecurityConfig {
                 "/v1/favorite/**",
                 "/v1/saved-recipe/**"
             ).hasAnyRole("USER", "ADMIN")
-            .requestMatchers(
-                "/v1/admin/**",
-                "/v1/notices/**"
-            ).hasRole("ADMIN")
+            .requestMatchers("/v1/admin/**", "/v1/notices/**").hasRole("ADMIN")
             .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         .logout(logout -> logout.logoutSuccessUrl("/"))
         //== 소셜 로그인 설정 ==//
