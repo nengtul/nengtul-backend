@@ -39,7 +39,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    if (request.getRequestURI().equals(NO_CHECK_URL)) {
+    if (request.getRequestURI().equals(NO_CHECK_URL) || request.getRequestURI().startsWith("/swagger-ui")) {
       filterChain.doFilter(request, response); // 로그인 요청이 들어오면, 다음 필터 호출
       return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
     }
@@ -86,17 +86,12 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   public void checkAccessTokenAndAuthentication(HttpServletRequest request,
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
-    if (accessToken != null && jwtTokenProvider.isTokenValid(accessToken)) {
-      // 토큰 검증, 토큰 유효할 때
-      jwtTokenProvider.extractEmail(accessToken)
-          .flatMap(userRepository::findByEmail)
-          .ifPresent(this::saveAuthentication);
-      filterChain.doFilter(request, response);
-    } else {
-      // 토큰 검증, 토큰 유효하지 않을 때 토큰 만료 메세지 출력
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid access token");
-    }
+    jwtTokenProvider.extractAccessToken(request)
+        .filter(jwtTokenProvider::isTokenValid)
+        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
+            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
+
+    filterChain.doFilter(request, response);
   }
 
   //인증 허가
@@ -109,7 +104,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
         .username(myUser.getEmail())
         .password(password)
-        .roles(myUser.getRoles().name())
+        .roles(myUser.getRoles().getKey())
         .build();
 
     Authentication authentication =
