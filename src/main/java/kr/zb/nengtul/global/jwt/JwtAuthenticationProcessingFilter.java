@@ -1,6 +1,7 @@
 package kr.zb.nengtul.global.jwt;
 
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -86,10 +87,30 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   public void checkAccessTokenAndAuthentication(HttpServletRequest request,
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    jwtTokenProvider.extractAccessToken(request)
-        .filter(jwtTokenProvider::isTokenValid)
-        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
-            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
+//    jwtTokenProvider.extractAccessToken(request)
+//        .filter(jwtTokenProvider::isTokenValid)
+//        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
+//            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
+//
+//    filterChain.doFilter(request, response);
+    String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
+    if (accessToken != null) {
+      try {
+        if (jwtTokenProvider.isTokenValid(accessToken)) {
+          jwtTokenProvider.extractEmail(accessToken)
+              .flatMap(userRepository::findByEmail)
+              .ifPresent(this::saveAuthentication);
+        } else {
+          // 유효하지 않은 토큰 401
+          response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+          return;
+        }
+      } catch (TokenExpiredException e) {
+        // 토큰이 만료 401
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+      }
+    }
 
     filterChain.doFilter(request, response);
   }
