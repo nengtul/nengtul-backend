@@ -70,6 +70,10 @@ public class RecipeDocument {
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute)
     private LocalDateTime modifiedAt;
 
+    public void updateViewCount() {
+        this.viewCount += 1;
+    }
+
     public void updateRecipe(RecipeUpdateDto recipeUpdateDto) {
 
         if (!recipeUpdateDto.getTitle().isEmpty()) {
