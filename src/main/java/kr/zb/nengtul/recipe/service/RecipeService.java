@@ -2,6 +2,7 @@ package kr.zb.nengtul.recipe.service;
 
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
+import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.dto.RecipeAddDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeGetDetailDto;
@@ -32,6 +33,8 @@ public class RecipeService {
     private final RecipeSearchRepository recipeSearchRepository;
 
     private final UserRepository userRepository;
+
+    private final LikesRepository likesRepository;
 
     private final AmazonS3Service amazonS3Service;
 
@@ -196,13 +199,13 @@ public class RecipeService {
                         .nickname("냉장고를털어라")
                         .build());
 
-        //Todo like count 추가
-//                    Long likeCount =
-//
+        Long likeCount = likesRepository.countByRecipeId(recipeDocument.getId());
+        System.out.println(likeCount);
+
         recipeGetListDto.setNickName(user.getNickname());
+        recipeGetListDto.setLikeCount(likeCount);
 
         return recipeGetListDto;
-
     }
 
     private void deleteRecipeS3UploadFile(String imagesUrl, String thumbnailUrl) {
@@ -214,7 +217,6 @@ public class RecipeService {
         for (String imageUrl : imagesUrlArr) {
             amazonS3Service.deleteFile(imageUrl);
         }
-
     }
 
 
