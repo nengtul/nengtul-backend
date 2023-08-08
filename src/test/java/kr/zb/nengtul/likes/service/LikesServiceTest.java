@@ -19,6 +19,7 @@ import kr.zb.nengtul.likes.domain.entity.Likes;
 import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -55,11 +56,16 @@ class LikesServiceTest {
   @DisplayName("좋아요 등록 성공")
   void addLikes_SUCCESS() {
     //given
+    User publisher = new User();
+
     when(userRepository.findByEmail(any()))
         .thenReturn(Optional.of(new User()));
 
     when(recipeSearchRepository.findById(any()))
         .thenReturn(Optional.of(new RecipeDocument()));
+
+    when(userRepository.findById(any()))
+        .thenReturn(Optional.of(publisher));
 
     Principal principal = new UsernamePasswordAuthenticationToken(
         "test@test.com", null);
@@ -70,6 +76,7 @@ class LikesServiceTest {
     //then
     verify(likesRepository, times(1))
         .save(any(Likes.class));
+    assertEquals(publisher.getPoint(), UserPoint.LIKES.getPoint());
   }
 
   @Test
@@ -144,6 +151,8 @@ class LikesServiceTest {
   void deleteLikes_SUCCESS() {
     //given
     User user = mock(User.class);
+    User publisher = new User();
+    publisher.setPlusPoint(UserPoint.LIKES);
 
     Likes likes = Likes.builder().user(user).build();
 
@@ -152,6 +161,12 @@ class LikesServiceTest {
 
     when(likesRepository.findById(any()))
         .thenReturn(Optional.of(likes));
+
+    when(recipeSearchRepository.findById(any()))
+        .thenReturn(Optional.of(new RecipeDocument()));
+
+    when(userRepository.findById(any()))
+        .thenReturn(Optional.of(publisher));
 
     when(user.getId())
         .thenReturn(1L);
@@ -165,6 +180,7 @@ class LikesServiceTest {
     //then
     verify(likesRepository, times(1))
         .delete(any(Likes.class));
+    assertEquals(publisher.getPoint(), 0);
   }
 
 
