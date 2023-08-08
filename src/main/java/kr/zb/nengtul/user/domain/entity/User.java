@@ -19,11 +19,11 @@ import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.notice.domain.entity.Notice;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @NoArgsConstructor
@@ -179,6 +179,14 @@ public class User extends BaseTimeEntity {
 
   public void setPointAddShardBoard(int point) {
     this.point += 3;
+  }
+
+  public void setPlusPoint(UserPoint userPoint) {
+    this.point += userPoint.getPoint();
+  }
+
+  public void setMinusPoint(UserPoint userPoint) {
+    this.point -= userPoint.getPoint();
   }
 
   public boolean isEmailVerifiedYn() {

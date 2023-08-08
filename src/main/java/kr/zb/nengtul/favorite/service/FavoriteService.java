@@ -5,6 +5,7 @@ import kr.zb.nengtul.favorite.domain.entity.Favorite;
 import kr.zb.nengtul.favorite.domain.repository.FavoriteRepository;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,10 @@ public class FavoriteService {
                 .ifPresent(favorite -> {
                     throw new CustomException(ErrorCode.ALREADY_ADDED_FAVORITE);
                 });
+
+        publisher.setPlusPoint(UserPoint.FAVORITE);
+
+        userRepository.save(publisher);
 
         favoriteRepository.save(Favorite.builder()
                 .user(user)
@@ -70,6 +75,10 @@ public class FavoriteService {
         if (!user.getId().equals(favorite.getUser().getId())) {
             throw new CustomException(ErrorCode.NO_PERMISSION);
         }
+
+        favorite.getPublisher().setMinusPoint(UserPoint.FAVORITE);
+
+        userRepository.save(favorite.getPublisher());
 
         favoriteRepository.delete(favorite);
 
