@@ -106,6 +106,9 @@ public class RecipeService {
         RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
 
+        recipeDocument.updateViewCount();
+        recipeSearchRepository.save(recipeDocument);
+
         RecipeGetDetailDto recipeGetDetailDto =
                 RecipeGetDetailDto.fromRecipeDocument(recipeDocument);
 
