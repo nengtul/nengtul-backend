@@ -92,7 +92,7 @@ public class ShareBoardService {
       throw new CustomException(NO_PERMISSION);
     }
     //혹시라도 포인트가 음수가 될 수 있으므로
-    if(!shareBoard.isClosed()){
+    if(shareBoard.isClosed()){
       user.setPoint(user.getPoint() - 3);
       userRepository.save(user);
     }
