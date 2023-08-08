@@ -52,7 +52,7 @@ public class ShareBoardService {
     if (image != null) {
       shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image, shareBoard.getId()));
     }
-    user.setPointAddShardBoard(user.getPoint());
+    user.setPoint(user.getPoint() + 3);
     userRepository.saveAndFlush(user);
   }
 
@@ -91,6 +91,11 @@ public class ShareBoardService {
     if (shareBoard.getUser() != user) {
       throw new CustomException(NO_PERMISSION);
     }
+    //혹시라도 포인트가 음수가 될 수 있으므로
+    if(!shareBoard.isClosed()){
+      user.setPoint(user.getPoint() - 3);
+      userRepository.save(user);
+    }
     shareBoardRepository.delete(shareBoard);
   }
 
@@ -112,5 +117,16 @@ public class ShareBoardService {
   public List<ShareBoard> getMyShareBoard(Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
     return shareBoardRepository.findAllByUser(user);
+  }
+
+  //채팅에서 나눔게시물 등록자가 나눔/거래 완료 버튼 누르면 사용할 service code.
+  @Transactional
+  public void soldOut(Long shareBoardId, Principal principal) {
+    User user = userService.findUserByEmail(principal.getName());
+    ShareBoard shareBoard = shareBoardRepository.findByIdAndUser(shareBoardId, user)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
+    user.setPoint(user.getPoint() + 3);
+    shareBoard.setClosed(true);
+    shareBoardRepository.save(shareBoard);
   }
 }
