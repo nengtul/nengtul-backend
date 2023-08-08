@@ -35,6 +35,7 @@ public class Notice extends BaseTimeEntity {
   private String title;
 
   @Lob
+  @Column(name = "content", columnDefinition = "BLOB")
   private String content;
 
   private String noticeImg;

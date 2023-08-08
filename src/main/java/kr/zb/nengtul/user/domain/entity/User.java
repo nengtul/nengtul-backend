@@ -177,8 +177,8 @@ public class User extends BaseTimeEntity {
     this.verificationCode = verificationCode;
   }
 
-  public void setPointAddShardBoard(int point) {
-    this.point += 3;
+  public void setPoint(int point) {
+    this.point = point;
   }
 
   public boolean isEmailVerifiedYn() {
