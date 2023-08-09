@@ -58,18 +58,18 @@ public class ChatRoomService {
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
-        if (chatUsers.size() == 1) {
-            ChatRoom chatRoom = chatUsers.get(0).getChatRoom();
-            connectedChatRoomRepository.deleteAllByChatRoom(chatRoom);
+        ChatRoom chatRoom = chatUsers.get(0).getChatRoom();
+
+        List<ConnectedChatRoom> deletedUser = chatUsers.stream()
+                .filter(connectedChatRoom -> connectedChatRoom.getUser().getId()
+                        .equals(user.getId())).toList();
+
+        connectedChatRoomRepository.deleteAll(deletedUser);
+        chatUsers.removeAll(deletedUser);
+
+        if(chatUsers.isEmpty()){
             chatRepository.deleteAllByChatRoom(chatRoom);
             chatRoomRepository.delete(chatRoom);
-        } else {
-            ConnectedChatRoom deletedUser = chatUsers.stream()
-                    .filter(connectedChatRoom -> connectedChatRoom.getUser().getId()
-                            .equals(user.getId()))
-                    .findFirst()
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-            connectedChatRoomRepository.delete(deletedUser);
         }
 
     }
