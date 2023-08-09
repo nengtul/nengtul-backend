@@ -40,6 +40,10 @@ public class RecipeGetDetailDto {
 
     private Long viewCount;
 
+    private String userProfileUrl;
+
+    private int point;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;

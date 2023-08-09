@@ -113,8 +113,12 @@ public class RecipeService {
                 RecipeGetDetailDto.fromRecipeDocument(recipeDocument);
 
         User user = userRepository.findById(recipeDocument.getUserId())
-                .orElseGet(() -> User.builder().nickname("냉장고를털어라").build());
+                .orElseGet(() -> User.builder()
+                    .profileImageUrl("")
+                    .nickname("냉장고를털어라").build());
 
+        recipeGetDetailDto.setUserProfileUrl(user.getProfileImageUrl());
+        recipeGetDetailDto.setPoint(user.getPoint());
         recipeGetDetailDto.setNickName(user.getNickname());
 
         return recipeGetDetailDto;
