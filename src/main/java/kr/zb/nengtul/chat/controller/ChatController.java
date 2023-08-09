@@ -82,16 +82,14 @@ public class ChatController {
                 .map(ConnectedChatRoom::getUser)
                 .toList();
 
-        User receiver = connectedUsers.stream()
-                .filter(user -> !Objects.equals(user.getId(), sender.getId()))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_OTHER_USER));
-
         simpMessagingTemplate.convertAndSend("/sub/chat/send/rooms/" + roomId,
                 ChatDto.fromEntity(message));
 
-        simpMessagingTemplate.convertAndSend("/sub/chat/push/users/" + receiver.getId(),
-                ChatDto.fromEntity(message));
+        connectedUsers.stream()
+                .filter(user -> !user.getId().equals(sender.getId()))  // 자신에게는 보내지 않음
+                .forEach(user -> simpMessagingTemplate.convertAndSend(
+                        "/sub/chat/push/users/" + user.getId(),
+                        ChatDto.fromEntity(message)));
     }
 
     @MessageMapping("/chat/get/rooms/{roomId}")

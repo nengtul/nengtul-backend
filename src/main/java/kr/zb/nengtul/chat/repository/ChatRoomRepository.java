@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
+    @EntityGraph(value = "chatRoomWithShareBoardAndConnectedChatRooms")
     Optional<ChatRoom> findByRoomId(String roomId);
 
     @EntityGraph(value = "chatRoomWithShareBoardAndConnectedChatRooms")
