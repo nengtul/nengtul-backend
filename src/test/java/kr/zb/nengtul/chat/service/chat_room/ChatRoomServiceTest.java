@@ -4,14 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import kr.zb.nengtul.chat.domain.ChatRoom;
 import kr.zb.nengtul.chat.domain.ConnectedChatRoom;
+import kr.zb.nengtul.chat.repository.ChatRepository;
 import kr.zb.nengtul.chat.repository.ChatRoomRepository;
 import kr.zb.nengtul.chat.repository.ConnectedChatRoomRepository;
 import kr.zb.nengtul.chat.service.ChatRoomService;
@@ -31,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class ChatRoomServiceTest {
 
+    private final ShareBoard shareBoard = new ShareBoard();
     @Captor
     ArgumentCaptor<ConnectedChatRoom> connectedChatRoomCaptor;
     @InjectMocks
@@ -39,8 +44,8 @@ public class ChatRoomServiceTest {
     private ConnectedChatRoomRepository connectedChatRoomRepository;
     @Mock
     private ChatRoomRepository chatRoomRepository;
-
-    private final ShareBoard shareBoard = new ShareBoard();
+    @Mock
+    private ChatRepository chatRepository;
 
     @DisplayName("ChatRoom 생성 테스트")
     @Test
@@ -98,7 +103,6 @@ public class ChatRoomServiceTest {
         verify(chatRoomRepository, times(1)).save(any(ChatRoom.class));
         verify(connectedChatRoomRepository, times(2)).save(connectedChatRoomCaptor.capture());
 
-
         List<ConnectedChatRoom> capturedConnectedChatRooms = connectedChatRoomCaptor.getAllValues();
         assertEquals(2, capturedConnectedChatRooms.size());
         assertEquals(user1, capturedConnectedChatRooms.get(0).getUserId());
@@ -141,4 +145,62 @@ public class ChatRoomServiceTest {
         assertEquals(exception.getErrorCode(), ErrorCode.NOT_FOUND_CHATROOM);
     }
 
+    @Test
+    @DisplayName("채팅방 나가기 - 상대방이 남아았을 때")
+    public void testLeaveChatRoom() {
+        // Given
+        User user = User.builder().id(123L).build();
+        User otherUser = User.builder().id(456L).build();
+
+        ChatRoom chatRoom = new ChatRoom(new ShareBoard());
+        List<ConnectedChatRoom> chatUsers = new ArrayList<>(List.of(
+                new ConnectedChatRoom(1L, chatRoom, user),
+                new ConnectedChatRoom(2L, chatRoom, otherUser)
+        ));
+
+        when(connectedChatRoomRepository.findByChatRoomRoomId(chatRoom.getRoomId()))
+                .thenReturn(chatUsers);
+        doNothing().when(connectedChatRoomRepository).deleteAll(any());
+        // When
+        chatRoomService.leaveChatRoom(user, chatRoom.getRoomId());
+
+        // Then
+        verify(connectedChatRoomRepository, times(1)).findByChatRoomRoomId(chatRoom.getRoomId());
+        verify(connectedChatRoomRepository, times(1)).deleteAll(any());
+        verifyNoMoreInteractions(chatRepository);
+        verifyNoMoreInteractions(chatRoomRepository);
+
+        assertEquals(1, chatUsers.size());
+        assertEquals(456L, chatUsers.get(0).getUser().getId()); //상대방만 남아있게 된다.
+    }
+
+
+    @Test
+    @DisplayName("채팅방 나가기 - 혼자 남아 있을 때")
+    public void testLeaveAndDeleteChatRoom() {
+        // Given
+        User user = User.builder().id(123L).build();
+
+        ChatRoom chatRoom = new ChatRoom(new ShareBoard());
+        List<ConnectedChatRoom> chatUsers = new ArrayList<>(List.of(
+                new ConnectedChatRoom(1L, chatRoom, user)
+        ));
+
+        when(connectedChatRoomRepository.findByChatRoomRoomId(chatRoom.getRoomId()))
+                .thenReturn(chatUsers);
+        doNothing().when(connectedChatRoomRepository).deleteAll(any());
+        doNothing().when(chatRepository).deleteAllByChatRoom(chatRoom);
+        doNothing().when(chatRoomRepository).delete(chatRoom);
+
+        // When
+        chatRoomService.leaveChatRoom(user, chatRoom.getRoomId());
+
+        // Then
+        verify(connectedChatRoomRepository, times(1)).findByChatRoomRoomId(chatRoom.getRoomId());
+        verify(connectedChatRoomRepository, times(1)).deleteAll(any());
+        verify(chatRepository, times(1)).deleteAllByChatRoom(chatRoom);
+        verify(chatRoomRepository, times(1)).delete(chatRoom);
+
+        assertEquals(0, chatUsers.size());
+    }
 }
