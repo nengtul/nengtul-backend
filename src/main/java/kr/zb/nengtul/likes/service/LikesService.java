@@ -92,15 +92,14 @@ public class LikesService {
       throw new CustomException(ErrorCode.NO_PERMISSION);
     }
 
-    RecipeDocument recipeDocument = recipeSearchRepository.findById(likes.getRecipeId())
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+    recipeSearchRepository.findById(likes.getRecipeId())
+        .ifPresent(recipe -> {
+          User publisher = userRepository.findById(recipe.getUserId())
+              .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-    User publisher = userRepository.findById(recipeDocument.getUserId())
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-    
-    publisher.setMinusPoint(UserPoint.LIKES);
-
-    userRepository.save(publisher);
+          publisher.setMinusPoint(UserPoint.LIKES);
+          userRepository.save(publisher);
+        });
 
     likesRepository.delete(likes);
   }
