@@ -5,6 +5,7 @@ import kr.zb.nengtul.favorite.domain.entity.Favorite;
 import kr.zb.nengtul.favorite.domain.repository.FavoriteRepository;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -44,10 +45,12 @@ class FavoriteServiceTest {
     @DisplayName("즐겨찾기 등록 성공")
     void addFavorite_SUCCESS() {
         //given
+        User publisher = User.builder().build();
+
         when(userRepository.findByEmail(any()))
                 .thenReturn(Optional.of(new User()));
         when(userRepository.findById(any()))
-                .thenReturn(Optional.of(new User()));
+                .thenReturn(Optional.of(publisher));
 
         Principal principal =
                 new UsernamePasswordAuthenticationToken("test@test.com", null);
@@ -58,6 +61,7 @@ class FavoriteServiceTest {
         //then
         verify(favoriteRepository, times(1))
                 .save(any(Favorite.class));
+        assertEquals(publisher.getPoint(), UserPoint.FAVORITE.getPoint());
     }
 
     @Test
@@ -125,13 +129,18 @@ class FavoriteServiceTest {
     void deleteFavorite_SUCCESS() {
         //given
         User user = mock(User.class);
+        User publisher = new User();
+        publisher.setPlusPoint(UserPoint.FAVORITE);
         when(user.getId())
                 .thenReturn(1L);
         when(userRepository.findByEmail(any()))
                 .thenReturn(Optional.of(user));
         when(favoriteRepository.findById(any()))
                 .thenReturn(Optional.of(
-                        Favorite.builder().user(user).build()));
+                        Favorite.builder()
+                            .user(user)
+                            .publisher(publisher)
+                            .build()));
 
         Principal principal =
                 new UsernamePasswordAuthenticationToken("test@test.com", null);
@@ -142,6 +151,7 @@ class FavoriteServiceTest {
         //then
         verify(favoriteRepository, times(1))
                 .delete(any(Favorite.class));
+        assertEquals(publisher.getPoint(), 0);
     }
 
     @Test
