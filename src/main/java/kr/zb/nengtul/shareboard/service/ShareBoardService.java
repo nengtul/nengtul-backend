@@ -10,6 +10,7 @@ import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.service.UserService;
@@ -52,7 +53,7 @@ public class ShareBoardService {
     if (image != null) {
       shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image, shareBoard.getId()));
     }
-    user.setPoint(user.getPoint() + 3);
+    user.setPlusPoint(UserPoint.SHARE);
     userRepository.saveAndFlush(user);
   }
 
@@ -93,7 +94,7 @@ public class ShareBoardService {
     }
     //혹시라도 포인트가 음수가 될 수 있으므로
     if(shareBoard.isClosed()){
-      user.setPoint(user.getPoint() - 3);
+      user.setMinusPoint(UserPoint.SHARE);
       userRepository.save(user);
     }
     shareBoardRepository.delete(shareBoard);
@@ -125,7 +126,7 @@ public class ShareBoardService {
     User user = userService.findUserByEmail(principal.getName());
     ShareBoard shareBoard = shareBoardRepository.findByIdAndUser(shareBoardId, user)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
-    user.setPoint(user.getPoint() + 3);
+    user.setPlusPoint(UserPoint.SHARE_OK);
     shareBoard.setClosed(true);
     shareBoardRepository.save(shareBoard);
   }
