@@ -17,6 +17,7 @@ import kr.zb.nengtul.shareboard.service.ShareBoardService;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -49,7 +50,7 @@ public class ChatController {
         ShareBoard shareBoard = shareBoardService.findById(shareBoardId);
         User receiver = shareBoard.getUser();
 
-        if(Objects.equals(receiver.getId(), sender.getId())){
+        if (Objects.equals(receiver.getId(), sender.getId())) {
             throw new CustomException(ErrorCode.CANNOT_OPEN_CHATROOM_YOURSELF);
         }
 
@@ -137,21 +138,23 @@ public class ChatController {
                 markedMessages.stream().map(ChatDto::fromEntity).toList());
     }
 
-    @DeleteMapping("/v1/chat/leave/{roomId}")
-    public void leaveChatRoom(
+    @DeleteMapping("/v1/chat/leave/rooms/{roomId}")
+    public ResponseEntity<Void> leaveChatRoom(
             Principal principal,
             @PathVariable String roomId
     ) {
         User user = userService.findUserByEmail(principal.getName());
         chatRoomService.leaveChatRoom(user, roomId);
+
+        return ResponseEntity.ok(null);
     }
 
     @GetMapping("/v1/chat/list")
-    public List<ChatRoomDto> getChat(Principal principal) {
+    public ResponseEntity<List<ChatRoomDto>> getChat(Principal principal) {
         User user = userService.findUserByEmail(principal.getName());
         List<ChatRoom> chatRoomList = chatRoomService.getChatList(user);
 
-        return chatRoomList.stream().map(ChatRoomDto::fromEntity).toList();
+        return ResponseEntity.ok(chatRoomList.stream().map(ChatRoomDto::fromEntity).toList());
 
     }
 
