@@ -1,7 +1,6 @@
 package kr.zb.nengtul.comment.service;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_COMMENT;
-import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import java.util.List;
@@ -16,11 +15,10 @@ import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.user.domain.entity.User;
+import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class CommentService {
+
+  private final UserRepository userRepository;
 
   private final RecipeSearchRepository recipeSearchRepository;
   private final CommentRepository commentRepository;
@@ -55,6 +55,7 @@ public class CommentService {
     comment.setComment(commentReqDto.getComment());
     commentRepository.save(comment);
   }
+
   @Transactional
   public void deleteComment(Long commentId, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
@@ -63,7 +64,7 @@ public class CommentService {
     commentRepository.delete(comment);
   }
 
-  public List<CommentGetDto> findAllCommentByRecipeId(String recipeId){
+  public List<CommentGetDto> findAllCommentByRecipeId(String recipeId) {
     RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
     List<Comment> commentList = commentRepository.findAllByRecipeId(recipeDocument.getId());

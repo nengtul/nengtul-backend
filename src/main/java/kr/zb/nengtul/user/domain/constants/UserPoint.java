@@ -6,6 +6,8 @@ import lombok.Getter;
 public enum UserPoint {
 
   LIKES(1),
+  SHARE(3),
+  SHARE_OK(3),
   FAVORITE(3);
 
   final int point;
