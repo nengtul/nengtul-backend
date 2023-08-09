@@ -42,14 +42,14 @@ public class Chat {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private boolean read;
+    private boolean readMark;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
     @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
-    public void setRead(boolean read) {
-        this.read = read;
+    public void setReadMark(boolean read) {
+        this.readMark = read;
     }
 }
