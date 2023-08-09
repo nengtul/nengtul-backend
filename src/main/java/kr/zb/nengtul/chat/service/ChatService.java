@@ -23,37 +23,41 @@ public class ChatService {
                 .sender(sender)
                 .chatRoom(chatRoom)
                 .content(content)
-                .read(false)
+                .readMark(false)
                 .build();
         return chatRepository.save(chat);
     }
 
     @Transactional
-    public void markAsRead(Long chatId, User reader) {
-        Chat chat = chatRepository.findByIdAndReadIsFalse(chatId)
+    public Chat markAsRead(Long chatId, User reader) {
+        Chat chat = chatRepository.findByIdAndReadMarkIsFalse(chatId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHAT));
-        if (!chat.getSender().equals(reader)) {
-            chat.setRead(true);
+        if (!chat.getSender().getId().equals(reader.getId())) {
+            chat.setReadMark(true);
             chatRepository.save(chat);
         }
+
+        return chat;
     }
 
     @Transactional
-    public void markAllAsRead(String roomId, User reader) {
-        List<Chat> chats = chatRepository.findByChatRoomRoomIdAndReadIsFalseOrderByCreatedAtDesc(
+    public List<Chat> markAllAsRead(String roomId, User reader) {
+        List<Chat> chats = chatRepository.findByChatRoomRoomIdAndReadMarkIsFalseOrderByCreatedAtAsc(
                 roomId);
         List<Chat> markedChat = new ArrayList<>();
         for (Chat chat : chats) {
-            if (!chat.getSender().equals(reader)) {
-                chat.setRead(true);
+            if (!chat.getSender().getId().equals(reader.getId())) {
+                chat.setReadMark(true);
                 markedChat.add(chat);
             }
         }
         chatRepository.saveAll(markedChat);
+
+        return markedChat;
     }
 
     public List<Chat> getPreviousMessages(String roomId) {
-        return chatRepository.findByChatRoomRoomIdOrderByCreatedAtDesc(roomId);
+        return chatRepository.findByChatRoomRoomIdOrderByCreatedAtAsc(roomId);
     }
 
 }

@@ -30,4 +30,12 @@ public class ConnectedChatRoom {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User userId;
+
+    public void setChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+    }
+
+    public User getUser(){
+        return this.userId;
+    }
 }

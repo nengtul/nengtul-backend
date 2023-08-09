@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,7 +35,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(name = "chatRoomWithChatList", attributeNodes = @NamedAttributeNode("chatList"))
+@NamedEntityGraph(name = "chatRoomWithShareBoardAndConnectedChatRooms",
+        attributeNodes = {
+                @NamedAttributeNode("shareBoard"),
+                @NamedAttributeNode(value = "connectedChatRooms", subgraph = "connectedChatRoomsWithUser")
+        },
+        subgraphs = @NamedSubgraph(name = "connectedChatRoomsWithUser", attributeNodes = @NamedAttributeNode("userId")))
 public class ChatRoom {
 
     @Id
@@ -42,12 +48,15 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "room_id")
     private String roomId;
 
-    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
+            CascadeType.MERGE})
     private List<ConnectedChatRoom> connectedChatRooms = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
+            CascadeType.MERGE})
     private List<Chat> chatList = new ArrayList<>();
 
     @ManyToOne

@@ -43,10 +43,10 @@ public class MarkAllAsReadTest {
     @BeforeEach
     public void setup() {
         // 가상의 sender, chatRoom, roomId, reader, pageable 객체 생성
-        sender = new User();
+        sender = User.builder().id(123L).build();
         chatRoom = new ChatRoom();
         roomId = "12345";
-        reader = new User();
+        reader = User.builder().id(321L).build();
     }
 
 
@@ -59,32 +59,32 @@ public class MarkAllAsReadTest {
                 .sender(sender)
                 .chatRoom(chatRoom)
                 .content("test")
-                .read(false)
+                .readMark(false)
                 .build();
         Chat chat2 = Chat.builder() // 읽음처리 되지 않음
                 .id(2L)
                 .sender(reader)
                 .chatRoom(chatRoom)
                 .content("test")
-                .read(false)
+                .readMark(false)
                 .build();
         List<Chat> chats = new ArrayList<>(Arrays.asList(chat1, chat2));
 
 // When
-        when(chatRepository.findByChatRoomRoomIdAndReadIsFalseOrderByCreatedAtDesc(
+        when(chatRepository.findByChatRoomRoomIdAndReadMarkIsFalseOrderByCreatedAtAsc(
                 roomId)).thenReturn(chats);
         chatService.markAllAsRead(roomId, reader);
 
 // Then
-        verify(chatRepository).findByChatRoomRoomIdAndReadIsFalseOrderByCreatedAtDesc(roomId);
+        verify(chatRepository).findByChatRoomRoomIdAndReadMarkIsFalseOrderByCreatedAtAsc(roomId);
         verify(chatRepository).saveAll(chatCaptor.capture());
 
         List<Chat> capturedChats = chatCaptor.getValue();
         assertEquals(1, capturedChats.size()); //1개만 업데이트 됨
-        assertTrue(capturedChats.get(0).isRead());
+        assertTrue(capturedChats.get(0).isReadMark());
 
-        assertTrue(chats.get(0).isRead());
-        assertFalse(chats.get(1).isRead()); // reader 자신의 메세지는 읽음처리 되지않음
+        assertTrue(chats.get(0).isReadMark());
+        assertFalse(chats.get(1).isReadMark()); // reader 자신의 메세지는 읽음처리 되지않음
 
     }
 
@@ -95,22 +95,22 @@ public class MarkAllAsReadTest {
         Chat chat1 = Chat.builder()
                 .id(1L)
                 .sender(sender)
-                .read(false)
+                .readMark(false)
                 .build();
         Chat chat2 = Chat.builder()
                 .id(2L)
                 .sender(sender)
-                .read(false)
+                .readMark(false)
                 .build();
         List<Chat> chats = new ArrayList<>(Arrays.asList(chat1, chat2));
 
         // When
-        when(chatRepository.findByChatRoomRoomIdAndReadIsFalseOrderByCreatedAtDesc(
+        when(chatRepository.findByChatRoomRoomIdAndReadMarkIsFalseOrderByCreatedAtAsc(
                 roomId)).thenReturn(chats);
         chatService.markAllAsRead(roomId, sender);
 
         // Then
-        verify(chatRepository).findByChatRoomRoomIdAndReadIsFalseOrderByCreatedAtDesc(roomId);
+        verify(chatRepository).findByChatRoomRoomIdAndReadMarkIsFalseOrderByCreatedAtAsc(roomId);
         verify(chatRepository, never()).save(any());
     }
 }

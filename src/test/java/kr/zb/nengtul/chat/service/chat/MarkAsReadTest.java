@@ -41,7 +41,7 @@ public class MarkAsReadTest {
     @BeforeEach
     public void setup() {
         // 가상의 sender와 chatRoom 객체 생성
-        sender = new User();
+        sender = User.builder().id(123L).build();
         ChatRoom chatRoom = new ChatRoom();
     }
 
@@ -56,20 +56,20 @@ public class MarkAsReadTest {
                 .chatRoom(chatRoom)
                 .sender(sender)
                 .content("test")
-                .read(false)
+                .readMark(false)
                 .build();
 
         // When
-        when(chatRepository.findByIdAndReadIsFalse(chatId)).thenReturn(Optional.of(chat));
+        when(chatRepository.findByIdAndReadMarkIsFalse(chatId)).thenReturn(Optional.of(chat));
         chatService.markAsRead(chatId, reader);
 
         // Then
-        verify(chatRepository).findByIdAndReadIsFalse(chatId);
+        verify(chatRepository).findByIdAndReadMarkIsFalse(chatId);
         verify(chatRepository).save(chatCaptor.capture());
 
         Chat capturedChat = chatCaptor.getValue();
-        assertTrue(capturedChat.isRead());
-        assertTrue(chat.isRead());
+        assertTrue(capturedChat.isReadMark());
+        assertTrue(chat.isReadMark());
     }
 
 
@@ -81,16 +81,16 @@ public class MarkAsReadTest {
         Chat chat = Chat.builder()
                 .id(chatId)
                 .sender(sender)
-                .read(false)
+                .readMark(false)
                 .build();
 
         // When
-        when(chatRepository.findByIdAndReadIsFalse(chatId)).thenReturn(java.util.Optional.of(chat));
+        when(chatRepository.findByIdAndReadMarkIsFalse(chatId)).thenReturn(java.util.Optional.of(chat));
         chatService.markAsRead(chatId, sender);
 
         // Then
-        verify(chatRepository).findByIdAndReadIsFalse(chatId);
+        verify(chatRepository).findByIdAndReadMarkIsFalse(chatId);
         verify(chatRepository, never()).save(any());
-        assertFalse(chat.isRead());
+        assertFalse(chat.isReadMark());
     }
 }

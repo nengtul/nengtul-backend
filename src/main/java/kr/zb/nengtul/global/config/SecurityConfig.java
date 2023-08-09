@@ -38,117 +38,125 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final CustomUserDetailService customUserDetailService;
-  private final JwtTokenProvider jwtTokenProvider;
-  private final UserRepository userRepository;
-  private final ObjectMapper objectMapper;
-  private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-  private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-  private final CustomOAuth2UserService customOAuth2UserService;
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    private final CustomUserDetailService customUserDetailService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    http
-        .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .csrf(AbstractHttpConfigurer::disable)
-        .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
-        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-            SessionCreationPolicy.STATELESS))
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        //== URL별 권한 관리 옵션 ==//
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
-                "/swagger-ui/**","/swagger-resources/**","/v3/api-docs/**","/v2/api-docs/**",
-                "/h2-console/**",
-                "/index.html",
-                "/login/**",
-                "/v1/auth/**",
-                "/v1/user/join",//회원가입
-                "/v1/user/login",//로그인
-                "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
-                "/v1/user/findid",//아이디 찾기
-                "/v1/user/verify/**", //이메일 인증
-                "/v1/notice/list/**", //공지사항 조회관련
-                "/v1/recipe/commentlist/**" //댓글 조회
-            ).permitAll()
-            .requestMatchers("/v1/user/**",
-                "/v1/shareboard/**",
-                "/v1/recipe/**",
-                "/v1/recipe/comment/**"//댓글 작성,수정,삭제
-            ).hasAnyRole("USER", "ADMIN")
-            .requestMatchers(
-                "/v1/admin/**",
-                "/v1/notice/**"
-            ).hasRole("ADMIN")
-            .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
-        )
-        //== 소셜 로그인 설정 ==//
-        .oauth2Login(oauth2Login -> oauth2Login
-            .successHandler(oAuth2LoginSuccessHandler)
-            .failureHandler(oAuth2LoginFailureHandler)
-            .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
-                customOAuth2UserService)))
-        // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
-        .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
-        .addFilterBefore(jwtAuthenticationProcessingFilter(),
-            CustomJsonUsernamePasswordAuthenticationFilter.class);
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    return http.build();
-  }
+        http
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                //== URL별 권한 관리 옵션 ==//
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico",
+                                "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**",
+                                "/v2/api-docs/**",
+                                "/h2-console/**",
+                                "/index.html",
+                                "/login/**",
+                                "/v1/auth/**",
+                                "/v1/user/join",//회원가입
+                                "/v1/user/login",//로그인
+                                "/v1/user/findpw",//비밀번호 찾기 (비밀번호 재발급)
+                                "/v1/user/findid",//아이디 찾기
+                                "/v1/user/verify/**", //이메일 인증
+                                "/v1/notice/list/**", //공지사항 조회관련
+                                "/v1/recipe/commentlist/**",//댓글 조회
+                                "/chat/**"
+                        ).permitAll()
+                        .requestMatchers("/v1/user/**",
+                                "/v1/shareboard/**",
+                                "/v1/recipe/**",
+                                "/v1/recipe/comment/**",//댓글 작성,수정,삭제
+                                "/v1/chat/**"
+                        ).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(
+                                "/v1/admin/**",
+                                "/v1/notice/**"
+                        ).hasRole("ADMIN")
+                        .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+                )
+                //== 소셜 로그인 설정 ==//
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                        .userInfoEndpoint(
+                                userInfoEndpointConfig -> userInfoEndpointConfig.userService(
+                                        customOAuth2UserService)))
+                // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
+                .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(),
+                        LogoutFilter.class)
+                .addFilterBefore(jwtAuthenticationProcessingFilter(),
+                        CustomJsonUsernamePasswordAuthenticationFilter.class);
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 
-  //password Encoder
-  @Bean
-  public AuthenticationManager authenticationManager() {
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-    provider.setPasswordEncoder(passwordEncoder());
-    provider.setUserDetailsService(customUserDetailService);
-    return new ProviderManager(provider);
-  }
+    //password Encoder
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(customUserDetailService);
+        return new ProviderManager(provider);
+    }
 
-  @Bean
-  public LoginSuccessHandler loginSuccessHandler() {
-    return new LoginSuccessHandler(jwtTokenProvider, userRepository);
-  }
+    @Bean
+    public LoginSuccessHandler loginSuccessHandler() {
+        return new LoginSuccessHandler(jwtTokenProvider, userRepository);
+    }
 
-  @Bean
-  public LoginFailureHandler loginFailureHandler() {
-    return new LoginFailureHandler();
-  }
+    @Bean
+    public LoginFailureHandler loginFailureHandler() {
+        return new LoginFailureHandler();
+    }
 
-  //커스텀 필터 및 성공 실패 핸들러
-  @Bean
-  public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter() {
-    CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
-        = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
-    customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
-    return customJsonUsernamePasswordLoginFilter;
-  }
+    //커스텀 필터 및 성공 실패 핸들러
+    @Bean
+    public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter() {
+        CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
+                = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
+        customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
+        customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(
+                loginSuccessHandler());
+        customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(
+                loginFailureHandler());
+        return customJsonUsernamePasswordLoginFilter;
+    }
 
-  @Bean
-  public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-    return new JwtAuthenticationProcessingFilter(
-        jwtTokenProvider, userRepository);
-  }
+    @Bean
+    public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
+        return new JwtAuthenticationProcessingFilter(
+                jwtTokenProvider, userRepository);
+    }
 
-  //cors 설정
-  @Bean
-  public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOriginPattern("*");
-    configuration.addAllowedMethod("*");
-    configuration.addAllowedHeader("*");
-    configuration.setAllowCredentials(true);
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
-    return source;
-  }
+    //cors 설정
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
