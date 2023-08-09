@@ -1,6 +1,7 @@
 package kr.zb.nengtul.user.domain.dto;
 
 import kr.zb.nengtul.global.entity.ProviderType;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.user.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class UserDetailDto {
   private ProviderType providerTYpe;
   private String address;
   private String addressDetail;
+  private RoleType roles;
   private boolean emailVerifiedYn;
   private int point;
 
@@ -35,6 +37,7 @@ public class UserDetailDto {
         .providerTYpe(user.getProviderType())
         .address(user.getAddress())
         .addressDetail(user.getAddressDetail())
+        .roles(user.getRoles())
         .emailVerifiedYn(user.isEmailVerifiedYn())
         .point(user.getPoint())
         .build();
