@@ -15,7 +15,6 @@ import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.user.domain.entity.User;
-import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,61 +26,60 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CommentService {
 
-  private final UserRepository userRepository;
+    private final RecipeSearchRepository recipeSearchRepository;
+    private final CommentRepository commentRepository;
+    private final UserService userService;
+    private final ReplyCommentService replyCommentService;
 
-  private final RecipeSearchRepository recipeSearchRepository;
-  private final CommentRepository commentRepository;
-  private final UserService userService;
-  private final ReplyCommentService replyCommentService;
+    @Transactional
+    public void createComment(String recipeId, CommentReqDto commentReqDto, Principal principal) {
+        User user = userService.findUserByEmail(principal.getName());
+        RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+        Comment comment = Comment.builder()
+                .recipeId(recipeDocument.getId())
+                .user(user)
+                .comment(commentReqDto.getComment())
+                .build();
+        commentRepository.save(comment);
+    }
 
-  @Transactional
-  public void createComment(String recipeId, CommentReqDto commentReqDto, Principal principal) {
-    User user = userService.findUserByEmail(principal.getName());
-    RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
-    Comment comment = Comment.builder()
-        .recipeId(recipeDocument.getId())
-        .user(user)
-        .comment(commentReqDto.getComment())
-        .build();
-    commentRepository.save(comment);
-  }
+    @Transactional
+    public void updateComment(Long commentId, CommentReqDto commentReqDto, Principal principal) {
+        User user = userService.findUserByEmail(principal.getName());
+        Comment comment = commentRepository.findByIdAndUser(commentId, user)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
+        comment.setComment(commentReqDto.getComment());
+        commentRepository.save(comment);
+    }
 
-  @Transactional
-  public void updateComment(Long commentId, CommentReqDto commentReqDto, Principal principal) {
-    User user = userService.findUserByEmail(principal.getName());
-    Comment comment = commentRepository.findByIdAndUser(commentId, user)
-        .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
-    comment.setComment(commentReqDto.getComment());
-    commentRepository.save(comment);
-  }
+    @Transactional
+    public void deleteComment(Long commentId, Principal principal) {
+        User user = userService.findUserByEmail(principal.getName());
+        Comment comment = commentRepository.findByIdAndUser(commentId, user)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
+        commentRepository.delete(comment);
+    }
 
-  @Transactional
-  public void deleteComment(Long commentId, Principal principal) {
-    User user = userService.findUserByEmail(principal.getName());
-    Comment comment = commentRepository.findByIdAndUser(commentId, user)
-        .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
-    commentRepository.delete(comment);
-  }
+    public List<CommentGetDto> findAllCommentByRecipeId(String recipeId) {
+        RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+        List<Comment> commentList = commentRepository.findAllByRecipeId(recipeDocument.getId());
 
-  public List<CommentGetDto> findAllCommentByRecipeId(String recipeId) {
-    RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
-        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
-    List<Comment> commentList = commentRepository.findAllByRecipeId(recipeDocument.getId());
+        return commentList.stream().map(this::buildCommentGetDto).collect(Collectors.toList());
+    }
 
-    return commentList.stream().map(this::buildCommentGetDto).collect(Collectors.toList());
-  }
-
-  public CommentGetDto buildCommentGetDto(Comment comment) {
-    return CommentGetDto.builder()
-        .recipeId(comment.getRecipeId())
-        .commentId(comment.getId())
-        .userId(comment.getUser().getId())
-        .userNickname(comment.getUser().getNickname())
-        .comment(comment.getComment())
-        .createdAt(comment.getCreatedAt())
-        .modifiedAt(comment.getModifiedAt())
-        .replyCommentGetDtoList(replyCommentService.getReplyCommentByComment(comment.getId()))
-        .build();
-  }
+    public CommentGetDto buildCommentGetDto(Comment comment) {
+        return CommentGetDto.builder()
+                .recipeId(comment.getRecipeId())
+                .commentId(comment.getId())
+                .userId(comment.getUser().getId())
+                .userNickname(comment.getUser().getNickname())
+                .comment(comment.getComment())
+                .createdAt(comment.getCreatedAt())
+                .modifiedAt(comment.getModifiedAt())
+                .replyCommentGetDtoList(
+                        replyCommentService.getReplyCommentByComment(comment.getId()))
+                .build();
+    }
 }
