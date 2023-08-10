@@ -1,9 +1,11 @@
 package kr.zb.nengtul.crawling.crawling.batch;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import kr.zb.nengtul.crawling.board.domain.Recipe;
+import kr.zb.nengtul.crawling.recipe.domain.RecipeDocument;
+import kr.zb.nengtul.crawling.recipe.type.RecipeCategory;
 import kr.zb.nengtul.crawling.crawling.dto.CrawlInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,15 +19,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
+public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, RecipeDocument> {
 
     private static final int MAX_RETRY_COUNT = 3;
     private static final int RETRY_DELAY_MS = 1000;
 
     @Override
-    public Recipe process(CrawlInfo item) throws Exception {
+    public RecipeDocument process(CrawlInfo item) throws Exception {
         int retryCount = 0;
-        String category = item.getCategory();
+        RecipeCategory category = item.getCategory();
         String url = "https://www.10000recipe.com"+item.getRecipeUrl();
         String mainPhotoUrl = item.getMainPhotoUrl();
         log.info(url);
@@ -60,7 +62,7 @@ public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
                         recipeVideoIframe != null ? recipeVideoIframe.attr("org_src") : "";
                 String imageUrl = getImageUrls(imageElements);
 
-                return Recipe.builder()
+                return RecipeDocument.builder()
                         .userId(1L)
                         .title(title)
                         .intro(intro)
@@ -71,7 +73,8 @@ public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
                         .serving(serving)
                         .category(category)
                         .videoUrl(videoUrl)
-                        .mainPhotoUrl(mainPhotoUrl)
+                        .thumbnailUrl(mainPhotoUrl)
+                        .viewCount(0L)
                         .build();
             } catch (IOException e) {
                 log.error("Error while crawling URL: {}", url);
@@ -91,23 +94,22 @@ public class CrawlingItemProcessor implements ItemProcessor<CrawlInfo, Recipe> {
         return ingredientElements.select("li").stream()
                 .map(ingredientElement -> ingredientElement.text().replaceAll("구매", "")
                         .replaceAll("\\s+", " ").trim())
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(","));
     }
 
     private String getCombinedSteps(Elements stepElements) {
         return stepElements.stream()
                 .map(Element::text)
-                .collect(Collectors.joining("\n"))
+                .collect(Collectors.joining("\\"))
                 .trim();
     }
 
     private String getImageUrls(Elements imageElements) {
-        StringBuilder imageBuilder = new StringBuilder();
-        for (Element imageElement : imageElements) {
-            Element imgElement = imageElement.selectFirst("img");
-            String imageUrl = imgElement != null ? imgElement.attr("src") : "";
-            imageBuilder.append(imageUrl).append("\n");
-        }
-        return imageBuilder.toString().trim();
+        List<String> imageUrls = imageElements.stream()
+                .map(imageElement -> imageElement.selectFirst("img"))
+                .map(imgElement -> imgElement != null ? imgElement.attr("src") : "")
+                .collect(Collectors.toList());
+
+        return String.join("\\", imageUrls);
     }
 }

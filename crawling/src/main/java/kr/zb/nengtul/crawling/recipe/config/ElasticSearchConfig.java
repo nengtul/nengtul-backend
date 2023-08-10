@@ -1,4 +1,4 @@
-package kr.zb.nengtul.recipe.config;
+package kr.zb.nengtul.crawling.recipe.config;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,5 +32,5 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
 
         return RestClients.create(configuration).rest();
     }
-}
 
+}

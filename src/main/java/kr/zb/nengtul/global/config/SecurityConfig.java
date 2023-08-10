@@ -90,14 +90,15 @@ public class SecurityConfig {
                 "/v3/api-docs/**",
                 "/swagger-ui/**").permitAll()
             .requestMatchers(
-                 "/**",
+                "/**",
                 "/v1/auth/**",
                 "/v1/users/join",//회원가입
                 "/v1/users/login",//로그인
                 "/v1/users/findpw",//비밀번호 찾기 (비밀번호 재발급)
                 "/v1/users/findid",//아이디 찾기
                 "/v1/users/verify/**", //이메일 인증
-                "/v1/recipe/commentlist/**" //댓글 조회
+                "/v1/recipe/commentlist/**", //댓글 조회
+                "/chat/**"
             ).permitAll()
             .requestMatchers(
                 "/v1/users/**",
@@ -107,7 +108,8 @@ public class SecurityConfig {
                 "/v1/recipes/comment/**",//댓글 작성,수정,삭제
                 "/v1/likes/**",
                 "/v1/favorite/**",
-                "/v1/saved-recipe/**"
+                "/v1/saved-recipe/**",
+                "/v1/chat/**"
             ).hasRole("USER")
             .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         .logout(logout -> logout.logoutSuccessUrl("/"))
@@ -161,8 +163,10 @@ public class SecurityConfig {
     CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
         = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
     customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
+    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(
+        loginSuccessHandler());
+    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(
+        loginFailureHandler());
     return customJsonUsernamePasswordLoginFilter;
   }
 

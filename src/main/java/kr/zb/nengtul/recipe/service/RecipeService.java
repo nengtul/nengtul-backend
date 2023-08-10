@@ -38,7 +38,6 @@ public class RecipeService {
 
     private final AmazonS3Service amazonS3Service;
 
-    @Transactional
     public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
                           List<MultipartFile> images, MultipartFile thumbnail) {
 
@@ -207,7 +206,6 @@ public class RecipeService {
                         .build());
 
         Long likeCount = likesRepository.countByRecipeId(recipeDocument.getId());
-        System.out.println(likeCount);
 
         recipeGetListDto.setNickName(user.getNickname());
         recipeGetListDto.setLikeCount(likeCount);

@@ -11,11 +11,13 @@ import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
 import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.notice.domain.entity.Notice;
 import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
@@ -35,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -270,6 +273,15 @@ public class UserService {
 
     user.setPassword(passwordEncoder.encode(userPasswordChangeDto.getPassword()));
     userRepository.save(user);
+  }
+
+
+  public String getEmailByAccessor(SimpMessageHeaderAccessor accessor) {
+    if (accessor.getSessionAttributes() == null) {
+      throw new CustomException(ErrorCode.NO_PERMISSION);
+    }
+    return (String) Objects.requireNonNull(accessor.getSessionAttributes())
+            .get("user");
   }
 
 }
