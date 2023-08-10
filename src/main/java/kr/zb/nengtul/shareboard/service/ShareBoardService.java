@@ -100,20 +100,21 @@ public class ShareBoardService {
     shareBoardRepository.delete(shareBoard);
   }
 
-  @Transactional
-  public List<ShareBoard> getShareBoardList(double lat, double lon, double range, Boolean closed) {
-    List<ShareBoard> shareBoardList;
-    if (closed == null) {
-      shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(
-          lat - range, lat + range, lon - range, lon + range);
+    @Transactional
+    public List<ShareBoard> getShareBoardList(double lat, double lon, double range,
+            Boolean closed) {
+        List<ShareBoard> shareBoardList;
+        if (closed == null) {
+            shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(
+                    lat - range, lat + range, lon - range, lon + range);
 
-    } else {
-      shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetweenAndClosed(
-          lat - range, lat + range, lon - range, lon + range, closed);
+        } else {
+            shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetweenAndClosed(
+                    lat - range, lat + range, lon - range, lon + range, closed);
 
+        }
+        return shareBoardList;
     }
-    return shareBoardList;
-  }
 
   public List<ShareBoard> getMyShareBoard(Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
@@ -130,4 +131,9 @@ public class ShareBoardService {
     shareBoard.setClosed(true);
     shareBoardRepository.save(shareBoard);
   }
+    public ShareBoard findById(Long shareBoardId) {
+        return shareBoardRepository.findById(shareBoardId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
+    }
+
 }

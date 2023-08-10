@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
   // 유저
   ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 사용자입니다."),
+  NOT_FOUND_OTHER_USER(HttpStatus.NOT_FOUND, "상대방이 존재하지 않습니다."),
+  NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, "해당하는 채팅방을 찾을 수 없습니다."),
+  NOT_FOUND_CHAT(HttpStatus.NOT_FOUND, "해당하는 채팅을 찾을 수 없습니다."),
+  CANNOT_OPEN_CHATROOM_YOURSELF(HttpStatus.FORBIDDEN, "자신과의 채팅방은 생성이 불가합니다."),
   ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 이메일입니다."),
   ALREADY_EXIST_NICKNAME(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 닉네임입니다."),
   ALREADY_EXIST_PHONENUMBER(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 휴대폰 번호입니다."),

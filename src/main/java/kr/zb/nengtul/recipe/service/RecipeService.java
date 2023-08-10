@@ -38,7 +38,6 @@ public class RecipeService {
 
     private final AmazonS3Service amazonS3Service;
 
-    @Transactional
     public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
                           List<MultipartFile> images, MultipartFile thumbnail) {
 
