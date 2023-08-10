@@ -32,6 +32,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -42,6 +43,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Configuration
 @EnableWebSecurity
+//@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -71,11 +73,11 @@ public class SecurityConfig {
         //== URL별 권한 관리 옵션 ==//
 //        .authorizeHttpRequests(m -> methodSecurityExpressionHandler(new RoleHierarchy()))
         .authorizeHttpRequests(authorizationHttpRequests -> authorizationHttpRequests
-            .requestMatchers("/v1/admin/**", "/v1/notices/**").hasRole("ADMIN")
+            .requestMatchers("/v1/notices/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.GET, "/v1/noticelist/**").permitAll()//공지사항 조회
             .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/v1/recipes/**").permitAll() //댓글
             .requestMatchers(HttpMethod.GET, "/v1/comments/**").permitAll()//대댓글
-            .requestMatchers(HttpMethod.GET, "/v1/notices/**").permitAll()//공지사항 조회
             .requestMatchers(
                 // -- Swagger UI v2
                 "/v2/api-docs",
@@ -89,7 +91,7 @@ public class SecurityConfig {
                 "/v3/api-docs/**",
                 "/swagger-ui/**").permitAll()
             .requestMatchers(
-                "/", "/**",
+                 "/**",
                 "/v1/auth/**",
                 "/v1/users/join",//회원가입
                 "/v1/users/login",//로그인
@@ -192,7 +194,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+      RoleHierarchy roleHierarchy) {
     DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
     expressionHandler.setRoleHierarchy(roleHierarchy);
     return expressionHandler;
