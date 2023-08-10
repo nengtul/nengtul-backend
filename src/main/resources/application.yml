@@ -37,6 +37,8 @@ spring:
   mailgun:
     secret-key: ${spring.mailgun.secret-key}
     domain: ${spring.mailgun.domain}
+  quit:
+    email: ${spring.quit.email}
 
   security:
     oauth2:
@@ -88,3 +90,4 @@ cloud:
     credentials:
       accessKey: ${BUCKET_ACCESS_KEY}
       secretKey: ${BUCKET_SECRET_KEY}
+

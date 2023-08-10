@@ -1,5 +1,6 @@
 package kr.zb.nengtul.recipe.domain.repository;
 
+import java.util.List;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import org.springframework.data.domain.Page;
@@ -16,5 +17,6 @@ public interface RecipeSearchRepository extends ElasticsearchRepository<RecipeDo
     Page<RecipeDocument> findAllByCategory(RecipeCategory category, Pageable pageable);
     Page<RecipeDocument> findAllByTitle(String title, Pageable pageable);
     Page<RecipeDocument> findAllByIngredient(String ingredient, Pageable pageable);
+    List<RecipeDocument> findAllByUserId(Long userId);
     void delete(RecipeDocument recipeDocument);
 }

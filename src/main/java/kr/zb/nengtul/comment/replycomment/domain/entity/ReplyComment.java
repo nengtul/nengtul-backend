@@ -38,4 +38,8 @@ public class ReplyComment extends BaseTimeEntity {
   public void setReplyComment(String replyComment) {
     this.replyComment = replyComment;
   }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
 }

@@ -89,4 +89,7 @@ public class RecipeDocument {
     this.videoUrl = recipeUpdateDto.getVideoUrl();
   }
 
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
 }
