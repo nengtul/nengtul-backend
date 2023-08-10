@@ -206,7 +206,6 @@ public class RecipeService {
                         .build());
 
         Long likeCount = likesRepository.countByRecipeId(recipeDocument.getId());
-        System.out.println(likeCount);
 
         recipeGetListDto.setNickName(user.getNickname());
         recipeGetListDto.setLikeCount(likeCount);
