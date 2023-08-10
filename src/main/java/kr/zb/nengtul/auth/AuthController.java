@@ -18,5 +18,12 @@ public class AuthController {
     //access Token 및 refreshToken 발급 과정은 필터에서 진행, 단순 요청을 위한 api\
     return null;
   }
+
+  //healthy 판정위한 200api
+  @GetMapping("/hello")
+  public ResponseEntity<Void> hello(){
+    return null;
+  }
+
 }
 

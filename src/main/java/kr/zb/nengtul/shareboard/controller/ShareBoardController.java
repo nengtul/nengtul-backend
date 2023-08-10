@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardListDto;
+import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.service.ShareBoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,17 +18,17 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "SHARE BOARD API", description = "나눔 게시판 API")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/v1/shareboard")
+@RequestMapping("/v1/shareboards")
 public class ShareBoardController {
 
   private final ShareBoardService shareBoardService;
@@ -35,9 +36,10 @@ public class ShareBoardController {
   //생성
   @Operation(summary = "게시글 작성", description = "게시글을 작성합니다.")
   @PostMapping
-  public ResponseEntity<Void> createShareBoard(@RequestBody @Valid ShareBoardDto shareBoardDto,
-      Principal principal) {
-    shareBoardService.createShareBoard(shareBoardDto, principal);
+  public ResponseEntity<Void> createShareBoard(
+      @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
+      @RequestPart(value = "image", required = false) MultipartFile image, Principal principal) {
+    shareBoardService.createShareBoard(shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
 
@@ -57,22 +59,32 @@ public class ShareBoardController {
 
   //수정
   @Operation(summary = "게시글 수정", description = "토큰을 통해 유저를 조회하고, 게시물 ID를 통해 유저 ID를 조회하여 비교 후 글의 작성자인 경우에 게시물을 수정할 수 있습니다.")
-  @PutMapping("/{id}")
+  @PostMapping("/{shareboardId}")
   public ResponseEntity<Void> updateShareBoard(
-      @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id,
-      @RequestBody @Valid ShareBoardDto shareBoardDto,
+      @Parameter(name = "shareboardId", description = "게시물 ID") @PathVariable Long shareboardId,
+      @RequestPart(value = "shareBoardDto") @Valid ShareBoardDto shareBoardDto,
+      @RequestPart(value = "image", required = false) MultipartFile image,
       Principal principal) {
-    shareBoardService.updateShareBoard(id, shareBoardDto, principal);
+    shareBoardService.updateShareBoard(shareboardId, shareBoardDto, principal, image);
     return ResponseEntity.ok(null);
   }
 
   //삭제
   @Operation(summary = "게시글 삭제", description = "토큰을 통해 유저를 조회하고, 게시물 ID를 통해 유저 ID를 조회하여 비교 후 글의 작성자인 경우에 게시물을 삭제할 수 있습니다.")
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{shareboardId}")
   public ResponseEntity<Void> deleteShareBoard(
-      @Parameter(name = "id", description = "게시물 ID") @PathVariable Long id, Principal principal) {
-    shareBoardService.deleteShareBoard(id, principal);
+      @Parameter(name = "shareboardId", description = "게시물 ID") @PathVariable Long shareboardId,
+      Principal principal) {
+    shareBoardService.deleteShareBoard(shareboardId, principal);
     return ResponseEntity.ok(null);
+  }
+
+  //내 나눔게시물 리스트 조회
+  @Operation(summary = "내 나눔게시물 조회", description = "토큰을 통해 유저를 조회하고, 내가 작성한 나눔게시물을 조회합니다.")
+  @GetMapping("/mylist")
+  public ResponseEntity<List<ShareBoard>> myShareBoard(Principal principal) {
+
+    return ResponseEntity.ok(shareBoardService.getMyShareBoard(principal));
   }
 }
 

@@ -1,6 +1,7 @@
 package kr.zb.nengtul.global.jwt;
 
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-  private static final String NO_CHECK_URL = "/v1/user/login"; // "/v1/user/login"으로 들어오는 요청은 Filter 작동 X
+  private static final String NO_CHECK_URL = "/v1/users/login"; // "/v1/users/login"으로 들어오는 요청은 Filter 작동 X
 
   private final JwtTokenProvider jwtTokenProvider;
   private final UserRepository userRepository;
@@ -39,8 +40,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    if (request.getRequestURI().equals(NO_CHECK_URL)) {
-      filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
+    if (request.getRequestURI().equals(NO_CHECK_URL) || request.getRequestURI().startsWith("/swagger-ui")) {
+      filterChain.doFilter(request, response); // 로그인 요청이 들어오면, 다음 필터 호출
       return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
     }
 
@@ -86,10 +87,30 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   public void checkAccessTokenAndAuthentication(HttpServletRequest request,
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    jwtTokenProvider.extractAccessToken(request)
-        .filter(jwtTokenProvider::isTokenValid)
-        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
-            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
+//    jwtTokenProvider.extractAccessToken(request)
+//        .filter(jwtTokenProvider::isTokenValid)
+//        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
+//            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
+//
+//    filterChain.doFilter(request, response);
+    String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
+    if (accessToken != null) {
+      try {
+        if (jwtTokenProvider.isTokenValid(accessToken)) {
+          jwtTokenProvider.extractEmail(accessToken)
+              .flatMap(userRepository::findByEmail)
+              .ifPresent(this::saveAuthentication);
+        } else {
+          // 유효하지 않은 토큰 401
+          response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+          return;
+        }
+      } catch (TokenExpiredException e) {
+        // 토큰이 만료 401
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+      }
+    }
 
     filterChain.doFilter(request, response);
   }
@@ -104,7 +125,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
         .username(myUser.getEmail())
         .password(password)
-        .roles(myUser.getRoles().name())
+        .roles(myUser.getRoles().getKey())
         .build();
 
     Authentication authentication =

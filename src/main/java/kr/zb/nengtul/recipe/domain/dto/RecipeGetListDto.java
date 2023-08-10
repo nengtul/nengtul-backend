@@ -19,12 +19,15 @@ public class RecipeGetListDto {
 
     private Long likeCount;
 
+    private String thumbnailUrl;
+
     public static RecipeGetListDto fromRecipeDocument(RecipeDocument recipeDocument) {
 
         return RecipeGetListDto.builder()
                 .recipeId(recipeDocument.getId())
                 .title(recipeDocument.getTitle())
                 .viewCount(recipeDocument.getViewCount())
+                .thumbnailUrl(recipeDocument.getThumbnailUrl())
                 .build();
 
     }

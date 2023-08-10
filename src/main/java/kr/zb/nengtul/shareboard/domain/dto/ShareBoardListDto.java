@@ -1,6 +1,11 @@
 package kr.zb.nengtul.shareboard.domain.dto;
 
+import static kr.zb.nengtul.global.exception.ErrorCode.LONG_CONTENT_MESSAGE;
+import static kr.zb.nengtul.global.exception.ErrorCode.LONG_PLACE_MESSAGE;
+
+import jakarta.validation.constraints.Max;
 import java.time.LocalDateTime;
+import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +24,9 @@ public class ShareBoardListDto {
   private Long userId; //채팅걸기위한 userId
   private String userNickname; //닉네임
   private String title; //제목
-  private String shareImg; //대표사진
+  private String content; //글 내용
+  private String place; //위치
+  private String shareImg; //사진 목록
   private Long price; //가격
   private double lat; //위도
   private double lon; //경도

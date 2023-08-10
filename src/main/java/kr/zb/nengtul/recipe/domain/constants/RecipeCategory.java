@@ -20,7 +20,8 @@ public enum RecipeCategory {
     BREAD("빵"),
     SNACKS("과자"),
     TEA_DRINK("차/음료/술"),
-    ETC("기타")
+    ETC("기타"),
+    NONE("없음")
     ;
 
     final String korean;

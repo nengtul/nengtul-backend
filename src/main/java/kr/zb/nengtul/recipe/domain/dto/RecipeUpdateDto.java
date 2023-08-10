@@ -18,15 +18,15 @@ public class RecipeUpdateDto {
 
     private String ingredient;
 
-    private String cookingStep;
+    private String imagesUrl;
 
-    private String imageUrl;
+    private String cookingStep;
 
     private String cookingTime;
 
     private String serving;
 
-    private RecipeCategory recipeCategory;
+    private RecipeCategory category;
 
     private String videoUrl;
 

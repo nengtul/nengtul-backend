@@ -7,12 +7,16 @@ package kr.zb.nengtul.global.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
 import java.util.Optional;
+import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -142,9 +146,13 @@ public class JwtTokenProvider {
     try {
       JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
       return true;
+    } catch (SignatureVerificationException e) {
+      log.error("Signature verification failed: {}", e.getMessage());
+    } catch (TokenExpiredException e) {
+      log.error("Token expired: {}", e.getMessage());
     } catch (Exception e) {
-      log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
-      return false;
+      log.error("Invalid token: {}", e.getMessage());
     }
+    return false;
   }
 }

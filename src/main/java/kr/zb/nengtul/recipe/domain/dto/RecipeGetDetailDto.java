@@ -26,6 +26,8 @@ public class RecipeGetDetailDto {
 
     private String cookingStep;
 
+    private String thumbnailUrl;
+
     private String imageUrl;
 
     private String cookingTime;
@@ -37,6 +39,10 @@ public class RecipeGetDetailDto {
     private String videoUrl;
 
     private Long viewCount;
+
+    private String userProfileUrl;
+
+    private int point;
 
     private LocalDateTime createdAt;
 
@@ -59,6 +65,7 @@ public class RecipeGetDetailDto {
                 .createdAt(recipeDocument.getCreatedAt())
                 .modifiedAt(recipeDocument.getModifiedAt())
                 .viewCount(recipeDocument.getViewCount())
+                .thumbnailUrl(recipeDocument.getThumbnailUrl())
                 .build();
 
     }

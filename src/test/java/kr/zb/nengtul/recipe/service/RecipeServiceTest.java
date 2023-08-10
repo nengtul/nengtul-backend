@@ -1,5 +1,6 @@
 package kr.zb.nengtul.recipe.service;
 
+import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.dto.RecipeAddDto;
 import kr.zb.nengtul.recipe.domain.dto.RecipeGetDetailDto;
@@ -21,10 +22,7 @@ import s3bucket.service.AmazonS3Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -32,13 +30,15 @@ import static org.mockito.Mockito.*;
 @DisplayName("레시피 서비스 테스트")
 class RecipeServiceTest {
 
-
     private RecipeService recipeService;
+
     private RecipeSearchRepository recipeSearchRepository;
 
     private UserRepository userRepository;
 
     private AmazonS3Service amazonS3Service;
+
+    private LikesRepository likesRepository;
 
     private List<RecipeDocument> recipeDocuments;
 
@@ -48,9 +48,10 @@ class RecipeServiceTest {
         recipeSearchRepository = mock(RecipeSearchRepository.class);
         amazonS3Service = mock(AmazonS3Service.class);
         userRepository = mock(UserRepository.class);
+        likesRepository = mock(LikesRepository.class);
 
         recipeService = new RecipeService(
-                recipeSearchRepository, userRepository, amazonS3Service);
+                recipeSearchRepository, userRepository, likesRepository, amazonS3Service);
 
         recipeDocuments = new ArrayList<>();
 
@@ -141,6 +142,7 @@ class RecipeServiceTest {
         //given
         RecipeAddDto recipeAddDto = new RecipeAddDto();
         List<MultipartFile> images = Collections.singletonList(mock(MultipartFile.class));
+        MultipartFile thumbnail = mock(MultipartFile.class);
 
         User user = new User();
 
@@ -150,7 +152,7 @@ class RecipeServiceTest {
                 .thenReturn("image_url");
 
         //when
-        recipeService.addRecipe(mock(Principal.class), recipeAddDto, images);
+        recipeService.addRecipe(mock(Principal.class), recipeAddDto, images, thumbnail);
 
         //then
         verify(recipeSearchRepository, times(1))
@@ -178,7 +180,6 @@ class RecipeServiceTest {
     @DisplayName("레시피 상세 내역 가져오기")
     void getRecipeDetailById() {
         //given
-
         RecipeDocument recipeDocument = RecipeDocument.builder()
                 .id("userId1")
                 .userId(1L)
@@ -212,6 +213,7 @@ class RecipeServiceTest {
         assertEquals(recipeDetailById.getCookingTime(), recipeDocument.getCookingTime());
         assertEquals(recipeDetailById.getServing(), recipeDocument.getServing());
         assertEquals(recipeDetailById.getViewCount(), recipeDocument.getViewCount());
+        assertEquals(recipeDetailById.getViewCount(), 1L);
         assertEquals(recipeDetailById.getCreatedAt(), recipeDocument.getCreatedAt());
         assertEquals(recipeDetailById.getModifiedAt(), recipeDocument.getModifiedAt());
         assertEquals(recipeDetailById.getCategory(), recipeDocument.getCategory().getKorean());
@@ -281,14 +283,16 @@ class RecipeServiceTest {
         RecipeUpdateDto recipeUpdateDto = RecipeUpdateDto.builder()
                 .title("수정된 타이틀")
                 .ingredient("수정된 재료")
-                .recipeCategory(RecipeCategory.ETC)
+                .category(RecipeCategory.ETC)
+                .imagesUrl("수정된 Url")
+                .intro("")
+                .videoUrl("")
                 .cookingStep("수정된 조리 스텝")
                 .cookingTime("수정된 시간")
                 .serving("수정된 양")
                 .build();
 
         User user = User.builder()
-                .id(1L)
                 .name("테스트이름")
                 .build();
 
@@ -300,6 +304,7 @@ class RecipeServiceTest {
                 .ingredient("재료1, 재료2, 재료3")
                 .cookingStep("테스트 쿠킹 스텝")
                 .imageUrl("testimageurl1")
+                .thumbnailUrl("testThumbnailUrl")
                 .cookingTime("30분")
                 .serving("1인분")
                 .viewCount(0L)
@@ -317,9 +322,9 @@ class RecipeServiceTest {
         when(recipeSearchRepository.findById(any()))
                 .thenReturn(Optional.of(recipeDocument));
 
-
         //when
-        recipeService.updateRecipe(principal, recipeDocument.getId(), recipeUpdateDto);
+        recipeService.updateRecipe(principal, recipeDocument.getId(), recipeUpdateDto,
+                Collections.singletonList(mock(MultipartFile.class)), mock(MultipartFile.class));
 
         //then
         assertEquals(recipeDocument.getTitle(), recipeUpdateDto.getTitle());
@@ -330,7 +335,6 @@ class RecipeServiceTest {
     void deleteRecipe() {
         //given
         User user = User.builder()
-                .id(1L)
                 .name("테스트이름")
                 .build();
 
@@ -367,6 +371,5 @@ class RecipeServiceTest {
         verify(recipeSearchRepository, times(1))
                 .delete(any(RecipeDocument.class));
     }
-
 
 }

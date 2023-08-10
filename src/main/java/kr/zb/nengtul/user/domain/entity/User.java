@@ -22,6 +22,7 @@ import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.notice.domain.entity.Notice;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,45 +32,44 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Builder
 public class User extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(unique = true)
-    private String email;
+  @Column(unique = true)
+  private String email;
 
-    private String name;
+  private String name;
 
-    @Column(unique = true)
-    private String nickname;
+  @Column(unique = true)
+  private String nickname;
 
-    private String password;
+  private String password;
 
-    private String phoneNumber;
+  private String phoneNumber;
 
-    private LocalDateTime verifyExpiredAt;
-    private String verificationCode;
-    private boolean emailVerifiedYn;
+  private LocalDateTime verifyExpiredAt;
+  private String verificationCode;
+  private boolean emailVerifiedYn;
 
-    private String profileImageUrl;
+  private String profileImageUrl;
 
-    private int point; // 포인트별 등급 상승을 위해 생성
+  private int point; // 포인트별 등급 상승을 위해 생성
 
-    @Enumerated(EnumType.STRING)
-    private RoleType roles;
+  @Enumerated(EnumType.STRING)
+  private RoleType roles;
 
-    @Enumerated(EnumType.STRING)
-    private ProviderType providerType;
+  @Enumerated(EnumType.STRING)
+  private ProviderType providerType;
 
-    private String address;
-    private String addressDetail;
+  private String address;
+  private String addressDetail;
 
-    private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
+  private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
 
-    private String refreshToken; // 리프레시 토큰
+  private String refreshToken; // 리프레시 토큰
 
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
             CascadeType.MERGE})
@@ -79,109 +79,124 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Notice> noticeList;
 
-    @JsonBackReference
-    @OneToMany(mappedBy = "user")
-    private List<ShareBoard> shareBoardList;
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
+  private List<ShareBoard> shareBoardList;
 
-    @JsonBackReference
-    @OneToMany(mappedBy = "user")
-    private List<Comment> commentList;
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
+  private List<Comment> commentList;
 
-    @Builder
-    public User(String name, String nickname, String password, String phoneNumber,
-            String email, String address, String addressDetail, String profileImageUrl) {
-        this.name = name;
-        this.nickname = nickname;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.emailVerifiedYn = false;
-        this.address = address;
-        this.addressDetail = addressDetail;
-        this.profileImageUrl = profileImageUrl;
-        this.socialId = "";
-        this.providerType = ProviderType.LOCAL;
-        this.roles = RoleType.USER;
-    }
+  @Builder
+  public User(String name, String nickname, String password, String phoneNumber,
+      String email, String address, String addressDetail, String profileImageUrl) {
+    this.name = name;
+    this.nickname = nickname;
+    this.password = password;
+    this.phoneNumber = phoneNumber;
+    this.email = email;
+    this.emailVerifiedYn = false;
+    this.address = address;
+    this.addressDetail = addressDetail;
+    this.profileImageUrl = profileImageUrl;
+    this.socialId = "";
+    this.providerType = ProviderType.LOCAL;
+    this.roles = RoleType.USER;
+  }
 
-    //OAuth2용
-    public User(
-            String name,
-            String nickname,
-            String email,
-            String profileImageUrl,
-            String socialId,
-            String phoneNumber,
-            ProviderType providerType,
-            RoleType roles
-    ) {
-        this.name = name;
-        this.nickname = nickname;
-        this.password = "NO_PASS";
-        this.email = email != null ? email : "NO_EMAIL";
-        this.verificationCode = "";
-        this.verifyExpiredAt = LocalDateTime.now();
-        this.emailVerifiedYn = true;
-        this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
-        this.providerType = providerType;
-        this.socialId = socialId;
-        this.phoneNumber = phoneNumber;
-        this.roles = roles;
-    }
+  //OAuth2용
+  public User(
+      String name,
+      String nickname,
+      String email,
+      String profileImageUrl,
+      String socialId,
+      String phoneNumber,
+      ProviderType providerType,
+      RoleType roles
+  ) {
+    this.name = name;
+    this.nickname = nickname;
+    this.password = "NO_PASS";
+    this.email = email != null ? email : "NO_EMAIL";
+    this.verificationCode = "";
+    this.verifyExpiredAt = LocalDateTime.now();
+    this.emailVerifiedYn = true;
+    this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
+    this.providerType = providerType;
+    this.socialId = socialId;
+    this.phoneNumber = phoneNumber;
+    this.roles = roles;
+  }
 
-    //oauth2 이름 업데이트 되었을때
-    public User update(String name) {
-        this.name = name;
-        return this;
-    }
+  //oauth2 이름 업데이트 되었을때
+  public User update(String name) {
+    this.name = name;
+    return this;
+  }
 
-    public void updateRefreshToken(String updateRefreshToken) {
-        this.refreshToken = updateRefreshToken;
-    }
+  public void updateRefreshToken(String updateRefreshToken) {
+    this.refreshToken = updateRefreshToken;
+  }
 
-    //정보 수정용 setter
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
+  //정보 수정용 setter
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
 
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
+  public void setProfileImageUrl(String profileImageUrl) {
+    this.profileImageUrl = profileImageUrl;
+  }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+  public void setAddress(String address) {
+    this.address = address;
+  }
+  public void setEmail(String email) {
+    this.address = email;
+  }
 
-    public void setAddressDetail(String addressDetail) {
-        this.addressDetail = addressDetail;
-    }
 
-    public void setVerifyExpiredAt(LocalDateTime verifyExpiredAt) {
-        this.verifyExpiredAt = verifyExpiredAt;
-    }
+  public void setAddressDetail(String addressDetail) {
+    this.addressDetail = addressDetail;
+  }
+  public void setRoles(RoleType roles) {
+    this.roles = roles;
+  }
 
-    public void setVerificationCode(String verificationCode) {
-        this.verificationCode = verificationCode;
-    }
+  public void setEmailVerifiedYn(boolean emailVerifiedYn) {
+    this.emailVerifiedYn = emailVerifiedYn;
+  }
 
-    public void setPointAddShardBoard(int point) {
-        this.point += 3;
-    }
+  public void setVerifyExpiredAt(LocalDateTime verifyExpiredAt) {
+    this.verifyExpiredAt = verifyExpiredAt;
+  }
 
-    public boolean isEmailVerifiedYn() {
-        return emailVerifiedYn;
-    }
+  public void setVerificationCode(String verificationCode) {
+    this.verificationCode = verificationCode;
+  }
 
-    public void setEmailVerifiedYn(boolean emailVerifiedYn) {
-        this.emailVerifiedYn = emailVerifiedYn;
-    }
+  public void setPoint(int point) {
+    this.point = point;
+  }
+
+  public void setPlusPoint(UserPoint userPoint) {
+    this.point += userPoint.getPoint();
+  }
+
+  public void setMinusPoint(UserPoint userPoint) {
+    this.point -= userPoint.getPoint();
+  }
+
+  public boolean isEmailVerifiedYn() {
+    return emailVerifiedYn;
+  }
 }

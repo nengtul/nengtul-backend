@@ -15,8 +15,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NoticeListDto {
   private Long noticeId;
-  private String userName;
+  private Long userId;
+  private String nickname;
   private String title;
+  private String content;
   private String noticeImg;
   private Long viewCount;
   private LocalDateTime createdAt;
@@ -25,8 +27,10 @@ public class NoticeListDto {
   public static NoticeListDto buildNoticeListDto(Notice notice) {
     return NoticeListDto.builder()
         .noticeId(notice.getId())
-        .userName(notice.getUser().getName())
+        .userId(notice.getUser().getId())
+        .nickname(notice.getUser().getNickname())
         .title(notice.getTitle())
+        .content(notice.getContent())
         .noticeImg(notice.getNoticeImg())
         .viewCount(notice.getViewCount())
         .createdAt(notice.getCreatedAt())

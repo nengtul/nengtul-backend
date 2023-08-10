@@ -21,5 +21,4 @@ public class NoticeReqDto {
   private String title;
   @NotEmpty(message = CONTENT_NOT_NULL_MESSAGE)
   private String content;
-  private String noticeImg;
 }

@@ -26,6 +26,18 @@
       "type": "keyword"
     },
 
+    "thumbnailUrl": {
+      "type": "keyword"
+    },
+
+    "imageUrl": {
+      "type": "keyword"
+    },
+
+    "cookingTime": {
+      "type": "keyword"
+    },
+
     "serving": {
       "type": "keyword"
     },

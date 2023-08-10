@@ -1,7 +1,9 @@
 package kr.zb.nengtul.comment.domain.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import kr.zb.nengtul.comment.domain.entity.Comment;
+import kr.zb.nengtul.comment.replycomment.domain.dto.ReplyCommentGetDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,19 +21,8 @@ public class CommentGetDto {
   private Long commentId;
   private Long userId;
   private String userNickname;
-  private String content;
+  private String comment;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
-
-  public static CommentGetDto buildCommentGetDto(Comment comment) {
-    return CommentGetDto.builder()
-        .recipeId(comment.getRecipeId())
-        .commentId(comment.getId())
-        .userId(comment.getUser().getId())
-        .userNickname(comment.getUser().getNickname())
-        .content(comment.getContent())
-        .createdAt(comment.getCreatedAt())
-        .modifiedAt(comment.getModifiedAt())
-        .build();
-  }
+  private List<ReplyCommentGetDto> replyCommentGetDtoList;
 }
