@@ -32,7 +32,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Builder
 public class User extends BaseTimeEntity {
 
   @Id
@@ -105,6 +104,11 @@ public class User extends BaseTimeEntity {
     this.roles = RoleType.USER;
   }
 
+  //test 코드용
+  public User(Long id){
+    this.id = id;
+
+  }
   //OAuth2용
   public User(
       String name,
