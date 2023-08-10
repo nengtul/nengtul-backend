@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,7 @@ public class NoticeController {
 
   //생성
   @Operation(summary = "공지사항 작성", description = "토큰을 통해 관리자여부를 확인 후 공지사항을 작성합니다.")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @PostMapping
   public ResponseEntity<Void> createNotice(
       @RequestPart(value = "noticeReqDto") @Valid NoticeReqDto noticeReqDto,
@@ -46,6 +48,7 @@ public class NoticeController {
 
   //수정
   @Operation(summary = "공지사항 수정", description = "토큰을 통해 관리자여부, 작성자 여부를 확인 후 공지사항을 수정합니다.")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @PostMapping("/{noticeId}")
   public ResponseEntity<Void> updateNotice(
       @Parameter(name = "email", description = "공지사항 ID") @PathVariable Long noticeId,
@@ -58,28 +61,12 @@ public class NoticeController {
 
   //삭제
   @Operation(summary = "공지사항 삭제", description = "토큰을 통해 관리자여부, 작성자 여부를 확인 후 공지사항을 삭제합니다.")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @DeleteMapping("/{noticeId}")
   public ResponseEntity<Void> deleteNotice(
       @Parameter(name = "id)", description = "공지사항 ID") @PathVariable Long noticeId,
       Principal principal) {
     noticeService.deleteNotice(noticeId, principal);
     return ResponseEntity.ok(null);
-  }
-
-  //전체 조회
-  @Operation(summary = "공지사항 조회", description = "공지사항 목록을 전체 조회합니다. (Pageable 적용)")
-  @GetMapping("/list")
-  public ResponseEntity<Page<NoticeListDto>> getNoticeList(Pageable pageable) {
-    return ResponseEntity.ok(
-        noticeService.getNoticeList(pageable).map(NoticeListDto::buildNoticeListDto));
-  }
-
-  //상세 조회
-  @Operation(summary = "공지사항 상세", description = "공지사항을 상세 조회합니다.")
-  @GetMapping("/{noticeId}")
-  public ResponseEntity<NoticeDetailDto> getNoticeDetails(
-      @Parameter(name = "id)", description = "공지사항 ID") @PathVariable Long noticeId) {
-    return ResponseEntity.ok(
-        NoticeDetailDto.buildNoticeDetailDto(noticeService.getNoticeDetails(noticeId)));
   }
 }

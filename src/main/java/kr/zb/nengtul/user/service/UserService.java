@@ -12,8 +12,18 @@ import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import kr.zb.nengtul.comment.domain.entity.Comment;
+import kr.zb.nengtul.comment.domain.respository.CommentRepository;
+import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
+import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
+import kr.zb.nengtul.notice.domain.entity.Notice;
+import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
+import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
+import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
+import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
+import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
@@ -26,6 +36,7 @@ import kr.zb.nengtul.user.mailgun.client.mailgun.SendMailForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,10 +49,23 @@ import s3bucket.service.AmazonS3Service;
 @Slf4j
 public class UserService {
 
+  private final RecipeSearchRepository recipeSearchRepository;
+
+  private final NoticeRepository noticeRepository;
+
+  private final ReplyCommentRepository replyCommentRepository;
+
+  private final ShareBoardRepository shareBoardRepository;
+
+  private final CommentRepository commentRepository;
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final MailgunClient mailgunClient;
   private final AmazonS3Service amazonS3Service;
+
+  @Value("${spring.quit.email}")
+  private String quitId;
 
   //회원가입 및 이메일 인증 발송
   @Transactional
@@ -86,6 +110,33 @@ public class UserService {
   @Transactional
   public void quitUser(Principal principal) {
     User user = findUserByEmail(principal.getName());
+    User quitUser = findUserByEmail(quitId);
+
+    for (Comment comment : user.getCommentList()) {
+      comment.setUser(quitUser);
+      commentRepository.save(comment);
+    }
+    for (ReplyComment replyComment : user.getReplyCommentList()) {
+      replyComment.setUser(quitUser);
+      replyCommentRepository.save(replyComment);
+    }
+    for (ShareBoard shareBoard : user.getShareBoardList()) {
+      shareBoard.setUser(quitUser);
+      shareBoard.setClosed(true);
+      shareBoardRepository.save(shareBoard);
+    }
+    for (Notice notice : user.getNoticeList()) {
+      notice.setUser(quitUser);
+      noticeRepository.save(notice);
+    }
+    for (Notice notice : user.getNoticeList()) {
+      notice.setUser(quitUser);
+      noticeRepository.save(notice);
+    }
+    for(RecipeDocument recipeDocument : recipeSearchRepository.findAllByUserId(user.getId())){
+      recipeDocument.setUserId(quitUser.getId());
+      recipeSearchRepository.save(recipeDocument);
+    }
 
     userRepository.deleteById(user.getId());
   }

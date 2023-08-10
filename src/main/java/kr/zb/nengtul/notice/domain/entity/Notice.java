@@ -58,4 +58,8 @@ public class Notice extends BaseTimeEntity {
   public void setViewCount(Long viewCount) {
     this.viewCount = viewCount;
   }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
 }

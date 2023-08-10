@@ -7,20 +7,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import kr.zb.nengtul.chat.domain.ConnectedChatRoom;
 import kr.zb.nengtul.comment.domain.entity.Comment;
+import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
+import kr.zb.nengtul.favorite.domain.entity.Favorite;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
+import kr.zb.nengtul.likes.domain.entity.Likes;
 import kr.zb.nengtul.notice.domain.entity.Notice;
+import kr.zb.nengtul.savedrecipe.domain.entity.SavedRecipe;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.user.domain.constants.UserPoint;
 import lombok.AllArgsConstructor;
@@ -71,13 +72,9 @@ public class User extends BaseTimeEntity {
 
   private String refreshToken; // 리프레시 토큰
 
-    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
-            CascadeType.MERGE})
-    private List<ConnectedChatRoom> ConnectedChatRoom = new ArrayList<>();
-
-    @JsonBackReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Notice> noticeList;
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
+  private List<Notice> noticeList;
 
   @JsonBackReference
   @OneToMany(mappedBy = "user")
@@ -85,7 +82,23 @@ public class User extends BaseTimeEntity {
 
   @JsonBackReference
   @OneToMany(mappedBy = "user")
+  private List<ReplyComment> replyCommentList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
   private List<Comment> commentList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<Likes> likesList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<Favorite> favoriteList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<SavedRecipe> savedRecipeList;
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
@@ -165,6 +178,7 @@ public class User extends BaseTimeEntity {
   public void setAddress(String address) {
     this.address = address;
   }
+
   public void setEmail(String email) {
     this.address = email;
   }
@@ -173,6 +187,7 @@ public class User extends BaseTimeEntity {
   public void setAddressDetail(String addressDetail) {
     this.addressDetail = addressDetail;
   }
+
   public void setRoles(RoleType roles) {
     this.roles = roles;
   }
@@ -187,10 +202,6 @@ public class User extends BaseTimeEntity {
 
   public void setVerificationCode(String verificationCode) {
     this.verificationCode = verificationCode;
-  }
-
-  public void setPoint(int point) {
-    this.point = point;
   }
 
   public void setPlusPoint(UserPoint userPoint) {

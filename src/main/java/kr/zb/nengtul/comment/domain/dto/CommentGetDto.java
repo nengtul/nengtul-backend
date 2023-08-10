@@ -2,7 +2,6 @@ package kr.zb.nengtul.comment.domain.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.replycomment.domain.dto.ReplyCommentGetDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

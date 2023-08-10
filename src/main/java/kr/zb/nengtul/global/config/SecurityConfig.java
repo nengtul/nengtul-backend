@@ -42,166 +42,165 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Configuration
 @EnableWebSecurity
+//@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailService customUserDetailService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
+  private final CustomUserDetailService customUserDetailService;
+  private final JwtTokenProvider jwtTokenProvider;
+  private final UserRepository userRepository;
+  private final ObjectMapper objectMapper;
+  private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+  private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                        .accessDeniedHandler(tokenAccessDeniedHandler))
-                //== URL별 권한 관리 옵션 ==//
-                //        .authorizeHttpRequests(m -> methodSecurityExpressionHandler(new RoleHierarchy()))
-                .authorizeHttpRequests(authorizationHttpRequests -> authorizationHttpRequests
-                        .requestMatchers("/v1/admin/**", "/v1/notices/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/recipes/**").permitAll() //댓글
-                        .requestMatchers(HttpMethod.GET, "/v1/comments/**").permitAll()//대댓글
-                        .requestMatchers(HttpMethod.GET, "/v1/notices/**").permitAll()//공지사항 조회
-                        .requestMatchers(// -- Swagger UI v2
-                                "/v2/api-docs",
-                                "/swagger-resources",
-                                "/swagger-resources/**",
-                                "/configuration/ui",
-                                "/configuration/security",
-                                "/swagger-ui.html",
-                                "/webjars/**",
-                                "/v3/api-docs/**",
-                                // -- Swagger UI v3 (OpenAPI)"/v3/api-docs/**",
-                                "/swagger-ui/**").permitAll()
-                        .requestMatchers(
-                                "/", "/**",
-                                "/v1/auth/**",
-                                "/v1/users/join",//회원가입
-                                "/v1/users/login",//로그인
-                                "/v1/users/findpw",//비밀번호 찾기 (비밀번호 재발급)
-                                "/v1/users/findid",//아이디 찾기
-                                "/v1/users/verify/**", //이메일 인증
-                                "/v1/recipe/commentlist/**",//댓글 조회
-                                "/chat/**"
-                        ).permitAll()
-                        .requestMatchers(
-                                "/v1/users/**",
-                                "/v1/shareboards/**",
-                                "/v1/recipe/**",
-                                "/v1/comments/**",//대댓글
-                                "/v1/recipes/comment/**",//댓글 작성,수정,삭제
-                                "/v1/likes/**",
-                                "/v1/favorite/**",
-                                "/v1/saved-recipe/**",
-                                "/v1/chat/**"
-                        ).hasRole("USER")
-                        .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
-                .logout(logout -> logout.logoutSuccessUrl("/"))
-                //== 소셜 로그인 설정 ==//
-                .oauth2Login(oauth2Login -> oauth2Login
-                        .authorizationEndpoint(
-                                authorizationEndpoint -> authorizationEndpoint.baseUri(
-                                        "/oauth2/authorize"))
-                        .redirectionEndpoint(
-                                redirectionEndpoint -> redirectionEndpoint.baseUri(
-                                        "/*/oauth2/code/*"))
-                        .userInfoEndpoint(
-                                userInfoEndpointConfig -> userInfoEndpointConfig.userService(
-                                        customOAuth2UserService))
-                        .successHandler(oAuth2LoginSuccessHandler)
-                        .failureHandler(oAuth2LoginFailureHandler))
-                // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
-                .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(),
-                        LogoutFilter.class)
-                .addFilterBefore(jwtAuthenticationProcessingFilter(),
-                        CustomJsonUsernamePasswordAuthenticationFilter.class);
+    http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
+            SessionCreationPolicy.STATELESS))
+        .csrf(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .headers(headers -> headers.frameOptions(frameOptions -> headers.disable()))
+        .exceptionHandling(exceptionHandling -> exceptionHandling
+            .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+            .accessDeniedHandler(tokenAccessDeniedHandler))
+        //== URL별 권한 관리 옵션 ==//
+//        .authorizeHttpRequests(m -> methodSecurityExpressionHandler(new RoleHierarchy()))
+        .authorizeHttpRequests(authorizationHttpRequests -> authorizationHttpRequests
+            .requestMatchers("/v1/notices/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.GET, "/v1/noticelist/**").permitAll()//공지사항 조회
+            .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/v1/recipes/**").permitAll() //댓글
+            .requestMatchers(HttpMethod.GET, "/v1/comments/**").permitAll()//대댓글
+            .requestMatchers(
+                // -- Swagger UI v2
+                "/v2/api-docs",
+                "/swagger-resources",
+                "/swagger-resources/**",
+                "/configuration/ui",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/webjars/**",
+                // -- Swagger UI v3 (OpenAPI)
+                "/v3/api-docs/**",
+                "/swagger-ui/**").permitAll()
+            .requestMatchers(
+                "/**",
+                "/v1/auth/**",
+                "/v1/users/join",//회원가입
+                "/v1/users/login",//로그인
+                "/v1/users/findpw",//비밀번호 찾기 (비밀번호 재발급)
+                "/v1/users/findid",//아이디 찾기
+                "/v1/users/verify/**", //이메일 인증
+                "/v1/recipe/commentlist/**", //댓글 조회
+                "/chat/**"
+            ).permitAll()
+            .requestMatchers(
+                "/v1/users/**",
+                "/v1/shareboards/**",
+                "/v1/recipe/**",
+                "/v1/comments/**",//대댓글
+                "/v1/recipes/comment/**",//댓글 작성,수정,삭제
+                "/v1/likes/**",
+                "/v1/favorite/**",
+                "/v1/saved-recipe/**",
+                "/v1/chat/**"
+            ).hasRole("USER")
+            .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+        .logout(logout -> logout.logoutSuccessUrl("/"))
+        //== 소셜 로그인 설정 ==//
+        .oauth2Login(oauth2Login -> oauth2Login
+            .authorizationEndpoint(
+                authorizationEndpoint -> authorizationEndpoint.baseUri("/oauth2/authorize"))
+            .redirectionEndpoint(
+                redirectionEndpoint -> redirectionEndpoint.baseUri("/*/oauth2/code/*"))
+            .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(
+                customOAuth2UserService))
+            .successHandler(oAuth2LoginSuccessHandler)
+            .failureHandler(oAuth2LoginFailureHandler)
+        )
+        // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
+        .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
+        .addFilterBefore(jwtAuthenticationProcessingFilter(),
+            CustomJsonUsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
 
-    //password Encoder
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(customUserDetailService);
-        return new ProviderManager(provider);
-    }
+  //password Encoder
+  @Bean
+  public AuthenticationManager authenticationManager() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setPasswordEncoder(passwordEncoder());
+    provider.setUserDetailsService(customUserDetailService);
+    return new ProviderManager(provider);
+  }
 
-    @Bean
-    public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtTokenProvider, userRepository);
-    }
+  @Bean
+  public LoginSuccessHandler loginSuccessHandler() {
+    return new LoginSuccessHandler(jwtTokenProvider, userRepository);
+  }
 
-    @Bean
-    public LoginFailureHandler loginFailureHandler() {
-        return new LoginFailureHandler();
-    }
+  @Bean
+  public LoginFailureHandler loginFailureHandler() {
+    return new LoginFailureHandler();
+  }
 
-    //커스텀 필터 및 성공 실패 핸들러
-    @Bean
-    public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter() {
-        CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
-                = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
-        customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
-        customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(
-                loginSuccessHandler());
-        customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(
-                loginFailureHandler());
-        return customJsonUsernamePasswordLoginFilter;
-    }
+  //커스텀 필터 및 성공 실패 핸들러
+  @Bean
+  public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter() {
+    CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
+        = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
+    customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
+    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(
+        loginSuccessHandler());
+    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(
+        loginFailureHandler());
+    return customJsonUsernamePasswordLoginFilter;
+  }
 
-    @Bean
-    public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        return new JwtAuthenticationProcessingFilter(
-                jwtTokenProvider, userRepository);
-    }
+  @Bean
+  public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
+    return new JwtAuthenticationProcessingFilter(
+        jwtTokenProvider, userRepository);
+  }
 
-    //cors 설정
-    @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("*");
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+  //cors 설정
+  @Bean
+  public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOriginPattern("*");
+    configuration.addAllowedMethod("*");
+    configuration.addAllowedHeader("*");
+    configuration.setAllowCredentials(true);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
-        return roleHierarchy;
-    }
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+    roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+    return roleHierarchy;
+  }
 
-    @Bean
-    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
-            RoleHierarchy roleHierarchy) {
-        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy);
-        return expressionHandler;
-    }
+  @Bean
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+      RoleHierarchy roleHierarchy) {
+    DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+    expressionHandler.setRoleHierarchy(roleHierarchy);
+    return expressionHandler;
+  }
 }
