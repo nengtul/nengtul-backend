@@ -41,7 +41,7 @@ public class MarkAsReadTest {
     @BeforeEach
     public void setup() {
         // 가상의 sender와 chatRoom 객체 생성
-        sender = User.builder().id(123L).build();
+        sender = new User(123L);
         ChatRoom chatRoom = new ChatRoom();
     }
 

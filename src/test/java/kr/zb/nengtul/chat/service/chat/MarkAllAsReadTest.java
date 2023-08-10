@@ -43,10 +43,9 @@ public class MarkAllAsReadTest {
     @BeforeEach
     public void setup() {
         // 가상의 sender, chatRoom, roomId, reader, pageable 객체 생성
-        sender = User.builder().id(123L).build();
-        chatRoom = new ChatRoom();
+        sender = new User(123L);
         roomId = "12345";
-        reader = User.builder().id(321L).build();
+        reader = new User(456L);
     }
 
 
