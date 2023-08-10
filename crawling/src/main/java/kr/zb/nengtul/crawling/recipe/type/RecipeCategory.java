@@ -1,4 +1,4 @@
-package kr.zb.nengtul.recipe.domain.constants;
+package kr.zb.nengtul.crawling.recipe.type;
 
 import lombok.Getter;
 

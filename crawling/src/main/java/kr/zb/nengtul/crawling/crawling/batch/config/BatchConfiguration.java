@@ -1,6 +1,6 @@
 package kr.zb.nengtul.crawling.crawling.batch.config;
 
-import kr.zb.nengtul.crawling.board.domain.Recipe;
+import kr.zb.nengtul.crawling.recipe.domain.RecipeDocument;
 import kr.zb.nengtul.crawling.crawling.dto.CrawlInfo;
 import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemProcessor;
 import kr.zb.nengtul.crawling.crawling.batch.CrawlingItemReader;
@@ -45,7 +45,7 @@ public class BatchConfiguration {
     ) {
         int CHUNK_SIZE = 10;
         return new StepBuilder("crawlingStep", jobRepository)
-                .<CrawlInfo, Recipe>chunk(CHUNK_SIZE, transactionManager)
+                .<CrawlInfo, RecipeDocument>chunk(CHUNK_SIZE, transactionManager)
                 .reader(crawlingItemReader)
                 .processor(crawlingItemProcessor)
                 .writer(crawlingItemWriter)
