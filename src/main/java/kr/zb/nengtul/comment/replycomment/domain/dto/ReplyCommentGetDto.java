@@ -19,6 +19,8 @@ public class ReplyCommentGetDto {
   private Long replyCommentId;
   private Long commentId;
   private Long userId;
+  private String profileImageUrl;
+  private int point;
   private String replyComment;
   private String userNickname;
   private LocalDateTime createdAt;
@@ -29,6 +31,8 @@ public class ReplyCommentGetDto {
         .replyCommentId(replyComment.getId())
         .commentId(replyComment.getComment().getId())
         .userId(replyComment.getUser().getId())
+        .profileImageUrl(replyComment.getUser().getProfileImageUrl())
+        .point(replyComment.getUser().getPoint())
         .replyComment(replyComment.getReplyComment())
         .userNickname(replyComment.getUser().getNickname())
         .createdAt(replyComment.getCreatedAt())
