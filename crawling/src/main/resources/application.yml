@@ -6,6 +6,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  elasticsearch:
+    uris: ${ES_URI}
+    password: ${ES_PASSWORD}
+    username: ${ES_USER_NAME}
   batch:
     job:
       enabled: true

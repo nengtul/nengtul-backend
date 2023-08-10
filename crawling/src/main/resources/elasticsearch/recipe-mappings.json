@@ -1,0 +1,69 @@
+{
+  "properties": {
+
+    "id": {
+      "type": "keyword"
+    },
+
+    "userId": {
+      "type": "keyword"
+    },
+
+    "title": {
+      "type": "text"
+    },
+
+    "intro": {
+      "type": "keyword"
+    },
+
+    "ingredient": {
+      "type": "text",
+      "analyzer": "korean"
+    },
+
+    "cookingStep": {
+      "type": "keyword"
+    },
+
+    "thumbnailUrl": {
+      "type": "keyword"
+    },
+
+    "imageUrl": {
+      "type": "keyword"
+    },
+
+    "cookingTime": {
+      "type": "keyword"
+    },
+
+    "serving": {
+      "type": "keyword"
+    },
+
+    "category": {
+      "type": "keyword"
+    },
+
+    "videoUrl": {
+      "type": "keyword"
+    },
+
+    "viewCount": {
+      "type": "long"
+    },
+
+    "createdAt": {
+      "type": "date",
+      "format": "uuuu-MM-dd'T'HH:mm"
+    },
+
+    "modifiedAt": {
+      "type": "date",
+      "format": "uuuu-MM-dd'T'HH:mm"
+    }
+
+  }
+
+}
