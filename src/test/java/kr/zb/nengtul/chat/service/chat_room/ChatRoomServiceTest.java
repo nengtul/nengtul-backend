@@ -149,8 +149,8 @@ public class ChatRoomServiceTest {
     @DisplayName("채팅방 나가기 - 상대방이 남아았을 때")
     public void testLeaveChatRoom() {
         // Given
-        User user = User.builder().id(123L).build();
-        User otherUser = User.builder().id(456L).build();
+        User user = new User(123L);
+        User otherUser = new User(456L);
 
         ChatRoom chatRoom = new ChatRoom(new ShareBoard());
         List<ConnectedChatRoom> chatUsers = new ArrayList<>(List.of(
@@ -179,7 +179,7 @@ public class ChatRoomServiceTest {
     @DisplayName("채팅방 나가기 - 혼자 남아 있을 때")
     public void testLeaveAndDeleteChatRoom() {
         // Given
-        User user = User.builder().id(123L).build();
+        User user = new User(123L);
 
         ChatRoom chatRoom = new ChatRoom(new ShareBoard());
         List<ConnectedChatRoom> chatUsers = new ArrayList<>(List.of(
