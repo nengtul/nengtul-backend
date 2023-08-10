@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Tag(name = "NOTICE API", description = "공지사항 API")
+@Tag(name = "NOTICE LIST API", description = "공지사항 조회 API")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
