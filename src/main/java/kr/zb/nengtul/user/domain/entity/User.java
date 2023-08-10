@@ -199,10 +199,6 @@ public class User extends BaseTimeEntity {
     this.verificationCode = verificationCode;
   }
 
-  public void setPoint(int point) {
-    this.point = point;
-  }
-
   public void setPlusPoint(UserPoint userPoint) {
     this.point += userPoint.getPoint();
   }
