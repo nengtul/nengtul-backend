@@ -1,5 +1,7 @@
 package kr.zb.nengtul.favorite.service;
 
+import java.security.Principal;
+import java.util.List;
 import kr.zb.nengtul.favorite.domain.dto.FavoriteDto;
 import kr.zb.nengtul.favorite.domain.entity.Favorite;
 import kr.zb.nengtul.favorite.domain.repository.FavoriteRepository;
@@ -13,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -83,4 +83,12 @@ public class FavoriteService {
         favoriteRepository.delete(favorite);
 
     }
+
+    public List<Long> getSubscriberIds(User user) {
+        return favoriteRepository.findByPublisher(user)
+                .stream()
+                .map(favorite -> favorite.getUser().getId())
+                .toList();
+    }
+
 }

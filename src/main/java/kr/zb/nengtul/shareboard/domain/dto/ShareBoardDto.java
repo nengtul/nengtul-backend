@@ -3,14 +3,12 @@ package kr.zb.nengtul.shareboard.domain.dto;
 import static kr.zb.nengtul.global.exception.ErrorCode.LAT_AVERAGE_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.LAT_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.LONG_CONTENT_MESSAGE;
-import static kr.zb.nengtul.global.exception.ErrorCode.LONG_PLACE_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.LON_AVERAGE_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.LON_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.TITLE_NOT_NULL_MESSAGE;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -26,21 +24,22 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShareBoardDto {
-  @NotEmpty(message = TITLE_NOT_NULL_MESSAGE)
-  private String title;
-  @Size(max = 100, message = LONG_CONTENT_MESSAGE)
-  private String content; //글 내용
-  @Size(max = 50, message = LONG_CONTENT_MESSAGE)
-  private String place; //위치
-  private Long price;
 
-  @NotNull(message = LAT_NOT_NULL_MESSAGE)
-  @DecimalMin(value = "-90.0", message = LAT_AVERAGE_MESSAGE)
-  @DecimalMax(value = "90.0", message = LAT_AVERAGE_MESSAGE)
-  private Double lat;
+    @NotEmpty(message = TITLE_NOT_NULL_MESSAGE)
+    private String title;
+    @Size(max = 100, message = LONG_CONTENT_MESSAGE)
+    private String content; //글 내용
+    @Size(max = 50, message = LONG_CONTENT_MESSAGE)
+    private String place; //위치
+    private Long price;
 
-  @NotNull(message = LON_NOT_NULL_MESSAGE)
-  @DecimalMin(value = "-180.0", message = LON_AVERAGE_MESSAGE)
-  @DecimalMax(value = "180.0", message = LON_AVERAGE_MESSAGE)
-  private Double lon;
+    @NotNull(message = LAT_NOT_NULL_MESSAGE)
+    @DecimalMin(value = "-90.0", message = LAT_AVERAGE_MESSAGE)
+    @DecimalMax(value = "90.0", message = LAT_AVERAGE_MESSAGE)
+    private Double lat;
+
+    @NotNull(message = LON_NOT_NULL_MESSAGE)
+    @DecimalMin(value = "-180.0", message = LON_AVERAGE_MESSAGE)
+    @DecimalMax(value = "180.0", message = LON_AVERAGE_MESSAGE)
+    private Double lon;
 }

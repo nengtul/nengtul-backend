@@ -1,6 +1,8 @@
 package kr.zb.nengtul.favorite.domain.repository;
 
+import java.util.List;
 import kr.zb.nengtul.favorite.domain.entity.Favorite;
+import kr.zb.nengtul.user.domain.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +17,5 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     Optional<Favorite> findByUserIdAndPublisherId(Long userId, Long publisherId);
 
+    List<Favorite> findByPublisher(User publisher);
 }
