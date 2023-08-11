@@ -30,174 +30,185 @@ import s3bucket.service.AmazonS3Service;
 @RequiredArgsConstructor
 public class RecipeService {
 
-    private final RecipeSearchRepository recipeSearchRepository;
+  private final RecipeSearchRepository recipeSearchRepository;
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    private final LikesRepository likesRepository;
+  private final LikesRepository likesRepository;
 
-    private final AmazonS3Service amazonS3Service;
+  private final AmazonS3Service amazonS3Service;
 
-    public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
-            List<MultipartFile> images, MultipartFile thumbnail) {
+  public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
+      List<MultipartFile> images, MultipartFile thumbnail) {
 
-        User user = userRepository.findByEmail(principal.getName()).
-                orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+    User user = userRepository.findByEmail(principal.getName()).
+        orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        String uuid = UUID.randomUUID().toString();
+    String uuid = UUID.randomUUID().toString();
 
-        recipeSearchRepository.save(RecipeDocument.builder()
-                .userId(user.getId())
-                .title(recipeAddDto.getTitle())
-                .intro(recipeAddDto.getIntro())
-                .ingredient(recipeAddDto.getIngredient())
-                .cookingStep(recipeAddDto.getCookingStep())
-                .imageUrl(
-                        amazonS3Service.uploadFileForRecipeCookingStep(images, uuid)
-                )
-                .thumbnailUrl(
-                        amazonS3Service.uploadFileForRecipeThumbnail(thumbnail, uuid)
-                )
-                .cookingTime(recipeAddDto.getCookingTime())
-                .serving(recipeAddDto.getServing())
-                .category(recipeAddDto.getCategory())
-                .videoUrl(recipeAddDto.getVideoUrl())
-                .viewCount(0L)
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
-                .build());
+    recipeSearchRepository.save(RecipeDocument.builder()
+        .userId(user.getId())
+        .title(recipeAddDto.getTitle())
+        .intro(recipeAddDto.getIntro())
+        .ingredient(recipeAddDto.getIngredient())
+        .cookingStep(recipeAddDto.getCookingStep())
+        .imageUrl(
+            amazonS3Service.uploadFileForRecipeCookingStep(images, uuid)
+        )
+        .thumbnailUrl(
+            amazonS3Service.uploadFileForRecipeThumbnail(thumbnail, uuid)
+        )
+        .cookingTime(recipeAddDto.getCookingTime())
+        .serving(recipeAddDto.getServing())
+        .category(recipeAddDto.getCategory())
+        .videoUrl(recipeAddDto.getVideoUrl())
+        .viewCount(0L)
+        .createdAt(LocalDateTime.now())
+        .modifiedAt(LocalDateTime.now())
+        .build());
 
+  }
+
+  public Page<RecipeGetListDto> getAllRecipe(Pageable pageable) {
+
+    return recipeSearchRepository.findAll(pageable)
+        .map(this::settingRecipeGetListDto);
+  }
+
+  public RecipeGetDetailDto getRecipeDetailById(String recipeId) {
+
+    RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+
+    recipeDocument.updateViewCount();
+    recipeSearchRepository.save(recipeDocument);
+
+    RecipeGetDetailDto recipeGetDetailDto =
+        RecipeGetDetailDto.fromRecipeDocument(recipeDocument);
+
+    User user = userRepository.findById(recipeDocument.getUserId())
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+    recipeGetDetailDto.setUserProfileUrl(user.getProfileImageUrl());
+    recipeGetDetailDto.setPoint(user.getPoint());
+    recipeGetDetailDto.setNickName(user.getNickname());
+
+    return recipeGetDetailDto;
+  }
+
+  public Page<RecipeGetListDto> getRecipeByCategory(RecipeCategory category, Pageable pageable) {
+
+    return recipeSearchRepository.findAllByCategory(category, pageable)
+        .map(this::settingRecipeGetListDto);
+  }
+
+  public Page<RecipeGetListDto> getRecipeByTitle(String title, Pageable pageable) {
+
+    return recipeSearchRepository.findAllByTitle(title, pageable)
+        .map(this::settingRecipeGetListDto);
+  }
+
+  public Page<RecipeGetListDto> getRecipeByIngredient(String ingredient, Pageable pageable) {
+
+    return recipeSearchRepository.findAllByIngredient(ingredient, pageable)
+        .map(this::settingRecipeGetListDto);
+  }
+
+  @Transactional
+  public void updateRecipe(
+      Principal principal, String recipeId, RecipeUpdateDto recipeUpdateDto,
+      List<MultipartFile> images, MultipartFile thumbnail) {
+
+    User user = userRepository.findByEmail(principal.getName())
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+    RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+
+    if (!Objects.equals(user.getId(), recipeDocument.getUserId())) {
+      throw new CustomException(ErrorCode.NO_PERMISSION);
     }
 
-    public Page<RecipeGetListDto> getAllRecipe(Pageable pageable) {
-
-        return recipeSearchRepository.findAll(pageable)
-                .map(this::settingRecipeGetListDto);
+    if (!thumbnail.isEmpty()) {
+      amazonS3Service.updateFile(thumbnail, recipeDocument.getThumbnailUrl());
     }
 
-    public RecipeGetDetailDto getRecipeDetailById(String recipeId) {
+    if (!recipeUpdateDto.getImagesUrl().isEmpty() &&
+        !images.get(0).isEmpty()) {
 
-        RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+      String[] imageUrlArr = recipeUpdateDto.getImagesUrl().split("\\\\");
 
-        recipeDocument.updateViewCount();
-        recipeSearchRepository.save(recipeDocument);
-
-        RecipeGetDetailDto recipeGetDetailDto =
-                RecipeGetDetailDto.fromRecipeDocument(recipeDocument);
-
-        User user = userRepository.findById(recipeDocument.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        recipeGetDetailDto.setUserProfileUrl(user.getProfileImageUrl());
-        recipeGetDetailDto.setPoint(user.getPoint());
-        recipeGetDetailDto.setNickName(user.getNickname());
-
-        return recipeGetDetailDto;
+      for (int i = 0; i < imageUrlArr.length; i++) {
+        amazonS3Service.updateFile(images.get(i), imageUrlArr[i]);
+      }
     }
 
-    public Page<RecipeGetListDto> getRecipeByCategory(RecipeCategory category, Pageable pageable) {
+    recipeDocument.updateRecipe(recipeUpdateDto);
 
-        return recipeSearchRepository.findAllByCategory(category, pageable)
-                .map(this::settingRecipeGetListDto);
+    recipeSearchRepository.save(recipeDocument);
+  }
+
+
+  @Transactional
+  public void deleteRecipe(Principal principal, String recipeId) {
+
+    User user = userRepository.findByEmail(principal.getName())
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+    RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+
+    if (!Objects.equals(user.getId(), recipeDocument.getUserId()) &&
+        !user.getRoles().equals(RoleType.ADMIN)) {
+      throw new CustomException(ErrorCode.NO_PERMISSION);
     }
 
-    public Page<RecipeGetListDto> getRecipeByTitle(String title, Pageable pageable) {
+    deleteRecipeS3UploadFile(
+        recipeDocument.getImageUrl(), recipeDocument.getThumbnailUrl());
 
-        return recipeSearchRepository.findAllByTitle(title, pageable)
-                .map(this::settingRecipeGetListDto);
+    recipeSearchRepository.delete(recipeDocument);
+  }
+
+  private RecipeGetListDto settingRecipeGetListDto(RecipeDocument recipeDocument) {
+
+    RecipeGetListDto recipeGetListDto =
+        RecipeGetListDto.fromRecipeDocument(recipeDocument);
+
+    User user = userRepository.findById(recipeDocument.getUserId())
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+    Long likeCount = likesRepository.countByRecipeId(recipeDocument.getId());
+
+    recipeGetListDto.setNickName(user.getNickname());
+    recipeGetListDto.setLikeCount(likeCount);
+
+    return recipeGetListDto;
+  }
+
+  private void deleteRecipeS3UploadFile(String imagesUrl, String thumbnailUrl) {
+
+    amazonS3Service.deleteFile(thumbnailUrl);
+
+    String[] imagesUrlArr = imagesUrl.split("\\\\");
+
+    for (String imageUrl : imagesUrlArr) {
+      amazonS3Service.deleteFile(imageUrl);
     }
+  }
 
-    public Page<RecipeGetListDto> getRecipeByIngredient(String ingredient, Pageable pageable) {
+  public RecipeDocument findById(String recipeId) {
+    return recipeSearchRepository.findById(recipeId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+  }
 
-        return recipeSearchRepository.findAllByIngredient(ingredient, pageable)
-                .map(this::settingRecipeGetListDto);
-    }
+  public Page<RecipeGetListDto> getAllMyRecipe(Principal principal, Pageable pageable) {
 
-    @Transactional
-    public void updateRecipe(
-            Principal principal, String recipeId, RecipeUpdateDto recipeUpdateDto,
-            List<MultipartFile> images, MultipartFile thumbnail) {
+    User user = userRepository.findByEmail(principal.getName())
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+    return recipeSearchRepository.findAllByUserId(user.getId(), pageable)
+        .map(this::settingRecipeGetListDto);
 
-        RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+  }
 
-        if (!Objects.equals(user.getId(), recipeDocument.getUserId())) {
-            throw new CustomException(ErrorCode.NO_PERMISSION);
-        }
-
-        if (!thumbnail.isEmpty()) {
-            amazonS3Service.updateFile(thumbnail, recipeDocument.getThumbnailUrl());
-        }
-
-        if (!recipeUpdateDto.getImagesUrl().isEmpty() &&
-                !images.get(0).isEmpty()) {
-
-            String[] imageUrlArr = recipeUpdateDto.getImagesUrl().split("\\\\");
-
-            for (int i = 0; i < imageUrlArr.length; i++) {
-                amazonS3Service.updateFile(images.get(i), imageUrlArr[i]);
-            }
-        }
-
-        recipeDocument.updateRecipe(recipeUpdateDto);
-
-        recipeSearchRepository.save(recipeDocument);
-    }
-
-
-    @Transactional
-    public void deleteRecipe(Principal principal, String recipeId) {
-
-        User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
-
-        if (!Objects.equals(user.getId(), recipeDocument.getUserId()) &&
-                !user.getRoles().equals(RoleType.ADMIN)) {
-            throw new CustomException(ErrorCode.NO_PERMISSION);
-        }
-
-        deleteRecipeS3UploadFile(
-                recipeDocument.getImageUrl(), recipeDocument.getThumbnailUrl());
-
-        recipeSearchRepository.delete(recipeDocument);
-    }
-
-    private RecipeGetListDto settingRecipeGetListDto(RecipeDocument recipeDocument) {
-
-        RecipeGetListDto recipeGetListDto =
-                RecipeGetListDto.fromRecipeDocument(recipeDocument);
-
-        User user = userRepository.findById(recipeDocument.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        Long likeCount = likesRepository.countByRecipeId(recipeDocument.getId());
-
-        recipeGetListDto.setNickName(user.getNickname());
-        recipeGetListDto.setLikeCount(likeCount);
-
-        return recipeGetListDto;
-    }
-
-    private void deleteRecipeS3UploadFile(String imagesUrl, String thumbnailUrl) {
-
-        amazonS3Service.deleteFile(thumbnailUrl);
-
-        String[] imagesUrlArr = imagesUrl.split("\\\\");
-
-        for (String imageUrl : imagesUrlArr) {
-            amazonS3Service.deleteFile(imageUrl);
-        }
-    }
-
-    public RecipeDocument findById(String recipeId) {
-       return recipeSearchRepository.findById(recipeId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
-    }
 }
