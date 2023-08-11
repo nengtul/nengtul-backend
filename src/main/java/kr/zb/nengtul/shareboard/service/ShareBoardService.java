@@ -6,6 +6,7 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import java.util.List;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
@@ -89,32 +90,35 @@ public class ShareBoardService {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
-    if (shareBoard.getUser() != user) {
+    if (user.equals(shareBoard.getUser()) || user.getRoles().equals(RoleType.ADMIN)) {
+      //거래안됐는데 삭제하면 포인트 차감
+      if (shareBoard.isClosed()) {
+        user.setMinusPoint(UserPoint.SHARE);
+        userRepository.save(user);
+      }
+      shareBoardRepository.delete(shareBoard);
+    }else{
       throw new CustomException(NO_PERMISSION);
+
     }
-    //혹시라도 포인트가 음수가 될 수 있으므로
-    if(shareBoard.isClosed()){
-      user.setMinusPoint(UserPoint.SHARE);
-      userRepository.save(user);
-    }
-    shareBoardRepository.delete(shareBoard);
+
   }
 
-    @Transactional
-    public List<ShareBoard> getShareBoardList(double lat, double lon, double range,
-            Boolean closed) {
-        List<ShareBoard> shareBoardList;
-        if (closed == null) {
-            shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(
-                    lat - range, lat + range, lon - range, lon + range);
+  @Transactional
+  public List<ShareBoard> getShareBoardList(double lat, double lon, double range,
+      Boolean closed) {
+    List<ShareBoard> shareBoardList;
+    if (closed == null) {
+      shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(
+          lat - range, lat + range, lon - range, lon + range);
 
-        } else {
-            shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetweenAndClosed(
-                    lat - range, lat + range, lon - range, lon + range, closed);
+    } else {
+      shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetweenAndClosed(
+          lat - range, lat + range, lon - range, lon + range, closed);
 
-        }
-        return shareBoardList;
     }
+    return shareBoardList;
+  }
 
   public List<ShareBoard> getMyShareBoard(Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
@@ -131,9 +135,10 @@ public class ShareBoardService {
     shareBoard.setClosed(true);
     shareBoardRepository.save(shareBoard);
   }
-    public ShareBoard findById(Long shareBoardId) {
-        return shareBoardRepository.findById(shareBoardId)
-                .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
-    }
+
+  public ShareBoard findById(Long shareBoardId) {
+    return shareBoardRepository.findById(shareBoardId)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
+  }
 
 }
