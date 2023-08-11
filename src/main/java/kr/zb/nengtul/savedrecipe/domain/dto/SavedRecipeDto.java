@@ -16,6 +16,8 @@ public class SavedRecipeDto {
 
   private String thumbnailUrl;
 
+  private String recipeUserNickname;
+
   private LocalDateTime createdAt;
 
 }

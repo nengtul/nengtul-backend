@@ -125,6 +125,9 @@ class SavedRecipeServiceTest {
     when(recipeSearchRepository.findById(any()))
         .thenReturn(Optional.of(recipeDocument));
 
+    when(userRepository.findById(any()))
+        .thenReturn(Optional.of(new User()));
+
     Principal principal = new UsernamePasswordAuthenticationToken(
         "test@test.com", null);
 
