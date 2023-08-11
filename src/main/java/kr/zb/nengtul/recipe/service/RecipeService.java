@@ -112,9 +112,7 @@ public class RecipeService {
                 RecipeGetDetailDto.fromRecipeDocument(recipeDocument);
 
         User user = userRepository.findById(recipeDocument.getUserId())
-                .orElseGet(() -> User.builder()
-                    .profileImageUrl("")
-                    .nickname("냉장고를털어라").build());
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         recipeGetDetailDto.setUserProfileUrl(user.getProfileImageUrl());
         recipeGetDetailDto.setPoint(user.getPoint());
@@ -201,9 +199,7 @@ public class RecipeService {
                 RecipeGetListDto.fromRecipeDocument(recipeDocument);
 
         User user = userRepository.findById(recipeDocument.getUserId())
-                .orElseGet(() -> User.builder()
-                        .nickname("냉장고를털어라")
-                        .build());
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         Long likeCount = likesRepository.countByRecipeId(recipeDocument.getId());
 

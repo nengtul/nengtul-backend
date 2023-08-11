@@ -167,6 +167,8 @@ class RecipeServiceTest {
 
         when(recipeSearchRepository.findAll(pageable))
                 .thenReturn(new PageImpl<>(recipeDocuments));
+        when(userRepository.findById(any()))
+            .thenReturn(Optional.of(new User()));
 
         //when
         Page<RecipeGetListDto> allRecipe = recipeService.getAllRecipe(pageable);
@@ -198,6 +200,8 @@ class RecipeServiceTest {
 
         when(recipeSearchRepository.findById(any()))
                 .thenReturn(Optional.of(recipeDocument));
+        when(userRepository.findById(any()))
+            .thenReturn(Optional.of(new User()));
 
         //when
         RecipeGetDetailDto recipeDetailById = recipeService.getRecipeDetailById(any());
@@ -227,6 +231,8 @@ class RecipeServiceTest {
 
         when(recipeSearchRepository.findAllByCategory(RecipeCategory.BREAD, pageable))
                 .thenReturn(new PageImpl<>(recipeDocuments));
+        when(userRepository.findById(any()))
+            .thenReturn(Optional.of(new User()));
 
         //when
         Page<RecipeGetListDto> allRecipe =
@@ -246,6 +252,8 @@ class RecipeServiceTest {
 
         when(recipeSearchRepository.findAllByTitle("title", pageable))
                 .thenReturn(new PageImpl<>(recipeDocuments));
+        when(userRepository.findById(any()))
+            .thenReturn(Optional.of(new User()));
 
         //when
         Page<RecipeGetListDto> allRecipe =
@@ -265,6 +273,8 @@ class RecipeServiceTest {
 
         when(recipeSearchRepository.findAllByIngredient("ingredient", pageable))
                 .thenReturn(new PageImpl<>(recipeDocuments));
+        when(userRepository.findById(any()))
+            .thenReturn(Optional.of(new User()));
 
         //when
         Page<RecipeGetListDto> allRecipe =
