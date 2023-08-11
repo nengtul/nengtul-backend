@@ -99,9 +99,7 @@ public class ShareBoardService {
       shareBoardRepository.delete(shareBoard);
     }else{
       throw new CustomException(NO_PERMISSION);
-
     }
-
   }
 
   @Transactional

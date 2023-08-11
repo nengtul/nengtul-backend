@@ -1,15 +1,13 @@
 package kr.zb.nengtul.comment.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,15 +21,11 @@ import kr.zb.nengtul.comment.replycomment.service.ReplyCommentService;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.user.domain.entity.User;
-import kr.zb.nengtul.user.domain.repository.UserRepository;
-import kr.zb.nengtul.user.mailgun.client.MailgunClient;
 import kr.zb.nengtul.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import s3bucket.service.AmazonS3Service;
 
 @DisplayName("댓글 테스트")
 class CommentServiceTest {
@@ -153,7 +147,8 @@ class CommentServiceTest {
 
     // Mock 설정 (Mock setup)
     when(userService.findUserByEmail(userEmail)).thenReturn(user);
-    when(commentRepository.findByIdAndUser(commentId, user)).thenReturn(Optional.of(existingComment));
+    when(commentRepository.findById(commentId)).thenReturn(Optional.of(existingComment));
+    doNothing().when(commentRepository).delete(existingComment);
 
     // when
     commentService.deleteComment(commentId, mockPrincipal(userEmail));
@@ -223,11 +218,6 @@ class CommentServiceTest {
 
 
   private Principal mockPrincipal(String userEmail) {
-    return new Principal() {
-      @Override
-      public String getName() {
-        return userEmail;
-      }
-    };
+    return () -> userEmail;
   }
 }

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
@@ -240,9 +241,11 @@ class ShareBoardServiceTest {
 
     User authorUser = new User();
     authorUser.setEmail(authorEmail);
+    authorUser.setRoles(RoleType.USER);
 
     User otherUser = new User();
     otherUser.setEmail(otherUserEmail);
+    otherUser.setRoles(RoleType.USER);
 
     ShareBoard shareBoard = new ShareBoard();
     shareBoard.setId(shareBoardId);
@@ -253,9 +256,10 @@ class ShareBoardServiceTest {
 
     when(shareBoardRepository.findById(shareBoardId)).thenReturn(Optional.of(shareBoard));
 
-    //when&then
-    assertThrows(CustomException.class, () -> shareBoardService.deleteShareBoard(shareBoardId,
-        new UsernamePasswordAuthenticationToken(otherUserEmail, null)));
+    Principal otherUserPrincipal = () -> otherUserEmail;
+
+    // when & then
+    assertThrows(CustomException.class, () -> shareBoardService.deleteShareBoard(shareBoardId, otherUserPrincipal));
   }
 
   @Test

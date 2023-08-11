@@ -8,13 +8,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import kr.zb.nengtul.comment.domain.entity.Comment;
+import kr.zb.nengtul.comment.domain.respository.CommentRepository;
+import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
+import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
 import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.notice.domain.entity.Notice;
+import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
+import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
+import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
+import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
+import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
 import kr.zb.nengtul.user.domain.dto.UserPasswordChangeDto;
@@ -27,6 +40,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 import s3bucket.service.AmazonS3Service;
 
 @DisplayName("회원 테스트")
@@ -34,20 +48,32 @@ class UserServiceTest {
 
   private UserService userService;
   private UserRepository userRepository;
+  private RecipeSearchRepository recipeSearchRepository;
+  private NoticeRepository noticeRepository;
+  private ReplyCommentRepository replyCommentRepository;
+  private CommentRepository commentRepository;
+  private ShareBoardRepository shareBoardRepository;
   private PasswordEncoder passwordEncoder;
   private MailgunClient mailgunClient;
+  private AmazonS3Service amazonS3Service;
 
   @BeforeEach
   void setUp() {
     // Mock 객체 초기화
     userRepository = mock(UserRepository.class);
-    AmazonS3Service amazonS3Service = mock(AmazonS3Service.class);
+    amazonS3Service = mock(AmazonS3Service.class);
     mailgunClient = mock(MailgunClient.class);
-    userService = mock(UserService.class);
     passwordEncoder = mock(PasswordEncoder.class);
+    recipeSearchRepository = mock(RecipeSearchRepository.class);
+    noticeRepository = mock(NoticeRepository.class);
+    replyCommentRepository = mock(ReplyCommentRepository.class);
+    commentRepository = mock(CommentRepository.class);
+    shareBoardRepository = mock(ShareBoardRepository.class);
 
     userService = new UserService(
-        userRepository, passwordEncoder, mailgunClient, amazonS3Service);
+        recipeSearchRepository, noticeRepository, replyCommentRepository, shareBoardRepository,
+        commentRepository, userRepository, passwordEncoder, mailgunClient, amazonS3Service);
+    ReflectionTestUtils.setField(userService, "quitId", "quituser@example.com");
   }
 
   @Test
@@ -188,21 +214,41 @@ class UserServiceTest {
   @DisplayName("회원 탈퇴 성공")
   void quitUser_SUCCESS() {
     // given
-    String email = "aa@aa.aa";
-    User user = User.builder()
-        .email(email)
-        .build();
+    String userEmail = "user@example.com";
+    User quittingUser = new User();
+    quittingUser.setEmail(userEmail);
+    quittingUser.setId(1L);
+    quittingUser.setCommentList(new ArrayList<>());
+    quittingUser.setReplyCommentList(new ArrayList<>());
+    quittingUser.setShareBoardList(new ArrayList<>());
+    quittingUser.setNoticeList(new ArrayList<>());
+
+    String quitUserEmail = "quituser@example.com";
+    User quitUser = new User();
+    quitUser.setEmail(quitUserEmail);
+    quitUser.setId(2L);
+    quitUser.setCommentList(new ArrayList<>());
+    quitUser.setReplyCommentList(new ArrayList<>());
+    quitUser.setShareBoardList(new ArrayList<>());
+    quitUser.setNoticeList(new ArrayList<>());
 
     Principal principal = mock(Principal.class);
-    when(principal.getName()).thenReturn(email);
-    when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+    when(principal.getName()).thenReturn(userEmail);
+
+    when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(quittingUser));
+    when(userRepository.findByEmail(quitUserEmail)).thenReturn(Optional.of(quitUser));
 
     // when
     userService.quitUser(principal);
 
     // then
-    verify(userRepository).deleteById(user.getId());
+    verify(commentRepository, times(quittingUser.getCommentList().size())).save(any(Comment.class));
+    verify(replyCommentRepository, times(quittingUser.getReplyCommentList().size())).save(any(ReplyComment.class));
+    verify(shareBoardRepository, times(quittingUser.getShareBoardList().size())).save(any(ShareBoard.class));
+    verify(noticeRepository, times(quittingUser.getNoticeList().size())).save(any(Notice.class));
+    verify(userRepository).deleteById(quittingUser.getId());
   }
+
 
   @Test
   @DisplayName("회원 탈퇴 실패 - 사용자를 찾을 수 없음")
