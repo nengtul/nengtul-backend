@@ -1,6 +1,7 @@
 package kr.zb.nengtul.comment.service;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_COMMENT;
+import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import java.util.List;
@@ -10,6 +11,7 @@ import kr.zb.nengtul.comment.domain.dto.CommentReqDto;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.service.ReplyCommentService;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
@@ -56,9 +58,13 @@ public class CommentService {
   @Transactional
   public void deleteComment(Long commentId, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
-    Comment comment = commentRepository.findByIdAndUser(commentId, user)
+    Comment comment = commentRepository.findById(commentId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
-    commentRepository.delete(comment);
+    if (user.getRoles().equals(RoleType.ADMIN) || user.equals(comment.getUser())) {
+      commentRepository.delete(comment);
+    } else {
+      throw new CustomException(NO_PERMISSION);
+    }
   }
 
   public List<CommentGetDto> findAllCommentByRecipeId(String recipeId) {

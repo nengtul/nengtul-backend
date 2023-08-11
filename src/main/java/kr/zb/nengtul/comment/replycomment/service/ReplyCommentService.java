@@ -13,6 +13,7 @@ import kr.zb.nengtul.comment.replycomment.domain.dto.ReplyCommentGetDto;
 import kr.zb.nengtul.comment.replycomment.domain.dto.ReplyCommentReqDto;
 import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.service.UserService;
@@ -64,10 +65,11 @@ public class ReplyCommentService {
     User user = userService.findUserByEmail(principal.getName());
     ReplyComment replyComment = replyCommentRepository.findByIdAndCommentId(
         replyCommentId, commentId).orElseThrow(() -> new CustomException(NOT_FOUND_REPLY_COMMENT));
-    if (!user.equals(replyComment.getUser())) {
+    if (user.equals(replyComment.getUser()) || user.getRoles().equals(RoleType.ADMIN)) {
+      replyCommentRepository.delete(replyComment);
+    } else {
       throw new CustomException(NO_PERMISSION);
     }
-    replyCommentRepository.delete(replyComment);
   }
 
   public List<ReplyCommentGetDto> getReplyCommentByComment(Long commentId) {
