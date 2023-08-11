@@ -132,6 +132,12 @@ class LikesServiceTest {
     when(recipeSearchRepository.findById(any()))
         .thenReturn(Optional.of(recipeDocument));
 
+    when(userRepository.findById(any()))
+        .thenReturn(Optional.of(User.builder().nickname("테스트 닉네임").build()));
+
+    when(likesRepository.countByRecipeId(any()))
+        .thenReturn(50L);
+
     Principal principal = new UsernamePasswordAuthenticationToken(
         "test@test.com", null);
 
@@ -144,6 +150,8 @@ class LikesServiceTest {
     assertEquals(likesDto.getTitle(), recipeDocument.getTitle());
     assertEquals(likesDto.getThumbnailUrl(), recipeDocument.getThumbnailUrl());
     assertEquals(likesDto.getRecipeId(), recipeDocument.getId());
+    assertEquals(likesDto.getRecipeUserNickName(), "테스트 닉네임");
+    assertEquals(likesDto.getLikeCount(), 50);
   }
 
   @Test
