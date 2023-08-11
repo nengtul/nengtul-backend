@@ -215,4 +215,39 @@ public class User extends BaseTimeEntity {
   public boolean isEmailVerifiedYn() {
     return emailVerifiedYn;
   }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setNoticeList(List<Notice> noticeList) {
+    this.noticeList = noticeList;
+  }
+
+  public void setShareBoardList(
+      List<ShareBoard> shareBoardList) {
+    this.shareBoardList = shareBoardList;
+  }
+
+  public void setReplyCommentList(
+      List<ReplyComment> replyCommentList) {
+    this.replyCommentList = replyCommentList;
+  }
+
+  public void setCommentList(List<Comment> commentList) {
+    this.commentList = commentList;
+  }
+
+  public void setLikesList(List<Likes> likesList) {
+    this.likesList = likesList;
+  }
+
+  public void setFavoriteList(List<Favorite> favoriteList) {
+    this.favoriteList = favoriteList;
+  }
+
+  public void setSavedRecipeList(
+      List<SavedRecipe> savedRecipeList) {
+    this.savedRecipeList = savedRecipeList;
+  }
 }
