@@ -277,7 +277,7 @@ public class UserService {
 
 
   public String getEmailByAccessor(SimpMessageHeaderAccessor accessor) {
-    if (accessor.getSessionAttributes() == null) {
+    if (accessor.getSessionAttributes().get("user") == null) {
       throw new CustomException(ErrorCode.NO_PERMISSION);
     }
     return (String) Objects.requireNonNull(accessor.getSessionAttributes())
