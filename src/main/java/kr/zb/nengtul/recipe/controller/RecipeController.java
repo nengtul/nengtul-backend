@@ -39,6 +39,13 @@ public class RecipeController {
         return ResponseEntity.ok(null);
     }
 
+    @Operation(summary = "내가 작성한 레시피 조회", description = "토큰을 통해 유저 여부 확인 후 조회합니다.")
+    @GetMapping("/user")
+    ResponseEntity<Page<RecipeGetListDto>> getAllMyRecipe(Principal principal, Pageable pageable) {
+
+        return ResponseEntity.ok(recipeService.getAllMyRecipe(principal, pageable));
+    }
+
     @Operation(summary = "레시피 모두 조회", description = "토큰을 통해 유저 여부 확인 후 조회합니다.")
     @GetMapping
     ResponseEntity<Page<RecipeGetListDto>> getAllRecipe(Pageable pageable) {
