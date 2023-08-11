@@ -51,6 +51,7 @@ public enum ErrorCode {
   NOT_NULL_CONTENT(HttpStatus.BAD_REQUEST, "내용을 입력해 주세요."),
   NO_CONTENT(HttpStatus.NO_CONTENT, "일치하는 내용이 없습니다."),
   NO_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+  NOT_EXIST_USER_ATTRIBUTE_IN_WEBSOCKET_SESSION(HttpStatus.NO_CONTENT, "웹소켓 세션에 유저값이 없습니다."),
   INVALID_TOKEN(HttpStatus.FORBIDDEN, "만료된 토큰입니다."),
   NOT_VERIFY_EMAIL(HttpStatus.FORBIDDEN, "이메일 인증을 하지 않아 작성 권한이 없습니다."),
   //댓글
