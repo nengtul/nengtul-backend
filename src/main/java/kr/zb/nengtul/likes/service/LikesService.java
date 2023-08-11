@@ -69,12 +69,17 @@ public class LikesService {
                   .thumbnailUrl("")
                   .build());
 
+          User recipeUser = userRepository.findById(recipeDocument.getUserId())
+              .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
           return LikesDto.builder()
               .id(likes.getId())
               .createdAt(likes.getCreatedAt())
               .recipeId(recipeDocument.getId())
               .title(recipeDocument.getTitle())
               .thumbnailUrl(recipeDocument.getThumbnailUrl())
+              .likeCount(likesRepository.countByRecipeId(recipeDocument.getId()))
+              .recipeUserNickName(recipeUser.getNickname())
               .build();
         });
   }

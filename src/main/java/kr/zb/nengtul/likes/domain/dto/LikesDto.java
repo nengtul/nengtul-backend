@@ -16,6 +16,10 @@ public class LikesDto {
 
   private String thumbnailUrl;
 
+  private String recipeUserNickName;
+
+  private Long likeCount;
+
   private LocalDateTime createdAt;
 
 }
