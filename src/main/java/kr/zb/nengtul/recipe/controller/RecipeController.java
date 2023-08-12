@@ -39,28 +39,29 @@ public class RecipeController {
         return ResponseEntity.ok(null);
     }
 
-    @Operation(summary = "내가 작성한 레시피 조회", description = "토큰을 통해 유저 여부 확인 후 조회합니다.")
-    @GetMapping("/user")
-    ResponseEntity<Page<RecipeGetListDto>> getAllMyRecipe(Principal principal, Pageable pageable) {
+    @Operation(summary = "레시피 유저로 모두 조회")
+    @GetMapping("/user/{userId}")
+    ResponseEntity<Page<RecipeGetListDto>> getAllRecipeByUserId(@PathVariable Long userId, Pageable pageable) {
 
-        return ResponseEntity.ok(recipeService.getAllMyRecipe(principal, pageable));
+        return ResponseEntity.ok(recipeService.getAllRecipeByUserId(userId, pageable));
     }
 
-    @Operation(summary = "레시피 모두 조회", description = "토큰을 통해 유저 여부 확인 후 조회합니다.")
+    @Operation(summary = "레시피 모두 조회")
     @GetMapping
     ResponseEntity<Page<RecipeGetListDto>> getAllRecipe(Pageable pageable) {
 
         return ResponseEntity.ok(recipeService.getAllRecipe(pageable));
     }
 
-    @Operation(summary = "레시피 상세 조회", description = "토큰을 통해 유저 여부 확인 후 RecipeId를 받아 레시피 상세를 조회합니다.")
+    @Operation(summary = "레시피 상세 조회")
     @GetMapping("/detail/{recipeId}")
-    ResponseEntity<RecipeGetDetailDto> getRecipeById(@PathVariable String recipeId) {
+    ResponseEntity<RecipeGetDetailDto> getRecipeById(@PathVariable String recipeId,
+        Principal principal) {
 
-        return ResponseEntity.ok(recipeService.getRecipeDetailById(recipeId));
+        return ResponseEntity.ok(recipeService.getRecipeDetailById(recipeId, principal));
     }
 
-    @Operation(summary = "레시피 카테고리별 조회", description = "토큰을 통해 유저 여부 확인 후 카테고리별로 조회합니다.")
+    @Operation(summary = "레시피 카테고리별 조회")
     @GetMapping("/category/{category}")
     ResponseEntity<Page<RecipeGetListDto>> getRecipeByCategory(@PathVariable RecipeCategory category,
                                                                Pageable pageable) {
@@ -68,7 +69,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.getRecipeByCategory(category, pageable));
     }
 
-    @Operation(summary = "레시피 제목 조회", description = "토큰을 통해 유저 여부 확인 후 제목으로 조회합니다.")
+    @Operation(summary = "레시피 제목 조회")
     @GetMapping("/title/{title}")
     ResponseEntity<Page<RecipeGetListDto>> getRecipeByTitle(@PathVariable String title,
                                                             Pageable pageable) {
@@ -76,7 +77,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.getRecipeByTitle(title, pageable));
     }
 
-    @Operation(summary = "레시피 재료 조회", description = "토큰을 통해 유저 여부 확인 후 재료로 조회합니다.")
+    @Operation(summary = "레시피 재료 조회")
     @GetMapping("/ingredient/{ingredient}")
     ResponseEntity<Page<RecipeGetListDto>> getRecipeByIngredient(@PathVariable String ingredient,
                                                                  Pageable pageable) {

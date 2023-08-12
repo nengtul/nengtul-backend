@@ -1,7 +1,9 @@
 package kr.zb.nengtul.recipe.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyString;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
+import kr.zb.nengtul.likes.domain.entity.Likes;
 import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.recipe.domain.constants.RecipeCategory;
 import kr.zb.nengtul.recipe.domain.dto.RecipeAddDto;
@@ -197,8 +200,8 @@ class RecipeServiceTest {
   }
 
   @Test
-  @DisplayName("레시피 상세 내역 가져오기")
-  void getRecipeDetailById() {
+  @DisplayName("레시피 상세 내역 가져오기 - 좋아요를 하지 않은 경우")
+  void getRecipeDetailById_UnLikes() {
     //given
     RecipeDocument recipeDocument = RecipeDocument.builder()
         .id("userId1")
@@ -220,9 +223,13 @@ class RecipeServiceTest {
         .thenReturn(Optional.of(recipeDocument));
     when(userRepository.findById(any()))
         .thenReturn(Optional.of(new User()));
+    when(userRepository.findByEmail(any()))
+        .thenReturn(Optional.of(new User()));
+
+    Principal principal = new UsernamePasswordAuthenticationToken("", "");
 
     //when
-    RecipeGetDetailDto recipeDetailById = recipeService.getRecipeDetailById(any());
+    RecipeGetDetailDto recipeDetailById = recipeService.getRecipeDetailById(any(), principal);
 
     //then
     assertEquals(recipeDetailById.getId(), recipeDocument.getId());
@@ -239,6 +246,59 @@ class RecipeServiceTest {
     assertEquals(recipeDetailById.getCreatedAt(), recipeDocument.getCreatedAt());
     assertEquals(recipeDetailById.getModifiedAt(), recipeDocument.getModifiedAt());
     assertEquals(recipeDetailById.getCategory(), recipeDocument.getCategory().getKorean());
+    assertFalse(recipeDetailById.isLikes());
+  }
+
+  @Test
+  @DisplayName("레시피 상세 내역 가져오기 - 좋아요를 한 경우")
+  void getRecipeDetailById_Likes() {
+    //given
+    RecipeDocument recipeDocument = RecipeDocument.builder()
+        .id("userId1")
+        .userId(1L)
+        .title("테스트 타이틀 1")
+        .intro("테스트 인트로 1")
+        .ingredient("재료1, 재료2, 재료3")
+        .cookingStep("테스트 쿠킹 스텝")
+        .imageUrl("testimageurl1")
+        .cookingTime("30분")
+        .serving("1인분")
+        .viewCount(0L)
+        .createdAt(LocalDateTime.now())
+        .modifiedAt(LocalDateTime.now())
+        .category(RecipeCategory.BREAD)
+        .build();
+
+    when(recipeSearchRepository.findById(any()))
+        .thenReturn(Optional.of(recipeDocument));
+    when(userRepository.findById(any()))
+        .thenReturn(Optional.of(new User()));
+    when(userRepository.findByEmail(any()))
+        .thenReturn(Optional.of(new User()));
+    when(likesRepository.findByUserIdAndRecipeId(any(),any()))
+        .thenReturn(Optional.of(new Likes()));
+
+    Principal principal = new UsernamePasswordAuthenticationToken("", "");
+
+    //when
+    RecipeGetDetailDto recipeDetailById = recipeService.getRecipeDetailById(any(), principal);
+
+    //then
+    assertEquals(recipeDetailById.getId(), recipeDocument.getId());
+    assertEquals(recipeDetailById.getUserId(), recipeDocument.getUserId());
+    assertEquals(recipeDetailById.getTitle(), recipeDocument.getTitle());
+    assertEquals(recipeDetailById.getIntro(), recipeDocument.getIntro());
+    assertEquals(recipeDetailById.getIngredient(), recipeDocument.getIngredient());
+    assertEquals(recipeDetailById.getCookingStep(), recipeDocument.getCookingStep());
+    assertEquals(recipeDetailById.getImageUrl(), recipeDocument.getImageUrl());
+    assertEquals(recipeDetailById.getCookingTime(), recipeDocument.getCookingTime());
+    assertEquals(recipeDetailById.getServing(), recipeDocument.getServing());
+    assertEquals(recipeDetailById.getViewCount(), recipeDocument.getViewCount());
+    assertEquals(recipeDetailById.getViewCount(), 1L);
+    assertEquals(recipeDetailById.getCreatedAt(), recipeDocument.getCreatedAt());
+    assertEquals(recipeDetailById.getModifiedAt(), recipeDocument.getModifiedAt());
+    assertEquals(recipeDetailById.getCategory(), recipeDocument.getCategory().getKorean());
+    assertTrue(recipeDetailById.isLikes());
   }
 
   @Test
@@ -472,11 +532,9 @@ class RecipeServiceTest {
     when(recipeSearchRepository.findAllByUserId(any(), any()))
         .thenReturn(new PageImpl<>(recipeDocuments));
 
-    Principal principal = new UsernamePasswordAuthenticationToken("", "");
-
     //when
     Page<RecipeGetListDto> allMyRecipe =
-        recipeService.getAllMyRecipe(principal, Pageable.ofSize(5));
+        recipeService.getAllRecipeByUserId(1L, Pageable.ofSize(5));
 
     RecipeDocument recipeDocument = recipeDocuments.get(0);
     RecipeGetListDto recipeGetListDto = allMyRecipe.getContent().get(0);

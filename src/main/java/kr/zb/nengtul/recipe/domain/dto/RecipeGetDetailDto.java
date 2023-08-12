@@ -44,6 +44,8 @@ public class RecipeGetDetailDto {
 
     private int point;
 
+    private boolean isLikes;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
