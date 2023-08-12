@@ -18,6 +18,6 @@ public interface ShareBoardRepository extends JpaRepository<ShareBoard, Long> {
 
   Optional<ShareBoard> findByIdAndUser(Long id, User user);
 
-  int countByUserId(Long userId);
+  int countByUserIdAndClosed(Long userId, boolean closed);
 
 }

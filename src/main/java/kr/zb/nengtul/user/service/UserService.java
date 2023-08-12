@@ -304,7 +304,7 @@ public class UserService {
         .point(user.getPoint())
         .myRecipe(recipeSearchRepository.countByUserId(user.getId()))
         .likeRecipe(likesRepository.countByUserId(user.getId()))
-        .shareList(shareBoardRepository.countByUserId(user.getId()))
+        .shareList(shareBoardRepository.countByUserIdAndClosed(user.getId(), false)) //거래중인 게시물 개수만 확인
         .build();
   }
 
