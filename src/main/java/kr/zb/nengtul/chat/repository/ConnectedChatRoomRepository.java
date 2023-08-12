@@ -14,6 +14,4 @@ public interface ConnectedChatRoomRepository extends JpaRepository<ConnectedChat
     Optional<ChatRoom> findChatRoomByUsersAndShareBoard(User user1, User user2, Long shareBoardId);
 
     List<ConnectedChatRoom> findByChatRoomRoomId(String roomId);
-
-    void deleteAllByChatRoom(ChatRoom chatRoom);
 }
