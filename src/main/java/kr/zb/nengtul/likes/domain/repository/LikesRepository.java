@@ -15,4 +15,5 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
   Optional<Likes> findByUserIdAndRecipeId(Long id, String recipeId);
 
   Long countByRecipeId(String recipeId);
+  int countByUserId(Long userId);
 }

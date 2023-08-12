@@ -19,4 +19,5 @@ public interface RecipeSearchRepository extends ElasticsearchRepository<RecipeDo
     Page<RecipeDocument> findAllByIngredient(String ingredient, Pageable pageable);
     List<RecipeDocument> findAllByUserId(Long userId);
     void delete(RecipeDocument recipeDocument);
+    int countByUserId(Long userId);
 }

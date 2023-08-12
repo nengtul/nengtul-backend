@@ -89,7 +89,7 @@ public class UserController {
   @GetMapping("/detail")
   public ResponseEntity<UserDetailDto> getUserDetail(Principal principal) {
     return ResponseEntity.ok(
-        UserDetailDto.buildUserDetailDto(userService.findUserByEmail(principal.getName())));
+        userService.buildUserDetailDto(userService.findUserByEmail(principal.getName())));
   }
 
   //회원 탈퇴(상세보기 페이지에서 진행)

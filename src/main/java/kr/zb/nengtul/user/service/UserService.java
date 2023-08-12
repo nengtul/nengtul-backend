@@ -18,12 +18,14 @@ import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
+import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.notice.domain.entity.Notice;
 import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
+import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserFindPasswordDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
@@ -48,6 +50,8 @@ import s3bucket.service.AmazonS3Service;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+
+  private final LikesRepository likesRepository;
 
   private final RecipeSearchRepository recipeSearchRepository;
 
@@ -282,6 +286,26 @@ public class UserService {
     }
     return (String) Objects.requireNonNull(accessor.getSessionAttributes())
             .get("user");
+  }
+
+  @Transactional
+  public UserDetailDto buildUserDetailDto(User user) {
+    return UserDetailDto.builder()
+        .id(user.getId())
+        .name(user.getName())
+        .nickname(user.getNickname())
+        .phoneNumber(user.getPhoneNumber())
+        .profileImageUrl(user.getProfileImageUrl())
+        .providerTYpe(user.getProviderType())
+        .address(user.getAddress())
+        .addressDetail(user.getAddressDetail())
+        .roles(user.getRoles())
+        .emailVerifiedYn(user.isEmailVerifiedYn())
+        .point(user.getPoint())
+        .myRecipe(recipeSearchRepository.countByUserId(user.getId()))
+        .likeRecipe(likesRepository.countByUserId(user.getId()))
+        .shareList(shareBoardRepository.countByUserId(user.getId()))
+        .build();
   }
 
 }
