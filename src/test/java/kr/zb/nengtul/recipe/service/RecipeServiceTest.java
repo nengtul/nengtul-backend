@@ -476,7 +476,7 @@ class RecipeServiceTest {
 
     //when
     Page<RecipeGetListDto> allMyRecipe =
-        recipeService.getAllMyRecipe(principal, Pageable.ofSize(5));
+        recipeService.getAllRecipeByUserId(1L, Pageable.ofSize(5));
 
     RecipeDocument recipeDocument = recipeDocuments.get(0);
     RecipeGetListDto recipeGetListDto = allMyRecipe.getContent().get(0);

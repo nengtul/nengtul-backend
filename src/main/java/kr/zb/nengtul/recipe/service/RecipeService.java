@@ -201,9 +201,9 @@ public class RecipeService {
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
   }
 
-  public Page<RecipeGetListDto> getAllMyRecipe(Principal principal, Pageable pageable) {
+  public Page<RecipeGetListDto> getAllRecipeByUserId(Long userId, Pageable pageable) {
 
-    User user = userRepository.findByEmail(principal.getName())
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
     return recipeSearchRepository.findAllByUserId(user.getId(), pageable)
