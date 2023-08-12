@@ -75,7 +75,7 @@ public class RecipeService {
         .map(this::settingRecipeGetListDto);
   }
 
-  public RecipeGetDetailDto getRecipeDetailById(String recipeId) {
+  public RecipeGetDetailDto getRecipeDetailById(String recipeId, Principal principal) {
 
     RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
@@ -86,12 +86,22 @@ public class RecipeService {
     RecipeGetDetailDto recipeGetDetailDto =
         RecipeGetDetailDto.fromRecipeDocument(recipeDocument);
 
-    User user = userRepository.findById(recipeDocument.getUserId())
+    User recipeUser = userRepository.findById(recipeDocument.getUserId())
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-    recipeGetDetailDto.setUserProfileUrl(user.getProfileImageUrl());
-    recipeGetDetailDto.setPoint(user.getPoint());
-    recipeGetDetailDto.setNickName(user.getNickname());
+    recipeGetDetailDto.setUserProfileUrl(recipeUser.getProfileImageUrl());
+    recipeGetDetailDto.setPoint(recipeUser.getPoint());
+    recipeGetDetailDto.setNickName(recipeUser.getNickname());
+
+    if (principal != null) {
+
+      User user = userRepository.findByEmail(principal.getName())
+              .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+      likesRepository.findByUserIdAndRecipeId(user.getId(), recipeId)
+          .ifPresent(likes -> recipeGetDetailDto.setLikes(true));
+
+    }
 
     return recipeGetDetailDto;
   }

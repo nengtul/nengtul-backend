@@ -55,9 +55,10 @@ public class RecipeController {
 
     @Operation(summary = "레시피 상세 조회")
     @GetMapping("/detail/{recipeId}")
-    ResponseEntity<RecipeGetDetailDto> getRecipeById(@PathVariable String recipeId) {
+    ResponseEntity<RecipeGetDetailDto> getRecipeById(@PathVariable String recipeId,
+        Principal principal) {
 
-        return ResponseEntity.ok(recipeService.getRecipeDetailById(recipeId));
+        return ResponseEntity.ok(recipeService.getRecipeDetailById(recipeId, principal));
     }
 
     @Operation(summary = "레시피 카테고리별 조회")
