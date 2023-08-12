@@ -185,9 +185,15 @@ class RecipeServiceTest {
     //when
     Page<RecipeGetListDto> allRecipe = recipeService.getAllRecipe(pageable);
 
+    RecipeDocument recipeDocument = recipeDocuments.get(0);
+    RecipeGetListDto recipeGetListDto = allRecipe.getContent().get(0);
+
     //then
     assertEquals(recipeDocuments.size(), allRecipe.getContent().size());
     assertEquals(allRecipe.getContent().get(0).getClass(), RecipeGetListDto.class);
+    assertEquals(recipeDocument.getTitle(), recipeGetListDto.getTitle());
+    assertEquals(recipeDocument.getViewCount(), recipeGetListDto.getViewCount());
+    assertEquals(recipeDocument.getThumbnailUrl(), recipeGetListDto.getThumbnailUrl());
   }
 
   @Test
@@ -448,10 +454,39 @@ class RecipeServiceTest {
 
     //when
     CustomException customException = assertThrows(CustomException.class,
-        () ->recipeService.deleteRecipe(principal, recipeDocument.getId()));
+        () -> recipeService.deleteRecipe(principal, recipeDocument.getId()));
 
     //then
     assertEquals(ErrorCode.NO_PERMISSION, customException.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("내가 작성한 레시피 전체 조회")
+  void getAllMyRecipe() {
+    //given
+    when(userRepository.findByEmail(any()))
+        .thenReturn(Optional.of(new User()));
+    when(userRepository.findById(any()))
+        .thenReturn(Optional.of(new User()));
+
+    when(recipeSearchRepository.findAllByUserId(any(), any()))
+        .thenReturn(new PageImpl<>(recipeDocuments));
+
+    Principal principal = new UsernamePasswordAuthenticationToken("", "");
+
+    //when
+    Page<RecipeGetListDto> allMyRecipe =
+        recipeService.getAllMyRecipe(principal, Pageable.ofSize(5));
+
+    RecipeDocument recipeDocument = recipeDocuments.get(0);
+    RecipeGetListDto recipeGetListDto = allMyRecipe.getContent().get(0);
+
+    //then
+    assertEquals(recipeDocuments.size(), allMyRecipe.getContent().size());
+    assertEquals(allMyRecipe.getContent().get(0).getClass(), RecipeGetListDto.class);
+    assertEquals(recipeDocument.getTitle(), recipeGetListDto.getTitle());
+    assertEquals(recipeDocument.getViewCount(), recipeGetListDto.getViewCount());
+    assertEquals(recipeDocument.getThumbnailUrl(), recipeGetListDto.getThumbnailUrl());
   }
 
 }

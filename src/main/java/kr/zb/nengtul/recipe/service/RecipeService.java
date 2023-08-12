@@ -196,5 +196,19 @@ public class RecipeService {
     }
   }
 
+  public RecipeDocument findById(String recipeId) {
+    return recipeSearchRepository.findById(recipeId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
+  }
+
+  public Page<RecipeGetListDto> getAllMyRecipe(Principal principal, Pageable pageable) {
+
+    User user = userRepository.findByEmail(principal.getName())
+        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+    return recipeSearchRepository.findAllByUserId(user.getId(), pageable)
+        .map(this::settingRecipeGetListDto);
+
+  }
 
 }

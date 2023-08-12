@@ -20,6 +20,7 @@ public enum ErrorCode {
   ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증이 완료된 사용자입니다."),
   WRONG_VERIFY_CODE(HttpStatus.BAD_REQUEST, "잘못된 인증 시도입니다."),
   EXPIRED_CODE(HttpStatus.BAD_REQUEST, "인증시간이 만료되었습니다."),
+  NOT_OWNER_OF_THE_POST(HttpStatus.FORBIDDEN, "게시물 소유자가 아닙니다."),
   CHECK_ID_AND_PW(HttpStatus.NOT_FOUND, "이메일 혹은 비밀번호를 확인하세요."),
   CHECK_SOCIAL_SERVER(HttpStatus.NOT_FOUND, "소셜로그인에 실패하였습니다. 서버를 확인 하세요."),
   SHORT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 8자 이상이여야 합니다."),
@@ -51,6 +52,7 @@ public enum ErrorCode {
   NOT_NULL_CONTENT(HttpStatus.BAD_REQUEST, "내용을 입력해 주세요."),
   NO_CONTENT(HttpStatus.NO_CONTENT, "일치하는 내용이 없습니다."),
   NO_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+  NOT_EXIST_USER_ATTRIBUTE_IN_WEBSOCKET_SESSION(HttpStatus.NO_CONTENT, "웹소켓 세션에 유저값이 없습니다."),
   INVALID_TOKEN(HttpStatus.FORBIDDEN, "만료된 토큰입니다."),
   NOT_VERIFY_EMAIL(HttpStatus.FORBIDDEN, "이메일 인증을 하지 않아 작성 권한이 없습니다."),
   //댓글
