@@ -15,19 +15,19 @@ import static org.mockito.Mockito.when;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
 import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.notice.domain.entity.Notice;
 import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
-import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
 import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
+import kr.zb.nengtul.user.domain.dto.UserDetailDto;
 import kr.zb.nengtul.user.domain.dto.UserFindEmailReqDto;
 import kr.zb.nengtul.user.domain.dto.UserJoinDto;
 import kr.zb.nengtul.user.domain.dto.UserPasswordChangeDto;
@@ -50,6 +50,7 @@ class UserServiceTest {
   private UserRepository userRepository;
   private RecipeSearchRepository recipeSearchRepository;
   private NoticeRepository noticeRepository;
+  private LikesRepository likesRepository;
   private ReplyCommentRepository replyCommentRepository;
   private CommentRepository commentRepository;
   private ShareBoardRepository shareBoardRepository;
@@ -69,8 +70,9 @@ class UserServiceTest {
     replyCommentRepository = mock(ReplyCommentRepository.class);
     commentRepository = mock(CommentRepository.class);
     shareBoardRepository = mock(ShareBoardRepository.class);
+    likesRepository = mock(LikesRepository.class);
 
-    userService = new UserService(
+    userService = new UserService(likesRepository,
         recipeSearchRepository, noticeRepository, replyCommentRepository, shareBoardRepository,
         commentRepository, userRepository, passwordEncoder, mailgunClient, amazonS3Service);
     ReflectionTestUtils.setField(userService, "quitId", "quituser@example.com");
@@ -243,8 +245,10 @@ class UserServiceTest {
 
     // then
     verify(commentRepository, times(quittingUser.getCommentList().size())).save(any(Comment.class));
-    verify(replyCommentRepository, times(quittingUser.getReplyCommentList().size())).save(any(ReplyComment.class));
-    verify(shareBoardRepository, times(quittingUser.getShareBoardList().size())).save(any(ShareBoard.class));
+    verify(replyCommentRepository, times(quittingUser.getReplyCommentList().size())).save(
+        any(ReplyComment.class));
+    verify(shareBoardRepository, times(quittingUser.getShareBoardList().size())).save(
+        any(ShareBoard.class));
     verify(noticeRepository, times(quittingUser.getNoticeList().size())).save(any(Notice.class));
     verify(userRepository).deleteById(quittingUser.getId());
   }
@@ -417,4 +421,25 @@ class UserServiceTest {
         () -> userService.changePassword(principal, userPasswordChangeDto));
   }
 
+  @Test
+  @DisplayName("회원 상세 정보 DTO 변환 테스트")
+  void buildUserDetailDto_SUCCESS() {
+    // given
+    User user = new User();
+    user.setId(1L);
+
+    when(recipeSearchRepository.countByUserId(user.getId())).thenReturn(5);
+    when(likesRepository.countByUserId(user.getId())).thenReturn(10);
+    when(shareBoardRepository.countByUserId(user.getId())).thenReturn(3);
+
+    // when
+    UserDetailDto userDetailDto = userService.buildUserDetailDto(user);
+
+    // then
+    assertEquals(user.getId(), userDetailDto.getId());
+    assertEquals(user.getName(), userDetailDto.getName());
+    assertEquals(5, userDetailDto.getMyRecipe());
+    assertEquals(10, userDetailDto.getLikeRecipe());
+    assertEquals(3, userDetailDto.getShareList());
+  }
 }

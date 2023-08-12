@@ -288,7 +288,7 @@ public class UserService {
             .get("user");
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public UserDetailDto buildUserDetailDto(User user) {
     return UserDetailDto.builder()
         .id(user.getId())
