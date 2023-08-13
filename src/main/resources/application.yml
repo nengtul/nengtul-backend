@@ -28,7 +28,7 @@ spring:
     secret-key: ${spring.jwt.secret-key}
 
     access:
-      expiration: 180000 # 1시간(60분) (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h))
+      expiration: 3600000 # 1시간(60분) (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h))
       header: Authorization
 
     refresh:
