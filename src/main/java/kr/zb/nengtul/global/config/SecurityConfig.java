@@ -2,6 +2,7 @@ package kr.zb.nengtul.global.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
 import kr.zb.nengtul.global.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import kr.zb.nengtul.global.handler.LoginFailureHandler;
 import kr.zb.nengtul.global.handler.LoginSuccessHandler;
@@ -48,6 +49,7 @@ public class SecurityConfig {
 
   private final CustomUserDetailService customUserDetailService;
   private final JwtTokenProvider jwtTokenProvider;
+  private final BlacklistTokenRepository blacklistTokenRepository;
   private final UserRepository userRepository;
   private final ObjectMapper objectMapper;
   private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
@@ -173,7 +175,7 @@ public class SecurityConfig {
   @Bean
   public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
     return new JwtAuthenticationProcessingFilter(
-        jwtTokenProvider, userRepository);
+        jwtTokenProvider, userRepository, blacklistTokenRepository);
   }
 
   //cors 설정

@@ -7,6 +7,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
+import kr.zb.nengtul.auth.entity.BlacklistToken;
+import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
+import kr.zb.nengtul.global.util.HeaderUtil;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,15 +37,17 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final UserRepository userRepository;
+  private final BlacklistTokenRepository blacklistTokenRepository;
 
   private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    if (request.getRequestURI().equals(NO_CHECK_URL) || request.getRequestURI().startsWith("/swagger-ui")) {
-      filterChain.doFilter(request, response); // 로그인 요청이 들어오면, 다음 필터 호출
-      return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
+    //로그인 / 블랙리스트 체크
+    if (request.getRequestURI().equals(NO_CHECK_URL) && !isTokenBlacklisted(HeaderUtil.getAccessToken(request))) {
+        filterChain.doFilter(request, response);
+        return;
     }
 
     // 사용자 요청 헤더에서 RefreshToken 추출
@@ -50,7 +55,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         .filter(jwtTokenProvider::isTokenValid)
         .orElse(null);
 
-    if (refreshToken != null) {
+    if (refreshToken != null ) {
       checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
       return; //재발급 하고 인증 처리는 하지 않게 하기위해 바로 return으로 필터 진행 막기
     }
@@ -133,5 +138,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
+  }
+
+  //블랙리스트 토큰 판별
+  private boolean isTokenBlacklisted(String token) {
+    BlacklistToken blacklistToken = blacklistTokenRepository.findByBlacklistToken(token);
+    return blacklistToken != null;
   }
 }
