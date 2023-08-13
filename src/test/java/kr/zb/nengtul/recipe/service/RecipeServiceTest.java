@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import kr.zb.nengtul.favorite.domain.entity.Favorite;
+import kr.zb.nengtul.favorite.domain.repository.FavoriteRepository;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
@@ -55,6 +57,8 @@ class RecipeServiceTest {
 
   private LikesRepository likesRepository;
 
+  private FavoriteRepository favoriteRepository;
+
   private List<RecipeDocument> recipeDocuments;
 
   @BeforeEach
@@ -64,9 +68,10 @@ class RecipeServiceTest {
     amazonS3Service = mock(AmazonS3Service.class);
     userRepository = mock(UserRepository.class);
     likesRepository = mock(LikesRepository.class);
+    favoriteRepository = mock(FavoriteRepository.class);
 
     recipeService = new RecipeService(
-        recipeSearchRepository, userRepository, likesRepository, amazonS3Service);
+        recipeSearchRepository, userRepository, likesRepository, favoriteRepository, amazonS3Service);
 
     recipeDocuments = new ArrayList<>();
 
@@ -200,8 +205,8 @@ class RecipeServiceTest {
   }
 
   @Test
-  @DisplayName("레시피 상세 내역 가져오기 - 좋아요를 하지 않은 경우")
-  void getRecipeDetailById_UnLikes() {
+  @DisplayName("레시피 상세 내역 가져오기 - 좋아요, 즐겨찾기를 하지 않은 경우")
+  void getRecipeDetailById_UnLikes_UnFavorite() {
     //given
     RecipeDocument recipeDocument = RecipeDocument.builder()
         .id("userId1")
@@ -247,11 +252,12 @@ class RecipeServiceTest {
     assertEquals(recipeDetailById.getModifiedAt(), recipeDocument.getModifiedAt());
     assertEquals(recipeDetailById.getCategory(), recipeDocument.getCategory().getKorean());
     assertFalse(recipeDetailById.isLikes());
+    assertFalse(recipeDetailById.isFavorite());
   }
 
   @Test
-  @DisplayName("레시피 상세 내역 가져오기 - 좋아요를 한 경우")
-  void getRecipeDetailById_Likes() {
+  @DisplayName("레시피 상세 내역 가져오기 - 좋아요, 즐겨찾기를 한 경우")
+  void getRecipeDetailById_Likes_Favorite() {
     //given
     RecipeDocument recipeDocument = RecipeDocument.builder()
         .id("userId1")
@@ -277,6 +283,8 @@ class RecipeServiceTest {
         .thenReturn(Optional.of(new User()));
     when(likesRepository.findByUserIdAndRecipeId(any(),any()))
         .thenReturn(Optional.of(new Likes()));
+    when(favoriteRepository.findByUserIdAndPublisherId(any(),any()))
+        .thenReturn(Optional.of(new Favorite()));
 
     Principal principal = new UsernamePasswordAuthenticationToken("", "");
 
@@ -299,6 +307,7 @@ class RecipeServiceTest {
     assertEquals(recipeDetailById.getModifiedAt(), recipeDocument.getModifiedAt());
     assertEquals(recipeDetailById.getCategory(), recipeDocument.getCategory().getKorean());
     assertTrue(recipeDetailById.isLikes());
+    assertTrue(recipeDetailById.isFavorite());
   }
 
   @Test
@@ -521,8 +530,8 @@ class RecipeServiceTest {
   }
 
   @Test
-  @DisplayName("내가 작성한 레시피 전체 조회")
-  void getAllMyRecipe() {
+  @DisplayName("유저 아이디로 레시피 전체 조회")
+  void getAllRecipeByUser() {
     //given
     when(userRepository.findByEmail(any()))
         .thenReturn(Optional.of(new User()));
@@ -533,15 +542,15 @@ class RecipeServiceTest {
         .thenReturn(new PageImpl<>(recipeDocuments));
 
     //when
-    Page<RecipeGetListDto> allMyRecipe =
+    Page<RecipeGetListDto> allRecipeByUserId =
         recipeService.getAllRecipeByUserId(1L, Pageable.ofSize(5));
 
     RecipeDocument recipeDocument = recipeDocuments.get(0);
-    RecipeGetListDto recipeGetListDto = allMyRecipe.getContent().get(0);
+    RecipeGetListDto recipeGetListDto = allRecipeByUserId.getContent().get(0);
 
     //then
-    assertEquals(recipeDocuments.size(), allMyRecipe.getContent().size());
-    assertEquals(allMyRecipe.getContent().get(0).getClass(), RecipeGetListDto.class);
+    assertEquals(recipeDocuments.size(), allRecipeByUserId.getContent().size());
+    assertEquals(allRecipeByUserId.getContent().get(0).getClass(), RecipeGetListDto.class);
     assertEquals(recipeDocument.getTitle(), recipeGetListDto.getTitle());
     assertEquals(recipeDocument.getViewCount(), recipeGetListDto.getViewCount());
     assertEquals(recipeDocument.getThumbnailUrl(), recipeGetListDto.getThumbnailUrl());
