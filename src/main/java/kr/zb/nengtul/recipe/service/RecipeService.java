@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import kr.zb.nengtul.favorite.domain.repository.FavoriteRepository;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
@@ -35,6 +36,8 @@ public class RecipeService {
   private final UserRepository userRepository;
 
   private final LikesRepository likesRepository;
+
+  private final FavoriteRepository favoriteRepository;
 
   private final AmazonS3Service amazonS3Service;
 
@@ -101,6 +104,9 @@ public class RecipeService {
       likesRepository.findByUserIdAndRecipeId(user.getId(), recipeId)
           .ifPresent(likes -> recipeGetDetailDto.setLikes(true));
 
+      favoriteRepository.findByUserIdAndPublisherId(user.getId(), recipeUser.getId())
+          .ifPresent(favorite -> recipeGetDetailDto.setFavorite(true));
+
     }
 
     return recipeGetDetailDto;
@@ -151,6 +157,7 @@ public class RecipeService {
       for (int i = 0; i < imageUrlArr.length; i++) {
         amazonS3Service.updateFile(images.get(i), imageUrlArr[i]);
       }
+
     }
 
     recipeDocument.updateRecipe(recipeUpdateDto);

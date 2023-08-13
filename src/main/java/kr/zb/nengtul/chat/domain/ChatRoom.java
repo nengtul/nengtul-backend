@@ -18,7 +18,9 @@ import jakarta.persistence.NamedSubgraph;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import lombok.AllArgsConstructor;
@@ -40,6 +42,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
                 @NamedAttributeNode(value = "connectedChatRooms", subgraph = "connectedChatRoomsWithUser")
         },
         subgraphs = @NamedSubgraph(name = "connectedChatRoomsWithUser", attributeNodes = @NamedAttributeNode("userId")))
+@NamedEntityGraph(name = "chatRoomWithShareBoardAndConnectedChatRoomsAndChtList",
+        attributeNodes = {
+                @NamedAttributeNode("shareBoard"),
+                @NamedAttributeNode("chatList"),
+                @NamedAttributeNode(value = "connectedChatRooms", subgraph = "connectedChatRoomsWithUser")
+        },
+        subgraphs = @NamedSubgraph(name = "connectedChatRoomsWithUser", attributeNodes = @NamedAttributeNode("userId")))
+
 public class ChatRoom {
 
     @Id
@@ -51,7 +61,7 @@ public class ChatRoom {
 
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
             CascadeType.MERGE})
-    private List<ConnectedChatRoom> connectedChatRooms = new ArrayList<>();
+    private Set<ConnectedChatRoom> connectedChatRooms = new HashSet<>();
 
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
             CascadeType.MERGE})

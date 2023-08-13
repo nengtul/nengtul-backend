@@ -79,7 +79,7 @@ public class ChatRoomService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHATROOM));
     }
 
-    public List<ChatRoom> getChatList(User user) {
+    public List<ChatRoom> getChatRoomList(User user) {
         return chatRoomRepository.findByConnectedChatRoomsUserIdOrderByCreatedAtDesc(user);
     }
 }
