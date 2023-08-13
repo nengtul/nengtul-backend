@@ -1,5 +1,7 @@
 package kr.zb.nengtul;
 
+import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +20,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     "s3bucket", "kr.zb.nengtul"
 })
 public class NengtulApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(NengtulApplication.class, args);
     }

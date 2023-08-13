@@ -103,7 +103,7 @@ public class UserController {
 
   //로그아웃
   @Operation(summary = "로그아웃", description = "사용하던 토큰을 블랙리스트로 등록해 다시 사용할 수 없게 지정합니다.")
-  @DeleteMapping("/logout")
+  @PostMapping("/logout")
   public ResponseEntity<Void> logout(HttpServletRequest request, Principal principal) {
     userService.logout(request,principal);
     return ResponseEntity.ok(null);

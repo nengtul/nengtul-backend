@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Optional;
 import kr.zb.nengtul.auth.entity.BlacklistToken;
 import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
 import kr.zb.nengtul.comment.domain.entity.Comment;
@@ -317,13 +316,8 @@ public class UserService {
 
   @Transactional
   public void logout(HttpServletRequest request, Principal principal) {
+    //헤더에서 토큰 가져옴
     String token = HeaderUtil.getAccessToken(request);
-
-    // 이미 블랙리스트에 등록된 토큰인 경우 삭제하도록 처리
-    BlacklistToken existingToken = blacklistTokenRepository.findByBlacklistToken(token);
-    if (existingToken != null) {
-      blacklistTokenRepository.delete(existingToken);
-    }
 
     // AccessToken을 블랙리스트에 추가
     BlacklistToken blacklistToken = BlacklistToken.builder()
@@ -331,6 +325,8 @@ public class UserService {
         .blacklistToken(token)
         .build();
     blacklistTokenRepository.save(blacklistToken);
+
+    System.out.println(blacklistTokenRepository.count());
   }
 
 }
