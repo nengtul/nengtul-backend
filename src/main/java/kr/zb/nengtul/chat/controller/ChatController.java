@@ -148,9 +148,9 @@ public class ChatController {
     }
 
     @GetMapping("/v1/chat/list")
-    public ResponseEntity<List<ChatRoomDto>> getChatList(Principal principal) {
+    public ResponseEntity<List<ChatRoomDto>> getChatRoomList(Principal principal) {
         User user = userService.findUserByEmail(principal.getName());
-        List<ChatRoom> chatRoomList = chatRoomService.getChatList(user);
+        List<ChatRoom> chatRoomList = chatRoomService.getChatRoomList(user);
 
         return ResponseEntity.ok(chatRoomList.stream().map(ChatRoomDto::fromEntity).toList());
 
