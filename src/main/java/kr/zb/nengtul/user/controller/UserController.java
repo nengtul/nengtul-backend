@@ -3,6 +3,7 @@ package kr.zb.nengtul.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import kr.zb.nengtul.user.domain.dto.UserDetailDto;
@@ -97,6 +98,14 @@ public class UserController {
   @DeleteMapping("/detail")
   public ResponseEntity<Void> quitUser(Principal principal) {
     userService.quitUser(principal);
+    return ResponseEntity.ok(null);
+  }
+
+  //로그아웃
+  @Operation(summary = "로그아웃", description = "사용하던 토큰을 블랙리스트로 등록해 다시 사용할 수 없게 지정합니다.")
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(HttpServletRequest request, Principal principal) {
+    userService.logout(request,principal);
     return ResponseEntity.ok(null);
   }
 

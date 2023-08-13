@@ -9,15 +9,19 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NOT_FOUND_USER;
 import static kr.zb.nengtul.global.exception.ErrorCode.NO_CONTENT;
 import static kr.zb.nengtul.global.exception.ErrorCode.WRONG_VERIFY_CODE;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import kr.zb.nengtul.auth.entity.BlacklistToken;
+import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
+import kr.zb.nengtul.global.util.HeaderUtil;
 import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.notice.domain.entity.Notice;
 import kr.zb.nengtul.notice.domain.repository.NoticeRepository;
@@ -64,6 +68,7 @@ public class UserService {
   private final CommentRepository commentRepository;
 
   private final UserRepository userRepository;
+  private final BlacklistTokenRepository blacklistTokenRepository;
   private final PasswordEncoder passwordEncoder;
   private final MailgunClient mailgunClient;
   private final AmazonS3Service amazonS3Service;
@@ -137,7 +142,7 @@ public class UserService {
       notice.setUser(quitUser);
       noticeRepository.save(notice);
     }
-    for(RecipeDocument recipeDocument : recipeSearchRepository.findAllByUserId(user.getId())){
+    for (RecipeDocument recipeDocument : recipeSearchRepository.findAllByUserId(user.getId())) {
       recipeDocument.setUserId(quitUser.getId());
       recipeSearchRepository.save(recipeDocument);
     }
@@ -285,7 +290,7 @@ public class UserService {
       throw new CustomException(ErrorCode.NOT_EXIST_USER_ATTRIBUTE_IN_WEBSOCKET_SESSION);
     }
     return (String) Objects.requireNonNull(accessor.getSessionAttributes())
-            .get("user");
+        .get("user");
   }
 
   @Transactional(readOnly = true)
@@ -304,8 +309,24 @@ public class UserService {
         .point(user.getPoint())
         .myRecipe(recipeSearchRepository.countByUserId(user.getId()))
         .likeRecipe(likesRepository.countByUserId(user.getId()))
-        .shareList(shareBoardRepository.countByUserIdAndClosed(user.getId(), false)) //거래중인 게시물 개수만 확인
+        .shareList(
+            shareBoardRepository.countByUserIdAndClosed(user.getId(), false)) //거래중인 게시물 개수만 확인
         .build();
+  }
+
+  @Transactional
+  public void logout(HttpServletRequest request, Principal principal) {
+    //헤더에서 토큰 가져옴
+    String token = HeaderUtil.getAccessToken(request);
+
+    // AccessToken을 블랙리스트에 추가
+    BlacklistToken blacklistToken = BlacklistToken.builder()
+        .email(principal.getName())
+        .blacklistToken(token)
+        .build();
+    blacklistTokenRepository.save(blacklistToken);
+
+    System.out.println(blacklistTokenRepository.count());
   }
 
 }
