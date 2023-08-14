@@ -16,10 +16,12 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
+import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
+import kr.zb.nengtul.favorite.domain.repository.FavoriteRepository;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.likes.domain.repository.LikesRepository;
 import kr.zb.nengtul.notice.domain.entity.Notice;
@@ -54,6 +56,8 @@ class UserServiceTest {
   private ReplyCommentRepository replyCommentRepository;
   private CommentRepository commentRepository;
   private ShareBoardRepository shareBoardRepository;
+  private FavoriteRepository favoriteRepository;
+  private BlacklistTokenRepository blacklistTokenRepository;
   private PasswordEncoder passwordEncoder;
   private MailgunClient mailgunClient;
   private AmazonS3Service amazonS3Service;
@@ -71,10 +75,10 @@ class UserServiceTest {
     commentRepository = mock(CommentRepository.class);
     shareBoardRepository = mock(ShareBoardRepository.class);
     likesRepository = mock(LikesRepository.class);
-
+    favoriteRepository=mock(FavoriteRepository.class);
     userService = new UserService(likesRepository,
         recipeSearchRepository, noticeRepository, replyCommentRepository, shareBoardRepository,
-        commentRepository, userRepository, passwordEncoder, mailgunClient, amazonS3Service);
+        commentRepository,favoriteRepository, userRepository,blacklistTokenRepository, passwordEncoder, mailgunClient, amazonS3Service);
     ReflectionTestUtils.setField(userService, "quitId", "quituser@example.com");
   }
 
@@ -430,7 +434,8 @@ class UserServiceTest {
 
     when(recipeSearchRepository.countByUserId(user.getId())).thenReturn(5);
     when(likesRepository.countByUserId(user.getId())).thenReturn(10);
-    when(shareBoardRepository.countByUserId(user.getId())).thenReturn(3);
+    when(shareBoardRepository.countByUserIdAndClosed(user.getId(),false)).thenReturn(3);
+    when(favoriteRepository.countByUserId(user.getId())).thenReturn(3);
 
     // when
     UserDetailDto userDetailDto = userService.buildUserDetailDto(user);
@@ -441,5 +446,6 @@ class UserServiceTest {
     assertEquals(5, userDetailDto.getMyRecipe());
     assertEquals(10, userDetailDto.getLikeRecipe());
     assertEquals(3, userDetailDto.getShareList());
+    assertEquals(3, userDetailDto.getFavoriteList());
   }
 }

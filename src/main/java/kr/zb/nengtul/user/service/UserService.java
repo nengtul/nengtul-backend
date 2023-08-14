@@ -68,7 +68,6 @@ public class UserService {
 
   private final CommentRepository commentRepository;
   private final FavoriteRepository favoriteRepository;
-
   private final UserRepository userRepository;
   private final BlacklistTokenRepository blacklistTokenRepository;
   private final PasswordEncoder passwordEncoder;
