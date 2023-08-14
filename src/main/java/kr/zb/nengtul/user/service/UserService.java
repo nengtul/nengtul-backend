@@ -19,6 +19,7 @@ import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
+import kr.zb.nengtul.favorite.domain.repository.FavoriteRepository;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.global.util.HeaderUtil;
@@ -66,6 +67,7 @@ public class UserService {
   private final ShareBoardRepository shareBoardRepository;
 
   private final CommentRepository commentRepository;
+  private final FavoriteRepository favoriteRepository;
 
   private final UserRepository userRepository;
   private final BlacklistTokenRepository blacklistTokenRepository;
@@ -311,6 +313,7 @@ public class UserService {
         .likeRecipe(likesRepository.countByUserId(user.getId()))
         .shareList(
             shareBoardRepository.countByUserIdAndClosed(user.getId(), false)) //거래중인 게시물 개수만 확인
+        .favoriteList(favoriteRepository.countByUserId(user.getId()))
         .build();
   }
 
