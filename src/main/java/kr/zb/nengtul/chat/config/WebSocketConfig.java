@@ -21,11 +21,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-        registry.addEndpoint("/chat")
+        registry.setErrorHandler(stompErrorHandler).addEndpoint("/chat")
                 .setAllowedOriginPatterns("*");
-        registry.addEndpoint("/chat")
+        registry.setErrorHandler(stompErrorHandler).addEndpoint("/chat")
                 .setAllowedOriginPatterns("*").withSockJS();
-        registry.setErrorHandler(stompErrorHandler);
     }
 
     @Override
