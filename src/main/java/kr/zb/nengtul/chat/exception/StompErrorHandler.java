@@ -22,8 +22,8 @@ public class StompErrorHandler extends StompSubProtocolErrorHandler {
             Message<byte[]> clientMessage,
             Throwable ex) {
 
-        if (CustomException.class.equals(ex.getClass())) {
-            return errorMessage(((CustomException) ex).getErrorCode().getDetail());
+        if (ex instanceof CustomException customException) {
+            return errorMessage(customException.getErrorCode().getDetail());
         }
 
         return super.handleClientMessageProcessingError(clientMessage, ex);
