@@ -1,13 +1,13 @@
 package kr.zb.nengtul;
 
-import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.PostConstruct;
+import java.util.TimeZone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -20,7 +20,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     "s3bucket", "kr.zb.nengtul"
 })
 public class NengtulApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(NengtulApplication.class, args);
-    }
+
+  @PostConstruct
+  void started() {
+    TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(NengtulApplication.class, args);
+  }
 }
