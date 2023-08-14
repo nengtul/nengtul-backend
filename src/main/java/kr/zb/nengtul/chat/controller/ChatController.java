@@ -8,9 +8,11 @@ import kr.zb.nengtul.chat.domain.ChatRoom;
 import kr.zb.nengtul.chat.domain.ConnectedChatRoom;
 import kr.zb.nengtul.chat.dto.ChatDto;
 import kr.zb.nengtul.chat.dto.ChatRoomDto;
+import kr.zb.nengtul.chat.dto.RoomId;
 import kr.zb.nengtul.chat.service.ChatRoomService;
 import kr.zb.nengtul.chat.service.ChatService;
 import kr.zb.nengtul.global.exception.CustomException;
+import kr.zb.nengtul.global.exception.CustomException.CustomExceptionResponse;
 import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.service.ShareBoardService;
@@ -23,6 +25,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,16 +54,19 @@ public class ChatController {
         User receiver = shareBoard.getUser();
 
         if (Objects.equals(receiver.getId(), sender.getId())) {
-            throw new CustomException(ErrorCode.CANNOT_OPEN_CHATROOM_YOURSELF);
+                throw new CustomException(ErrorCode.CANNOT_OPEN_CHATROOM_YOURSELF);
         }
 
         ChatRoom chatRoom = chatRoomService.findOrCreateRoom(sender, receiver, shareBoard);
         Chat message = chatService.createMessage(sender, chatRoom, content);
 
         simpMessagingTemplate.convertAndSend("/sub/chat/start/users/" + sender.getId(),
-                ChatDto.fromEntity(message));
+                new RoomId(chatRoom.getRoomId()));
 
         simpMessagingTemplate.convertAndSend("/sub/chat/push/users/" + receiver.getId(),
+                ChatDto.fromEntity(message));
+
+        simpMessagingTemplate.convertAndSend("/sub/chat/send/rooms/" + chatRoom.getRoomId(),
                 ChatDto.fromEntity(message));
     }
 
@@ -154,6 +160,18 @@ public class ChatController {
 
         return ResponseEntity.ok(chatRoomList.stream().map(ChatRoomDto::fromEntity).toList());
 
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<CustomExceptionResponse> handleCustomException(ErrorCode errorCode) {
+
+        return ResponseEntity.status(errorCode.getHttpStatus().value()).body(
+                CustomExceptionResponse.builder()
+                        .status(errorCode.getHttpStatus().value())
+                        .code(errorCode.name())
+                        .message(errorCode.getDetail())
+                        .build()
+        );
     }
 
 }
