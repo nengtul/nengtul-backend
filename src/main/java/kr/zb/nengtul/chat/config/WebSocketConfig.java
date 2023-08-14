@@ -1,6 +1,5 @@
 package kr.zb.nengtul.chat.config;
 
-import kr.zb.nengtul.chat.exception.StompErrorHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -15,15 +14,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompTokenInterceptor stompTokenInterceptor;
-    private final StompErrorHandler stompErrorHandler;
-
     @Override
 
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-        registry.setErrorHandler(stompErrorHandler).addEndpoint("/chat")
+        registry.addEndpoint("/chat")
                 .setAllowedOriginPatterns("*");
-        registry.setErrorHandler(stompErrorHandler).addEndpoint("/chat")
+        registry.addEndpoint("/chat")
                 .setAllowedOriginPatterns("*").withSockJS();
     }
 

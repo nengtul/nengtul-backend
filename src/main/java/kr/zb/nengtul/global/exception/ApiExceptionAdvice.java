@@ -1,6 +1,7 @@
 package kr.zb.nengtul.global.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,5 +18,17 @@ public class ApiExceptionAdvice {
             .message(e.getMessage())
             .code(e.getErrorCode().name())
             .status(e.getStatus()).build());
+  }
+
+  @MessageExceptionHandler(CustomException.class)
+  public ResponseEntity<CustomException.CustomExceptionResponse> websocketHandler(CustomException e) {
+
+    return ResponseEntity
+            .status(e.getStatus())
+            .body(CustomException.CustomExceptionResponse.builder()
+                    .message(e.getMessage())
+                    .code(e.getErrorCode().name())
+                    .status(e.getStatus()).build());
+
   }
 }
