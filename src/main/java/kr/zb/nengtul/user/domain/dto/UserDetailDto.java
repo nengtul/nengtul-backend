@@ -17,6 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDetailDto {
+
   private Long id;
   private String name;
   private String nickname;
@@ -31,4 +32,5 @@ public class UserDetailDto {
   private int myRecipe;
   private int likeRecipe;
   private int shareList;
+  private int favoriteList;
 }
