@@ -51,11 +51,11 @@ public class UserController {
   //이메일 인증 (이메일에서 링크를 클릭하여 put 요청을 보낼 수 없어서 GET요청으로 처리)
   @Operation(summary = "이메일 인증", description = "이메일을 통해 보낸 링크 클릭시 인증이 진행됩니다.")
   @GetMapping("/verify")
-  public ResponseEntity<Void> verifyEmail(
+  public ResponseEntity<String> verifyEmail(
       @Parameter(name = "email", description = "이메일") @RequestParam String email,
       @Parameter(name = "code", description = "인증 코드") @RequestParam String code) {
     userService.verifyEmail(email, code);
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok("이메일 인증이 완료되었습니다. 냉장고를 털어라 홈페이지로 돌아가세요.");
   }
 
   //이메일 인증번호 재발급 요청

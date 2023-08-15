@@ -233,6 +233,10 @@ public class UserService {
     //유저 정보페이지에서 가져오기때문에 바로 get
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+    //이미 인증한 사용자가 인증 메일 다시 보내지못하게
+    if(user.isEmailVerifiedYn()){
+      throw new CustomException(ALREADY_VERIFIED);
+    }
     verifyEmailForm(user.getEmail(), user.getName());
   }
 
@@ -254,12 +258,13 @@ public class UserService {
   //인증용 이메일
   private String getVerificationEmailBody(String email, String name, String code) {
     //TODO : HTML email 폼 적용 예정
-    return "안녕하세요 " + name + "! 링크를 통해 이메일 인증을 진행해주세요. \n\n"
-        //.append("http://localhost:8080/v1/user/verify?email=") //로컬
-        + "https://nengtul.shop/v1/users/verify?email=" //배포
-        + email
-        + "&code="
-        + code;
+    return
+            "안녕하세요 " + name + " 회원님 ! 링크를 통해 냉장고를 털어라 이메일 인증을 진행해주세요. \n\n"
+            //.append("http://localhost:8080/v1/user/verify?email=") //로컬
+            + "https://nengtul.shop/v1/users/verify?email=" //배포
+            + email
+            + "&code="
+            + code;
   }
 
   //비밀번호 찾기용 Email
