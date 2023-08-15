@@ -31,6 +31,7 @@ public class ChatRoomService {
         ConnectedChatRoom userChatRoom = ConnectedChatRoom.builder()
                 .userId(user)
                 .chatRoom(chatRoom)
+                .leaveRoom(false)
                 .build();
 
         connectedChatRoomRepository.save(userChatRoom);
@@ -60,18 +61,23 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = chatUsers.get(0).getChatRoom();
 
-        List<ConnectedChatRoom> deletedUser = chatUsers.stream()
-                .filter(connectedChatRoom -> connectedChatRoom.getUser().getId()
-                        .equals(user.getId())).toList();
+        List<ConnectedChatRoom> updatedChatUsers = chatUsers.stream()
+                .peek(connectedChatRoom -> {
+                    if (connectedChatRoom.getUser().getId().equals(user.getId())) {
+                        connectedChatRoom.setLeaveRoom(true);
+                    }
+                })
+                .toList();
 
-        connectedChatRoomRepository.deleteAll(deletedUser);
-        chatUsers.removeAll(deletedUser);
+        long leaveCount = updatedChatUsers.stream()
+                .filter(connectedChatRoom -> !connectedChatRoom.isLeaveRoom())
+                .count();
 
-        if(chatUsers.isEmpty()){
+        if (leaveCount == 0) {
+            connectedChatRoomRepository.deleteAll(updatedChatUsers);
             chatRepository.deleteAllByChatRoom(chatRoom);
             chatRoomRepository.delete(chatRoom);
         }
-
     }
 
     public ChatRoom findById(String roomId) {
@@ -80,6 +86,10 @@ public class ChatRoomService {
     }
 
     public List<ChatRoom> getChatRoomList(User user) {
-        return chatRoomRepository.findByConnectedChatRoomsUserIdOrderByCreatedAtDesc(user);
+
+        return chatRoomRepository
+                .findByConnectedChatRoomsUserIdAndConnectedChatRoomsLeaveRoomIsFalseOrderByChatListCreatedAtDesc(
+                        user
+                );
     }
 }

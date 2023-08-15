@@ -31,11 +31,17 @@ public class ConnectedChatRoom {
     @JoinColumn(name = "user_id")
     private User userId;
 
+    private boolean leaveRoom;
+
     public void setChatRoom(ChatRoom chatRoom) {
         this.chatRoom = chatRoom;
     }
 
-    public User getUser(){
+    public void setLeaveRoom(boolean leaveRoom) {
+        this.leaveRoom = leaveRoom;
+    }
+
+    public User getUser() {
         return this.userId;
     }
 }

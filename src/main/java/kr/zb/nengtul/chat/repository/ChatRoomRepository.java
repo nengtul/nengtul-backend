@@ -14,5 +14,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByRoomId(String roomId);
 
     @EntityGraph(value = "chatRoomWithShareBoardAndConnectedChatRoomsAndChtList")
-    List<ChatRoom> findByConnectedChatRoomsUserIdOrderByCreatedAtDesc(User user);
+    List<ChatRoom> findByConnectedChatRoomsUserIdAndConnectedChatRoomsLeaveRoomIsFalseOrderByChatListCreatedAtDesc(User user);
+
+
 }
