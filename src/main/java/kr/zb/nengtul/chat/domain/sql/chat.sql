@@ -11,6 +11,7 @@ CREATE TABLE connected_chat_room
     id      BIGINT AUTO_INCREMENT PRIMARY KEY,
     room_id BIGINT,
     user_id BIGINT,
+    leave_room BOOLEAN,
 
     FOREIGN KEY (room_id) REFERENCES chat_room (id),
     FOREIGN KEY (user_id) REFERENCES user (id)
