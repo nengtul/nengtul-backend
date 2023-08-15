@@ -153,7 +153,7 @@ class LikesServiceTest {
     assertEquals(likesDto.getRecipeId(), recipeDocument.getId());
     assertEquals(likesDto.getRecipeUserNickName(), "테스트 닉네임");
     assertEquals(likesDto.getLikeCount(), 50);
-    assertEquals(likesDto.getRecipeViewCount(), 20);
+    assertEquals(likesDto.getViewCount(), 20);
   }
 
   @Test

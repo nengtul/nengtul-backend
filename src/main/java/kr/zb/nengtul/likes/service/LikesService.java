@@ -80,7 +80,7 @@ public class LikesService {
               .thumbnailUrl(recipeDocument.getThumbnailUrl())
               .likeCount(likesRepository.countByRecipeId(recipeDocument.getId()))
               .recipeUserNickName(recipeUser.getNickname())
-              .recipeViewCount(recipeDocument.getViewCount())
+              .viewCount(recipeDocument.getViewCount())
               .build();
         });
   }

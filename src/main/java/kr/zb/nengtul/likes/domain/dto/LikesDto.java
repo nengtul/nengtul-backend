@@ -20,7 +20,7 @@ public class LikesDto {
 
   private Long likeCount;
 
-  private Long recipeViewCount;
+  private Long viewCount;
 
   private LocalDateTime createdAt;
 
