@@ -112,6 +112,7 @@ class LikesServiceTest {
         .id("recipeId")
         .title("testTitle")
         .thumbnailUrl("testThumbnailUrl")
+        .viewCount(20L)
         .build();
 
     Likes likes = Likes.builder()
@@ -152,6 +153,7 @@ class LikesServiceTest {
     assertEquals(likesDto.getRecipeId(), recipeDocument.getId());
     assertEquals(likesDto.getRecipeUserNickName(), "테스트 닉네임");
     assertEquals(likesDto.getLikeCount(), 50);
+    assertEquals(likesDto.getRecipeViewCount(), 20);
   }
 
   @Test
