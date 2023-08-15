@@ -155,7 +155,10 @@ public class ChatController {
         User user = userService.findUserByEmail(principal.getName());
         List<ChatRoom> chatRoomList = chatRoomService.getChatRoomList(user);
 
-        return ResponseEntity.ok(chatRoomList.stream().map(ChatRoomDto::fromEntity).toList());
+        return ResponseEntity.ok(
+                chatRoomList.stream()
+                        .map(chatRoom -> ChatRoomDto.fromEntity(chatRoom, user))
+                        .toList());
 
     }
 }
