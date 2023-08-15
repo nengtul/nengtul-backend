@@ -52,7 +52,7 @@ spring:
             client-id: ${naver.client-id}
             client-secret: ${naver.client-secret}
             redirect-uri: ${naver.redirect-uri}
-            authorization-grant-type : authorization_code
+            authorization-grant-type: authorization_code
             scope: name, email, profile_image
             client-name: Naver
           kakao:
