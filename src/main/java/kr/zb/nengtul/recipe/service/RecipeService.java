@@ -41,7 +41,7 @@ public class RecipeService {
 
   private final AmazonS3Service amazonS3Service;
 
-  public void addRecipe(Principal principal, RecipeAddDto recipeAddDto,
+  public String addRecipe(Principal principal, RecipeAddDto recipeAddDto,
       List<MultipartFile> images, MultipartFile thumbnail) {
 
     User user = userRepository.findByEmail(principal.getName()).
@@ -49,7 +49,7 @@ public class RecipeService {
 
     String uuid = UUID.randomUUID().toString();
 
-    recipeSearchRepository.save(RecipeDocument.builder()
+    RecipeDocument recipeDocument = RecipeDocument.builder()
         .userId(user.getId())
         .title(recipeAddDto.getTitle())
         .intro(recipeAddDto.getIntro())
@@ -68,8 +68,11 @@ public class RecipeService {
         .viewCount(0L)
         .createdAt(LocalDateTime.now())
         .modifiedAt(LocalDateTime.now())
-        .build());
+        .build();
 
+    recipeSearchRepository.save(recipeDocument);
+
+    return recipeDocument.getId();
   }
 
   public Page<RecipeGetListDto> getAllRecipe(Pageable pageable) {
@@ -99,7 +102,7 @@ public class RecipeService {
     if (principal != null) {
 
       User user = userRepository.findByEmail(principal.getName())
-              .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+          .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
       likesRepository.findByUserIdAndRecipeId(user.getId(), recipeId)
           .ifPresent(likes -> recipeGetDetailDto.setLikes(true));
