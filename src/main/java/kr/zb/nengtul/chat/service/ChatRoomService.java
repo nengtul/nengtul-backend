@@ -1,6 +1,7 @@
 package kr.zb.nengtul.chat.service;
 
 import java.util.List;
+import java.util.Set;
 import kr.zb.nengtul.chat.domain.ChatRoom;
 import kr.zb.nengtul.chat.domain.ConnectedChatRoom;
 import kr.zb.nengtul.chat.repository.ChatRepository;
@@ -40,14 +41,25 @@ public class ChatRoomService {
     @Transactional
     public ChatRoom findOrCreateRoom(User user1, User user2, ShareBoard shareBoard) {
 
-        return connectedChatRoomRepository.findChatRoomByUsersAndShareBoard(user1, user2,
+        ChatRoom chatRoom = connectedChatRoomRepository.findChatRoomByUsersAndShareBoard(user1,
+                        user2,
                         shareBoard.getId())
                 .orElseGet(() -> {
-                    ChatRoom chatRoom = createChatRoom(shareBoard);
-                    joinRoom(user1, chatRoom);
-                    joinRoom(user2, chatRoom);
-                    return chatRoom;
+                    ChatRoom newRoom = createChatRoom(shareBoard);
+                    joinRoom(user1, newRoom);
+                    joinRoom(user2, newRoom);
+                    return newRoom;
                 });
+
+        Set<ConnectedChatRoom> connectedChatRooms = chatRoom.getConnectedChatRooms();
+
+        for (ConnectedChatRoom connectedChatRoom : connectedChatRooms) {
+            connectedChatRoom.setLeaveRoom(false);
+        }
+
+        connectedChatRoomRepository.saveAll(connectedChatRooms);
+
+        return chatRoom;
     }
 
     @Transactional
