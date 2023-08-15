@@ -29,14 +29,13 @@ public class RecipeController {
 
     @Operation(summary = "레시피 작성", description = "토큰을 통해 유저 여부 확인 후 레시피를 작성합니다.")
     @PostMapping
-    ResponseEntity<Void> addRecipe(Principal principal,
+    ResponseEntity<String> addRecipe(Principal principal,
                                    @RequestPart @Valid RecipeAddDto recipeAddDto,
                                    @RequestPart List<MultipartFile> images,
                                    @RequestPart MultipartFile thumbnail) {
 
-        recipeService.addRecipe(principal, recipeAddDto, images, thumbnail);
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(
+            recipeService.addRecipe(principal, recipeAddDto, images, thumbnail));
     }
 
     @Operation(summary = "레시피 유저로 모두 조회")
