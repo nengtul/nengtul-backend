@@ -20,12 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     "s3bucket", "kr.zb.nengtul"
 })
 public class NengtulApplication {
-
-  @PostConstruct
-  void started() {
-    TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-  }
-
+  
   public static void main(String[] args) {
     SpringApplication.run(NengtulApplication.class, args);
   }
