@@ -15,4 +15,8 @@ public class FavoriteDto {
 
     private String publisherProfilePhotoUrl;
 
+    private int publisherPoint;
+
+    private int publisherRecipeCount;
+
 }
