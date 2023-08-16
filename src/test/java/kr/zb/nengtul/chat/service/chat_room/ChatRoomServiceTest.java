@@ -3,6 +3,7 @@ package kr.zb.nengtul.chat.service.chat_room;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import kr.zb.nengtul.chat.domain.ChatRoom;
 import kr.zb.nengtul.chat.domain.ConnectedChatRoom;
@@ -154,24 +156,35 @@ public class ChatRoomServiceTest {
 
         ChatRoom chatRoom = new ChatRoom(new ShareBoard());
         List<ConnectedChatRoom> chatUsers = new ArrayList<>(List.of(
-                new ConnectedChatRoom(1L, chatRoom, user),
-                new ConnectedChatRoom(2L, chatRoom, otherUser)
+                new ConnectedChatRoom(1L, chatRoom, user,false),
+                new ConnectedChatRoom(2L, chatRoom, otherUser,false)
         ));
 
         when(connectedChatRoomRepository.findByChatRoomRoomId(chatRoom.getRoomId()))
                 .thenReturn(chatUsers);
-        doNothing().when(connectedChatRoomRepository).deleteAll(any());
+
         // When
         chatRoomService.leaveChatRoom(user, chatRoom.getRoomId());
 
         // Then
         verify(connectedChatRoomRepository, times(1)).findByChatRoomRoomId(chatRoom.getRoomId());
-        verify(connectedChatRoomRepository, times(1)).deleteAll(any());
         verifyNoMoreInteractions(chatRepository);
+        verifyNoMoreInteractions(connectedChatRoomRepository);
         verifyNoMoreInteractions(chatRoomRepository);
 
-        assertEquals(1, chatUsers.size());
-        assertEquals(456L, chatUsers.get(0).getUser().getId()); //상대방만 남아있게 된다.
+        long leaveCount = chatUsers.stream()
+                .filter(connectedChatRoom -> !connectedChatRoom.isLeaveRoom())
+                .count();
+
+        List<ConnectedChatRoom> check = chatUsers.stream()
+                .filter(connectedChatRoom -> Objects.equals(connectedChatRoom.getUser().getId(),
+                        user.getId())).toList();
+
+
+        assertEquals(1, leaveCount);//상대방만 남아있게 된다.
+        assertEquals(1, check.size());
+        assertEquals(123L, check.get(0).getUser().getId());
+        assertTrue(check.get(0).isLeaveRoom()); // isLeaveRoom가 true로 나가기 처리 됨
     }
 
 
@@ -183,7 +196,7 @@ public class ChatRoomServiceTest {
 
         ChatRoom chatRoom = new ChatRoom(new ShareBoard());
         List<ConnectedChatRoom> chatUsers = new ArrayList<>(List.of(
-                new ConnectedChatRoom(1L, chatRoom, user)
+                new ConnectedChatRoom(1L, chatRoom, user,false)
         ));
 
         when(connectedChatRoomRepository.findByChatRoomRoomId(chatRoom.getRoomId()))
@@ -201,6 +214,7 @@ public class ChatRoomServiceTest {
         verify(chatRepository, times(1)).deleteAllByChatRoom(chatRoom);
         verify(chatRoomRepository, times(1)).delete(chatRoom);
 
-        assertEquals(0, chatUsers.size());
+        assertEquals(1, chatUsers.size());
+        assertTrue(chatUsers.get(0).isLeaveRoom()); // 나가기 처리 확인
     }
 }
