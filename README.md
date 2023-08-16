@@ -36,12 +36,13 @@
 <img src="https://img.shields.io/badge/Docker-000000?style=flat-square&logo=Docker&logoColor=#2496ED"/></a>
 <img src="https://img.shields.io/badge/Jenkins-000000?style=flat-square&logo=Jenkins&logoColor=#D24939"/></a>
 <img src="https://img.shields.io/badge/Elasticsearch-000000?style=flat-square&logo=elasticsearch&logoColor="/></a>
+
 <img src="https://img.shields.io/badge/Redis-000000?style=flat-square&logo=Redis&logoColor="/></a>
 
 ## 📄 BackEnd-Architecture
 
 ## 📑 [ERD](https://www.erdcloud.com/d/73ggNMAvHyjBvBshE)
-![image](https://github.com/nengtul/nengtul-backend/assets/101981639/19128847-d093-4c27-9531-93057426fc69)
+![ERD](https://github.com/nengtul/nengtul-backend/assets/109198584/9c9777d1-0be7-4029-b2f9-ded376f25826)
 
 ## 📑 [API명세서](https://www.notion.so/API-ab731bbd93684b858bd055a734e0017b)
 
