@@ -65,7 +65,9 @@ public enum ErrorCode {
   //ExceptionHandler 에서 MethodArgumentNotValidException 용으로 사용
   //유저
   public static final String NAME_NOT_NULL_MESSAGE = "이름을 입력해 주세요.";
+  public static final String LONG_NAME_MESSAGE = "이름의 길이는 10글자를 초과할 수 없습니다.";
   public static final String NICKNAME_NOT_NULL_MESSAGE = "닉네임을 입력해 주세요.";
+  public static final String LONG_NICKNAME_MESSAGE = "닉네임 길이는 15글자를 초과할 수 없습니다.";
   public static final String SHORT_PASSWORD_LENGTH_MESSAGE = "비밀번호는 8자 이상이여야 합니다.";
   public static final String PASSWORD_NOT_NULL_MESSAGE = "비밀번호를 입력해 주세요.";
   public static final String PASSWORD_CHECK_MESSAGE = "비밀번호를 확인 주세요.";
@@ -77,6 +79,7 @@ public enum ErrorCode {
   //공통
   public static final String TITLE_NOT_NULL_MESSAGE = "제목을 입력해 주세요.";
   public static final String CONTENT_NOT_NULL_MESSAGE = "내용을 입력해 주세요.";
+  public static final String LONG_COMMENT_MESSAGE = "댓글은 200자를 초과할 수 없습니다..";
 
   //레시피
   public static final String INTRO_NOT_NULL_MESSAGE = "레시피 소개를 입력해 주세요.";
