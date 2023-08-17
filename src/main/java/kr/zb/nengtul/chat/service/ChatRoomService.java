@@ -92,11 +92,6 @@ public class ChatRoomService {
         }
     }
 
-    public ChatRoom findById(String roomId) {
-        return chatRoomRepository.findByRoomId(roomId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHATROOM));
-    }
-
     public List<ChatRoom> getChatRoomList(User user) {
 
         return chatRoomRepository
@@ -104,4 +99,10 @@ public class ChatRoomService {
                         user
                 );
     }
+
+    public ChatRoom findById(String roomId) {
+        return chatRoomRepository.findByRoomId(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHATROOM));
+    }
+
 }
