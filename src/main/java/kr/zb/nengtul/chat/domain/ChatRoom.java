@@ -81,4 +81,8 @@ public class ChatRoom {
         this.shareBoard = shareBoard;
     }
 
+    public void setShareBoard(ShareBoard shareBoard){
+        this.shareBoard = shareBoard;
+    }
+
 }
