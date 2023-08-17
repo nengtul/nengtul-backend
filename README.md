@@ -8,8 +8,8 @@
     운영체제 :  Windows
     통합개발환경(IDE) : IntelliJ
     JDK 버전 : JDK 17
-    SpringBoot 버전 : JDK 17
-    데이터 베이스 : Mysql
+    SpringBoot 버전 : 3.1.1
+    데이터 베이스 : Mysql, ElasticSearch
     빌드 툴 : Gradle-8.1.1
     CI/CD : jenkins
     관리 툴 : GitHub
@@ -21,25 +21,33 @@
 <img src="https://img.shields.io/badge/Gradle-000000?style=flat-square&logo=Gradle&logoColor=#02303A"/></a>
 <img src="https://img.shields.io/badge/Spring Security-000000?style=flat-square&logo=Spring Security&logoColor=#6DB33F"/></a>
 <img src="https://img.shields.io/badge/Spring JPA-000000?style=flat-square&logo=Spring Jpa&logoColor=#6DB33F"/></a>
+
+
 <img src="https://img.shields.io/badge/Oauth 2.0-000000?style=flat-square&logo=Authy&logoColor=blue"/></a>
 <img src="https://img.shields.io/badge/JSON Web Tokens-000000?style=flat-square&logo=JSON Web Tokens&logoColor=purple"/></a>
 <img src="https://img.shields.io/badge/jsoup-000000?style=flat-square&logo=html5&logoColor=#6DB33F"/></a>
 <img src="https://img.shields.io/badge/Spring_Batch-000000?style=flat-square&logo=Spring&logoColor=#6DB33F"/></a>
+<img src="https://img.shields.io/badge/WebSocket-000000?style=flat-square&logo=WebSocket&logoColor=white"/>
+<img src="https://img.shields.io/badge/STOMP-000000?style=flat-square"/>
+
 
 ### Database
 <img src="https://img.shields.io/badge/Mysql-000000?style=flat-square&logo=MySql&logoColor="/></a>
+<img src="https://img.shields.io/badge/Elasticsearch-000000?style=flat-square&logo=elasticsearch&logoColor="/></a>
 ### DevOps
 <img src="https://img.shields.io/badge/AWS-000000?style=flat-square&logo=Amazon AWS&logoColor=#232F3E"/></a>
 <img src="https://img.shields.io/badge/Amazon EC2-000000?style=flat-square&logo=Amazon EC2&logoColor=#FF9900"/></a>
 <img src="https://img.shields.io/badge/Amazon RDS-000000?style=flat-square&logo=Amazon RDS&logoColor=#527FFF"/></a>
+
+
 <img src="https://img.shields.io/badge/Amazon S3-000000?style=flat-square&logo=Amazon S3&logoColor=#569A31"/></a>
 <img src="https://img.shields.io/badge/Docker-000000?style=flat-square&logo=Docker&logoColor=#2496ED"/></a>
 <img src="https://img.shields.io/badge/Jenkins-000000?style=flat-square&logo=Jenkins&logoColor=#D24939"/></a>
-<img src="https://img.shields.io/badge/Elasticsearch-000000?style=flat-square&logo=elasticsearch&logoColor="/></a>
-
 <img src="https://img.shields.io/badge/Redis-000000?style=flat-square&logo=Redis&logoColor="/></a>
 
-## 📄 BackEnd-Architecture
+## 📄 Architecture
+![Architecture](https://github.com/zxcv5595/RaiseMeUp/assets/109198584/89329bf4-8860-4935-af25-92c72fc96aaa)
+
 
 ## 📑 [ERD](https://www.erdcloud.com/d/73ggNMAvHyjBvBshE)
 ![ERD](https://github.com/nengtul/nengtul-backend/assets/109198584/9c9777d1-0be7-4029-b2f9-ded376f25826)
@@ -101,3 +109,15 @@
 ### 🧑‍🤝‍🧑 주변 마트
 
     부족한 재료가 있을 때 주변 마트 검색 기능을 통하여 재료 수급처를 자신의 위치 기반으로 지도상에 표시합니다.
+
+### **🥘 크롤링을 이용한 게시판 업로드**
+    개발, 서비스 이용에 필요한 데이터들을 ‘만개의 레시피’ 웹사이트에서 크롤링합니다.
+    Spring Batch를 사용하여 많은 데이터를 쉽게 다루고 트랜잭션을 관리할 수 있습니다.
+    별개 모듈로 분리하여 web-server 와 같이 항상 떠 있을 필요가 없이, 필요 시 마다 사용하는 구조입니다.
+
+### **💬 유저 간 실시간 채팅**
+    나눔 게시판을 보다 거래를 하고 싶다면, 상대에게 채팅을 보낼 수 있습니다. 
+    이루어진 대화는 채팅 목록에 들어가서 다시 확인할 수 있으며, 채팅을 계속 진행할 수도 있습니다.
+    Stomp 프로토콜을 통한 Websocket을 사용합니다.  실시간 데이터 송수신을 위해 웹소켓을 활용했습니다.
+    ChannelInterceptor를 구현하여 StompCommand.CONNECT 시 토큰을 검증합니다.
+    검증 이후, 유저아이디를 웹소켓 세션에 저장하여 웹소켓 통신 시, 활용합니다.
