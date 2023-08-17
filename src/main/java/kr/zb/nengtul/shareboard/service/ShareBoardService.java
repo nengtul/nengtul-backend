@@ -6,10 +6,12 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import java.util.List;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
 import kr.zb.nengtul.shareboard.domain.repository.ShareBoardRepository;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import kr.zb.nengtul.user.service.UserService;
@@ -52,7 +54,7 @@ public class ShareBoardService {
     if (image != null) {
       shareBoard.setShareImg(amazonS3Service.uploadFileForShareBoard(image, shareBoard.getId()));
     }
-    user.setPointAddShardBoard(user.getPoint());
+    user.setPlusPoint(UserPoint.SHARE);
     userRepository.saveAndFlush(user);
   }
 
@@ -88,14 +90,21 @@ public class ShareBoardService {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
     User user = userService.findUserByEmail(principal.getName());
-    if (shareBoard.getUser() != user) {
+    if (user.equals(shareBoard.getUser()) || user.getRoles().equals(RoleType.ADMIN)) {
+      //거래안됐는데 삭제하면 포인트 차감
+      if (shareBoard.isClosed()) {
+        user.setMinusPoint(UserPoint.SHARE);
+        userRepository.save(user);
+      }
+      shareBoardRepository.delete(shareBoard);
+    }else{
       throw new CustomException(NO_PERMISSION);
     }
-    shareBoardRepository.delete(shareBoard);
   }
 
   @Transactional
-  public List<ShareBoard> getShareBoardList(double lat, double lon, double range, Boolean closed) {
+  public List<ShareBoard> getShareBoardList(double lat, double lon, double range,
+      Boolean closed) {
     List<ShareBoard> shareBoardList;
     if (closed == null) {
       shareBoardList = shareBoardRepository.findByLatBetweenAndLonBetween(
@@ -113,4 +122,21 @@ public class ShareBoardService {
     User user = userService.findUserByEmail(principal.getName());
     return shareBoardRepository.findAllByUser(user);
   }
+
+  //채팅에서 나눔게시물 등록자가 나눔/거래 완료 버튼 누르면 사용할 service code.
+  @Transactional
+  public void soldOut(Long shareBoardId, Principal principal) {
+    User user = userService.findUserByEmail(principal.getName());
+    ShareBoard shareBoard = shareBoardRepository.findByIdAndUser(shareBoardId, user)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
+    user.setPlusPoint(UserPoint.SHARE_OK);
+    shareBoard.setClosed(true);
+    shareBoardRepository.save(shareBoard);
+  }
+
+  public ShareBoard findById(Long shareBoardId) {
+    return shareBoardRepository.findById(shareBoardId)
+        .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
+  }
+
 }

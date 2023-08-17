@@ -15,6 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NoticeListDto {
   private Long noticeId;
+  private Long userId;
   private String nickname;
   private String title;
   private String content;
@@ -26,6 +27,7 @@ public class NoticeListDto {
   public static NoticeListDto buildNoticeListDto(Notice notice) {
     return NoticeListDto.builder()
         .noticeId(notice.getId())
+        .userId(notice.getUser().getId())
         .nickname(notice.getUser().getNickname())
         .title(notice.getTitle())
         .content(notice.getContent())

@@ -11,6 +11,7 @@ import kr.zb.nengtul.comment.domain.dto.CommentReqDto;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.service.ReplyCommentService;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.recipe.domain.entity.RecipeDocument;
@@ -19,8 +20,6 @@ import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,15 +54,20 @@ public class CommentService {
     comment.setComment(commentReqDto.getComment());
     commentRepository.save(comment);
   }
+
   @Transactional
   public void deleteComment(Long commentId, Principal principal) {
     User user = userService.findUserByEmail(principal.getName());
-    Comment comment = commentRepository.findByIdAndUser(commentId, user)
+    Comment comment = commentRepository.findById(commentId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
-    commentRepository.delete(comment);
+    if (user.getRoles().equals(RoleType.ADMIN) || user.equals(comment.getUser())) {
+      commentRepository.delete(comment);
+    } else {
+      throw new CustomException(NO_PERMISSION);
+    }
   }
 
-  public List<CommentGetDto> findAllCommentByRecipeId(String recipeId){
+  public List<CommentGetDto> findAllCommentByRecipeId(String recipeId) {
     RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
     List<Comment> commentList = commentRepository.findAllByRecipeId(recipeDocument.getId());
@@ -77,10 +81,13 @@ public class CommentService {
         .commentId(comment.getId())
         .userId(comment.getUser().getId())
         .userNickname(comment.getUser().getNickname())
+        .profileImageUrl(comment.getUser().getProfileImageUrl())
+        .point(comment.getUser().getPoint())
         .comment(comment.getComment())
         .createdAt(comment.getCreatedAt())
         .modifiedAt(comment.getModifiedAt())
-        .replyCommentGetDtoList(replyCommentService.getReplyCommentByComment(comment.getId()))
+        .replyCommentGetDtoList(
+            replyCommentService.getReplyCommentByComment(comment.getId()))
         .build();
   }
 }

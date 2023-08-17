@@ -23,6 +23,7 @@ public class ShareBoardListDto {
   private Long id; //게시물 id
   private Long userId; //채팅걸기위한 userId
   private String userNickname; //닉네임
+  private int point;
   private String title; //제목
   private String content; //글 내용
   private String place; //위치
@@ -39,6 +40,7 @@ public class ShareBoardListDto {
         .id(shareBoard.getId())
         .userId(shareBoard.getUser().getId())
         .userNickname(shareBoard.getUser().getNickname())
+        .point(shareBoard.getUser().getPoint())
         .title(shareBoard.getTitle())
         .shareImg(shareBoard.getShareImg())
         .price(shareBoard.getPrice())

@@ -3,6 +3,7 @@ package kr.zb.nengtul.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import kr.zb.nengtul.user.domain.dto.UserDetailDto;
@@ -50,11 +51,11 @@ public class UserController {
   //이메일 인증 (이메일에서 링크를 클릭하여 put 요청을 보낼 수 없어서 GET요청으로 처리)
   @Operation(summary = "이메일 인증", description = "이메일을 통해 보낸 링크 클릭시 인증이 진행됩니다.")
   @GetMapping("/verify")
-  public ResponseEntity<Void> verifyEmail(
+  public ResponseEntity<String> verifyEmail(
       @Parameter(name = "email", description = "이메일") @RequestParam String email,
       @Parameter(name = "code", description = "인증 코드") @RequestParam String code) {
     userService.verifyEmail(email, code);
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok("이메일 인증이 완료되었습니다. 냉장고를 털어라 홈페이지로 돌아가세요.");
   }
 
   //이메일 인증번호 재발급 요청
@@ -89,7 +90,7 @@ public class UserController {
   @GetMapping("/detail")
   public ResponseEntity<UserDetailDto> getUserDetail(Principal principal) {
     return ResponseEntity.ok(
-        UserDetailDto.buildUserDetailDto(userService.findUserByEmail(principal.getName())));
+        userService.buildUserDetailDto(userService.findUserByEmail(principal.getName())));
   }
 
   //회원 탈퇴(상세보기 페이지에서 진행)
@@ -97,6 +98,14 @@ public class UserController {
   @DeleteMapping("/detail")
   public ResponseEntity<Void> quitUser(Principal principal) {
     userService.quitUser(principal);
+    return ResponseEntity.ok(null);
+  }
+
+  //로그아웃
+  @Operation(summary = "로그아웃", description = "사용하던 토큰을 블랙리스트로 등록해 다시 사용할 수 없게 지정합니다.")
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(HttpServletRequest request, Principal principal) {
+    userService.logout(request,principal);
     return ResponseEntity.ok(null);
   }
 

@@ -2,22 +2,27 @@ package kr.zb.nengtul.global.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
 import kr.zb.nengtul.global.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import kr.zb.nengtul.global.handler.LoginFailureHandler;
 import kr.zb.nengtul.global.handler.LoginSuccessHandler;
+import kr.zb.nengtul.global.handler.TokenAccessDeniedHandler;
 import kr.zb.nengtul.global.jwt.JwtAuthenticationProcessingFilter;
 import kr.zb.nengtul.global.jwt.JwtTokenProvider;
 import kr.zb.nengtul.global.jwt.service.CustomUserDetailService;
 import kr.zb.nengtul.global.oauth2.exception.RestAuthenticationEntryPoint;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginFailureHandler;
 import kr.zb.nengtul.global.oauth2.handler.OAuth2LoginSuccessHandler;
-import kr.zb.nengtul.global.handler.TokenAccessDeniedHandler;
 import kr.zb.nengtul.global.oauth2.service.CustomOAuth2UserService;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -38,11 +43,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Configuration
 @EnableWebSecurity
+//@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
   private final CustomUserDetailService customUserDetailService;
   private final JwtTokenProvider jwtTokenProvider;
+  private final BlacklistTokenRepository blacklistTokenRepository;
   private final UserRepository userRepository;
   private final ObjectMapper objectMapper;
   private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
@@ -65,11 +72,13 @@ public class SecurityConfig {
             .authenticationEntryPoint(new RestAuthenticationEntryPoint())
             .accessDeniedHandler(tokenAccessDeniedHandler))
         //== URL별 권한 관리 옵션 ==//
+//        .authorizeHttpRequests(m -> methodSecurityExpressionHandler(new RoleHierarchy()))
         .authorizeHttpRequests(authorizationHttpRequests -> authorizationHttpRequests
+            .requestMatchers("/v1/notices/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.GET, "/v1/noticelist/**").permitAll()//공지사항 조회
             .requestMatchers(HttpMethod.GET, "/v1/recipe/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/v1/recipes/**").permitAll() //댓글
             .requestMatchers(HttpMethod.GET, "/v1/comments/**").permitAll()//대댓글
-            .requestMatchers(HttpMethod.GET, "/v1/notices/**").permitAll()//공지사항 조회
             .requestMatchers(
                 // -- Swagger UI v2
                 "/v2/api-docs",
@@ -83,14 +92,15 @@ public class SecurityConfig {
                 "/v3/api-docs/**",
                 "/swagger-ui/**").permitAll()
             .requestMatchers(
-                "/", "/**",
+                "/**",
                 "/v1/auth/**",
                 "/v1/users/join",//회원가입
                 "/v1/users/login",//로그인
                 "/v1/users/findpw",//비밀번호 찾기 (비밀번호 재발급)
                 "/v1/users/findid",//아이디 찾기
                 "/v1/users/verify/**", //이메일 인증
-                "/v1/recipe/commentlist/**" //댓글 조회
+                "/v1/recipe/commentlist/**", //댓글 조회
+                "/chat/**"
             ).permitAll()
             .requestMatchers(
                 "/v1/users/**",
@@ -100,9 +110,9 @@ public class SecurityConfig {
                 "/v1/recipes/comment/**",//댓글 작성,수정,삭제
                 "/v1/likes/**",
                 "/v1/favorite/**",
-                "/v1/saved-recipe/**"
-            ).hasAnyRole("USER", "ADMIN")
-            .requestMatchers("/v1/admin/**", "/v1/notices/**").hasRole("ADMIN")
+                "/v1/saved-recipe/**",
+                "/v1/chat/**"
+            ).hasRole("USER")
             .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
         .logout(logout -> logout.logoutSuccessUrl("/"))
         //== 소셜 로그인 설정 ==//
@@ -155,15 +165,17 @@ public class SecurityConfig {
     CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordLoginFilter
         = new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
     customJsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
-    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
+    customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(
+        loginSuccessHandler());
+    customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(
+        loginFailureHandler());
     return customJsonUsernamePasswordLoginFilter;
   }
 
   @Bean
   public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
     return new JwtAuthenticationProcessingFilter(
-        jwtTokenProvider, userRepository);
+        jwtTokenProvider, userRepository, blacklistTokenRepository);
   }
 
   //cors 설정
@@ -177,5 +189,20 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+    roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+    return roleHierarchy;
+  }
+
+  @Bean
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+      RoleHierarchy roleHierarchy) {
+    DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+    expressionHandler.setRoleHierarchy(roleHierarchy);
+    return expressionHandler;
   }
 }

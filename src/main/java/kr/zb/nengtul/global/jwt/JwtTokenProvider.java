@@ -1,10 +1,5 @@
 package kr.zb.nengtul.global.jwt;
 
-//import io.jsonwebtoken.Claims;
-//import io.jsonwebtoken.Jws;
-//import io.jsonwebtoken.Jwts;
-//import io.jsonwebtoken.SignatureAlgorithm;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
@@ -13,10 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-
 import java.util.Optional;
-import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

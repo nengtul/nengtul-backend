@@ -2,7 +2,6 @@ package kr.zb.nengtul.comment.domain.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.replycomment.domain.dto.ReplyCommentGetDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +21,8 @@ public class CommentGetDto {
   private Long userId;
   private String userNickname;
   private String comment;
+  private String profileImageUrl;
+  private int point;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
   private List<ReplyCommentGetDto> replyCommentGetDtoList;

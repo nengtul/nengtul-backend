@@ -15,11 +15,12 @@ public enum RecipeCategory {
     FUSION("퓨전"),
     KIMCHI_SALTED_FISH_SAUCES("김치/젓갈/장류"),
     SEASONING_SAUCE_JAM("양념/소스/잼"),
-    SALAD("샐러듬"),
+    SALAD("샐러드"),
     SOUP("스프"),
     BREAD("빵"),
     SNACKS("과자"),
     TEA_DRINK("차/음료/술"),
+    WESTERN_FOOD("양식"),
     ETC("기타"),
     NONE("없음")
     ;

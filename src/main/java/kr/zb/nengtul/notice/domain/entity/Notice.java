@@ -35,6 +35,7 @@ public class Notice extends BaseTimeEntity {
   private String title;
 
   @Lob
+  @Column(name = "content", columnDefinition = "BLOB")
   private String content;
 
   private String noticeImg;
@@ -56,5 +57,9 @@ public class Notice extends BaseTimeEntity {
 
   public void setViewCount(Long viewCount) {
     this.viewCount = viewCount;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
   }
 }

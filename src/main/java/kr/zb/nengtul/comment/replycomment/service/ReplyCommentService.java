@@ -7,19 +7,19 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
-import kr.zb.nengtul.comment.domain.dto.CommentReqDto;
 import kr.zb.nengtul.comment.domain.entity.Comment;
 import kr.zb.nengtul.comment.domain.respository.CommentRepository;
 import kr.zb.nengtul.comment.replycomment.domain.dto.ReplyCommentGetDto;
 import kr.zb.nengtul.comment.replycomment.domain.dto.ReplyCommentReqDto;
 import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
 import kr.zb.nengtul.comment.replycomment.domain.repository.ReplyCommentRepository;
+import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
-import kr.zb.nengtul.global.exception.ErrorCode;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +44,6 @@ public class ReplyCommentService {
         .user(user)
         .comment(comment)
         .build();
-
     replyCommentRepository.save(replyComment);
   }
 
@@ -66,10 +65,11 @@ public class ReplyCommentService {
     User user = userService.findUserByEmail(principal.getName());
     ReplyComment replyComment = replyCommentRepository.findByIdAndCommentId(
         replyCommentId, commentId).orElseThrow(() -> new CustomException(NOT_FOUND_REPLY_COMMENT));
-    if (!user.equals(replyComment.getUser())) {
+    if (user.equals(replyComment.getUser()) || user.getRoles().equals(RoleType.ADMIN)) {
+      replyCommentRepository.delete(replyComment);
+    } else {
       throw new CustomException(NO_PERMISSION);
     }
-    replyCommentRepository.delete(replyComment);
   }
 
   public List<ReplyCommentGetDto> getReplyCommentByComment(Long commentId) {

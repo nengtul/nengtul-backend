@@ -40,6 +40,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
 
+    //elasticsearch
+    implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
 
     //JWT
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'

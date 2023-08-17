@@ -38,7 +38,14 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	//chatting
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	//validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//json
+	implementation 'com.google.code.gson:gson:2.8.9'
 
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 

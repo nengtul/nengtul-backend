@@ -15,11 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Builder
+@Getter
 @Setter
 public class ShareBoard extends BaseTimeEntity {
   @Id
@@ -45,3 +45,6 @@ public class ShareBoard extends BaseTimeEntity {
   @Column(columnDefinition = "boolean default false", nullable = false)
   private boolean closed; //거래 완료 여부
 }
+
+
+

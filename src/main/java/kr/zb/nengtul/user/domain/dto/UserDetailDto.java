@@ -1,11 +1,14 @@
 package kr.zb.nengtul.user.domain.dto;
 
 import kr.zb.nengtul.global.entity.ProviderType;
+import kr.zb.nengtul.global.entity.RoleType;
+import kr.zb.nengtul.recipe.domain.repository.RecipeSearchRepository;
 import kr.zb.nengtul.user.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -14,6 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDetailDto {
+
   private Long id;
   private String name;
   private String nickname;
@@ -22,21 +26,11 @@ public class UserDetailDto {
   private ProviderType providerTYpe;
   private String address;
   private String addressDetail;
+  private RoleType roles;
   private boolean emailVerifiedYn;
   private int point;
-
-  public static UserDetailDto buildUserDetailDto(User user){
-    return UserDetailDto.builder()
-        .id(user.getId())
-        .name(user.getName())
-        .nickname(user.getNickname())
-        .phoneNumber(user.getPhoneNumber())
-        .profileImageUrl(user.getProfileImageUrl())
-        .providerTYpe(user.getProviderType())
-        .address(user.getAddress())
-        .addressDetail(user.getAddressDetail())
-        .emailVerifiedYn(user.isEmailVerifiedYn())
-        .point(user.getPoint())
-        .build();
-  }
+  private int myRecipe;
+  private int likeRecipe;
+  private int shareList;
+  private int favoriteList;
 }

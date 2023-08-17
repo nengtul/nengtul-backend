@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import kr.zb.nengtul.crawling.recipe.type.RecipeCategory;
 import kr.zb.nengtul.crawling.crawling.dto.CrawlInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -23,7 +24,7 @@ public class CrawlingItemReader implements ItemReader<CrawlInfo> {
     private static final int RETRY_DELAY_MS = 1000;
     private final List<CrawlInfo> crawlInfoList;
     private final AtomicInteger currentIndex;
-    private final Map<Integer, String> cat4Map; // 만개의 레시피 카테고리별 구분 파라미터 값
+    private final Map<Integer, RecipeCategory> cat4Map; // 만개의 레시피 카테고리별 구분 파라미터 값
 
     public CrawlingItemReader() throws Exception {
         crawlInfoList = new ArrayList<>();
@@ -38,25 +39,25 @@ public class CrawlingItemReader implements ItemReader<CrawlInfo> {
         }
     }
 
-    private Map<Integer, String> getCat4Map() {
-        Map<Integer, String> cat4Map = new HashMap<>();
-        cat4Map.put(63, "밑반찬");
-        cat4Map.put(56, "메인반찬");
-        cat4Map.put(54, "국/탕");
-        cat4Map.put(55, "찌개");
-        cat4Map.put(60, "디저트");
-        cat4Map.put(53, "면/만두");
-        cat4Map.put(52, "밥/죽/떡");
-        cat4Map.put(61, "퓨전");
-        cat4Map.put(57, "김치/젓갈/장류");
-        cat4Map.put(58, "양념/소스/잼");
-        cat4Map.put(65, "양식");
-        cat4Map.put(64, "샐러드");
-        cat4Map.put(68, "스프");
-        cat4Map.put(66, "빵");
-        cat4Map.put(69, "과자");
-        cat4Map.put(59, "차/음료/술");
-        cat4Map.put(62, "기타");
+    private Map<Integer, RecipeCategory> getCat4Map() {
+        Map<Integer, RecipeCategory> cat4Map = new HashMap<>();
+        cat4Map.put(63, RecipeCategory.SIDE_DISH);
+        cat4Map.put(56, RecipeCategory.MAIN_SIDE_DISH);
+        cat4Map.put(54, RecipeCategory.KOREAN_SOUP);
+        cat4Map.put(55, RecipeCategory.STEW);
+        cat4Map.put(60, RecipeCategory.DESSERT);
+        cat4Map.put(53, RecipeCategory.NOODLES_DUMPLINGS);
+        cat4Map.put(52, RecipeCategory.RICE_PORRIDGE_RICE_CAKE);
+        cat4Map.put(61, RecipeCategory.FUSION);
+        cat4Map.put(57, RecipeCategory.KIMCHI_SALTED_FISH_SAUCES);
+        cat4Map.put(58, RecipeCategory.SEASONING_SAUCE_JAM);
+        cat4Map.put(65, RecipeCategory.WESTERN_FOOD);
+        cat4Map.put(64, RecipeCategory.SALAD);
+        cat4Map.put(68, RecipeCategory.SOUP);
+        cat4Map.put(66, RecipeCategory.BREAD);
+        cat4Map.put(69, RecipeCategory.SNACKS);
+        cat4Map.put(59, RecipeCategory.TEA_DRINK);
+        cat4Map.put(62, RecipeCategory.ETC);
         return cat4Map;
     }
 

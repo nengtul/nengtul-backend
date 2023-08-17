@@ -60,12 +60,16 @@ public class SavedRecipeService {
                   .thumbnailUrl("")
                   .build());
 
+          User recipeUser = userRepository.findById(recipeDocument.getUserId())
+              .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
           return SavedRecipeDto.builder()
               .id(savedRecipe.getId())
               .createdAt(savedRecipe.getCreatedAt())
               .recipeId(recipeDocument.getId())
               .title(recipeDocument.getTitle())
               .thumbnailUrl(recipeDocument.getThumbnailUrl())
+              .recipeUserNickname(recipeUser.getNickname())
               .build();
         });
 

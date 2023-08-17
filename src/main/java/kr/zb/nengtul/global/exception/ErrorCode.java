@@ -9,13 +9,19 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
   // 유저
   ALREADY_EXIST_USER(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 사용자입니다."),
+  NOT_FOUND_OTHER_USER(HttpStatus.NOT_FOUND, "상대방이 존재하지 않습니다."),
+  NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, "해당하는 채팅방을 찾을 수 없습니다."),
+  NOT_FOUND_CHAT(HttpStatus.NOT_FOUND, "해당하는 채팅을 찾을 수 없습니다."),
+  CANNOT_OPEN_CHATROOM_YOURSELF(HttpStatus.FORBIDDEN, "자신과의 채팅방은 생성이 불가합니다."),
   ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 이메일입니다."),
   ALREADY_EXIST_NICKNAME(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 닉네임입니다."),
   ALREADY_EXIST_PHONENUMBER(HttpStatus.BAD_REQUEST, "이미 등록 되어있는 휴대폰 번호입니다."),
+  ALREADY_LOGOUT_TOKEN(HttpStatus.BAD_REQUEST, "로그아웃된 회원입니다. 로그인을 다시 해주세요."),
   NOT_FOUND_USER(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
   ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증이 완료된 사용자입니다."),
   WRONG_VERIFY_CODE(HttpStatus.BAD_REQUEST, "잘못된 인증 시도입니다."),
   EXPIRED_CODE(HttpStatus.BAD_REQUEST, "인증시간이 만료되었습니다."),
+  NOT_OWNER_OF_THE_POST(HttpStatus.FORBIDDEN, "게시물 소유자가 아닙니다."),
   CHECK_ID_AND_PW(HttpStatus.NOT_FOUND, "이메일 혹은 비밀번호를 확인하세요."),
   CHECK_SOCIAL_SERVER(HttpStatus.NOT_FOUND, "소셜로그인에 실패하였습니다. 서버를 확인 하세요."),
   SHORT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호는 8자 이상이여야 합니다."),
@@ -47,6 +53,7 @@ public enum ErrorCode {
   NOT_NULL_CONTENT(HttpStatus.BAD_REQUEST, "내용을 입력해 주세요."),
   NO_CONTENT(HttpStatus.NO_CONTENT, "일치하는 내용이 없습니다."),
   NO_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
+  NOT_EXIST_USER_ATTRIBUTE_IN_WEBSOCKET_SESSION(HttpStatus.NO_CONTENT, "웹소켓 세션에 유저값이 없습니다."),
   INVALID_TOKEN(HttpStatus.FORBIDDEN, "만료된 토큰입니다."),
   NOT_VERIFY_EMAIL(HttpStatus.FORBIDDEN, "이메일 인증을 하지 않아 작성 권한이 없습니다."),
   //댓글

@@ -1,12 +1,18 @@
 package kr.zb.nengtul.global.jwt;
 
 
+import static kr.zb.nengtul.global.exception.ErrorCode.ALREADY_LOGOUT_TOKEN;
+
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.UUID;
+import kr.zb.nengtul.auth.entity.BlacklistToken;
+import kr.zb.nengtul.auth.repository.BlacklistTokenRepository;
+import kr.zb.nengtul.global.util.HeaderUtil;
 import kr.zb.nengtul.user.domain.entity.User;
 import kr.zb.nengtul.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +25,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-
-/** 로그인 이외의 요청이 오면 처리하는 필터
- * 1. RefreshToken이 없고, AccessToken이 유효한 경우 -> 인증 성공 처리, RefreshToken을 재발급하지는 않는다.
- * 2. RefreshToken이 없고, AccessToken이 없거나 유효하지 않은 경우 -> 인증 실패 처리, 403 ERROR
- * 3. RefreshToken이 있는 경우 -> DB의 RefreshToken과 비교하여 일치하면 AccessToken 재발급, RefreshToken 재발급(RTR 방식) 인증 성공 처리는 하지 않고 실패 처리
+/**
+ * 로그인 이외의 요청이 오면 처리하는 필터 1. RefreshToken이 없고, AccessToken이 유효한 경우 -> 인증 성공 처리, RefreshToken을 재발급하지는
+ * 않는다. 2. RefreshToken이 없고, AccessToken이 없거나 유효하지 않은 경우 -> 인증 실패 처리, 403 ERROR 3. RefreshToken이 있는
+ * 경우 -> DB의 RefreshToken과 비교하여 일치하면 AccessToken 재발급, RefreshToken 재발급(RTR 방식) 인증 성공 처리는 하지 않고 실패
+ * 처리
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -34,15 +39,16 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final UserRepository userRepository;
+  private final BlacklistTokenRepository blacklistTokenRepository;
 
   private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    if (request.getRequestURI().equals(NO_CHECK_URL) || request.getRequestURI().startsWith("/swagger-ui")) {
-      filterChain.doFilter(request, response); // 로그인 요청이 들어오면, 다음 필터 호출
-      return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
+    if (request.getRequestURI().equals(NO_CHECK_URL)) {
+      filterChain.doFilter(request, response);
+      return;
     }
 
     // 사용자 요청 헤더에서 RefreshToken 추출
@@ -55,8 +61,22 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
       return; //재발급 하고 인증 처리는 하지 않게 하기위해 바로 return으로 필터 진행 막기
     }
 
-    // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
-    checkAccessTokenAndAuthentication(request, response, filterChain);
+    //로그아웃된 토큰인지 확인하는 로직
+    if (isTokenBlacklisted(HeaderUtil.getAccessToken(request))) {
+      response.setStatus(ALREADY_LOGOUT_TOKEN.getHttpStatus().value());
+      response.setCharacterEncoding("UTF-8");
+      response.setContentType("application/json;charset=UTF-8");
+
+      String errorMessage = "{\"status\": " + ALREADY_LOGOUT_TOKEN.getHttpStatus().value() +
+          ", \"code\": \"" + "ALREADY_LOGOUT_TOKEN" +
+          "\", \"message\": \"" + ALREADY_LOGOUT_TOKEN.getDetail() + "\"}";
+
+      response.getWriter().write(errorMessage);
+    } else {
+      // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
+      checkAccessTokenAndAuthentication(request, response, filterChain);
+    }
+
   }
 
   //리프레시 토큰으로 유저 정보 찾기 & 액세스 토큰/리프레시 토큰 재발급
@@ -87,12 +107,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   public void checkAccessTokenAndAuthentication(HttpServletRequest request,
       HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-//    jwtTokenProvider.extractAccessToken(request)
-//        .filter(jwtTokenProvider::isTokenValid)
-//        .flatMap(accessToken -> jwtTokenProvider.extractEmail(accessToken)
-//            .flatMap(userRepository::findByEmail)).ifPresent(this::saveAuthentication);
-//
-//    filterChain.doFilter(request, response);
     String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
     if (accessToken != null) {
       try {
@@ -133,5 +147,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
+  }
+
+  //블랙리스트 토큰 판별
+  private boolean isTokenBlacklisted(String token) {
+    BlacklistToken blacklistToken = blacklistTokenRepository.findByBlacklistToken(token);
+    return blacklistToken != null;
   }
 }

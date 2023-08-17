@@ -14,16 +14,20 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.List;
 import kr.zb.nengtul.comment.domain.entity.Comment;
+import kr.zb.nengtul.comment.replycomment.domain.entity.ReplyComment;
+import kr.zb.nengtul.favorite.domain.entity.Favorite;
 import kr.zb.nengtul.global.entity.BaseTimeEntity;
 import kr.zb.nengtul.global.entity.ProviderType;
 import kr.zb.nengtul.global.entity.RoleType;
+import kr.zb.nengtul.likes.domain.entity.Likes;
 import kr.zb.nengtul.notice.domain.entity.Notice;
+import kr.zb.nengtul.savedrecipe.domain.entity.SavedRecipe;
 import kr.zb.nengtul.shareboard.domain.entity.ShareBoard;
+import kr.zb.nengtul.user.domain.constants.UserPoint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @NoArgsConstructor
@@ -69,7 +73,7 @@ public class User extends BaseTimeEntity {
   private String refreshToken; // 리프레시 토큰
 
   @JsonBackReference
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user")
   private List<Notice> noticeList;
 
   @JsonBackReference
@@ -78,7 +82,23 @@ public class User extends BaseTimeEntity {
 
   @JsonBackReference
   @OneToMany(mappedBy = "user")
+  private List<ReplyComment> replyCommentList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user")
   private List<Comment> commentList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<Likes> likesList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<Favorite> favoriteList;
+
+  @JsonBackReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<SavedRecipe> savedRecipeList;
 
   @Builder
   public User(String name, String nickname, String password, String phoneNumber,
@@ -97,6 +117,11 @@ public class User extends BaseTimeEntity {
     this.roles = RoleType.USER;
   }
 
+  //test 코드용
+  public User(Long id){
+    this.id = id;
+
+  }
   //OAuth2용
   public User(
       String name,
@@ -153,6 +178,7 @@ public class User extends BaseTimeEntity {
   public void setAddress(String address) {
     this.address = address;
   }
+
   public void setEmail(String email) {
     this.address = email;
   }
@@ -161,6 +187,7 @@ public class User extends BaseTimeEntity {
   public void setAddressDetail(String addressDetail) {
     this.addressDetail = addressDetail;
   }
+
   public void setRoles(RoleType roles) {
     this.roles = roles;
   }
@@ -177,11 +204,50 @@ public class User extends BaseTimeEntity {
     this.verificationCode = verificationCode;
   }
 
-  public void setPointAddShardBoard(int point) {
-    this.point += 3;
+  public void setPlusPoint(UserPoint userPoint) {
+    this.point += userPoint.getPoint();
+  }
+
+  public void setMinusPoint(UserPoint userPoint) {
+    this.point -= userPoint.getPoint();
   }
 
   public boolean isEmailVerifiedYn() {
     return emailVerifiedYn;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setNoticeList(List<Notice> noticeList) {
+    this.noticeList = noticeList;
+  }
+
+  public void setShareBoardList(
+      List<ShareBoard> shareBoardList) {
+    this.shareBoardList = shareBoardList;
+  }
+
+  public void setReplyCommentList(
+      List<ReplyComment> replyCommentList) {
+    this.replyCommentList = replyCommentList;
+  }
+
+  public void setCommentList(List<Comment> commentList) {
+    this.commentList = commentList;
+  }
+
+  public void setLikesList(List<Likes> likesList) {
+    this.likesList = likesList;
+  }
+
+  public void setFavoriteList(List<Favorite> favoriteList) {
+    this.favoriteList = favoriteList;
+  }
+
+  public void setSavedRecipeList(
+      List<SavedRecipe> savedRecipeList) {
+    this.savedRecipeList = savedRecipeList;
   }
 }
