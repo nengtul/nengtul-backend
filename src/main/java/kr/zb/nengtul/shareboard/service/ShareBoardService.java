@@ -94,12 +94,13 @@ public class ShareBoardService {
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
 
-    ChatRoom chatRoom = chatRoomRepository.findByShareBoard(shareBoard);
+    List<ChatRoom> chatRoomList = chatRoomRepository.findByShareBoard(shareBoard);
 
-    if(chatRoom!=null){
-        chatRoom.setShareBoard(null);
-        chatRoomRepository.save(chatRoom);
+    if (!chatRoomList.isEmpty()) {
+      chatRoomList.forEach(chatRoom -> chatRoom.setShareBoard(null));
+      chatRoomRepository.saveAll(chatRoomList);
     }
+
 
     User user = userService.findUserByEmail(principal.getName());
     if (user.equals(shareBoard.getUser()) || user.getRoles().equals(RoleType.ADMIN)) {
