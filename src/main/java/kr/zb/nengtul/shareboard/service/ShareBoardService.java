@@ -6,6 +6,8 @@ import static kr.zb.nengtul.global.exception.ErrorCode.NO_PERMISSION;
 
 import java.security.Principal;
 import java.util.List;
+import kr.zb.nengtul.chat.domain.ChatRoom;
+import kr.zb.nengtul.chat.repository.ChatRoomRepository;
 import kr.zb.nengtul.global.entity.RoleType;
 import kr.zb.nengtul.global.exception.CustomException;
 import kr.zb.nengtul.shareboard.domain.dto.ShareBoardDto;
@@ -30,6 +32,7 @@ public class ShareBoardService {
   private final UserRepository userRepository;
   private final UserService userService;
   private final ShareBoardRepository shareBoardRepository;
+  private final ChatRoomRepository chatRoomRepository;
   private final AmazonS3Service amazonS3Service;
 
   @Transactional
@@ -87,10 +90,20 @@ public class ShareBoardService {
 
   @Transactional
   public void deleteShareBoard(Long id, Principal principal) {
+
     ShareBoard shareBoard = shareBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(NOT_FOUND_SHARE_BOARD));
+
+    ChatRoom chatRoom = chatRoomRepository.findByShareBoard(shareBoard);
+
+    if(chatRoom!=null){
+        chatRoom.setShareBoard(null);
+        chatRoomRepository.save(chatRoom);
+    }
+
     User user = userService.findUserByEmail(principal.getName());
     if (user.equals(shareBoard.getUser()) || user.getRoles().equals(RoleType.ADMIN)) {
+
       //거래안됐는데 삭제하면 포인트 차감
       if (shareBoard.isClosed()) {
         user.setMinusPoint(UserPoint.SHARE);

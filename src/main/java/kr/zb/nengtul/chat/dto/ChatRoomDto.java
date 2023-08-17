@@ -42,13 +42,23 @@ public class ChatRoomDto {
 
         ShareBoard shareBoard = chatRoom.getShareBoard();
 
+        String shareImg = "삭제된 게시물";
+        String title = "-";
+        Long price = 0L;
+
+        if (shareBoard != null) {
+            shareImg = shareBoard.getShareImg();
+            title = shareBoard.getTitle();
+            price = shareBoard.getPrice();
+        }
+
         return ChatRoomDto.builder()
                 .roomId(chatRoom.getRoomId())
                 .receiverPhoto(receiver.getProfileImageUrl())
                 .receiverNickname(receiver.getNickname())
-                .shareBoardMainPhoto(shareBoard.getShareImg())
-                .shareBoardTitle(shareBoard.getTitle())
-                .shareBoardPrice(shareBoard.getPrice())
+                .shareBoardMainPhoto(shareImg)
+                .shareBoardTitle(title)
+                .shareBoardPrice(price)
                 .latestChat(Objects.requireNonNull(latestChat).getContent())
                 .build();
     }
