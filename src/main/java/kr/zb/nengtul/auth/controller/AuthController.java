@@ -21,6 +21,7 @@ public class AuthController {
 
   //healthy 판정위한 200api
   @GetMapping("/hello")
+  @Operation(summary = "인증서 healthy 위함", description = "https 적용시 사용하였으며, 200을 반환하여 health 상태를 얻습니다..")
   public ResponseEntity<Void> hello(){
     return null;
   }
