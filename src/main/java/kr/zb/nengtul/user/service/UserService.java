@@ -88,8 +88,7 @@ public class UserService {
     } else if (userRepository.existsByPhoneNumber(userJoinDto.getPhoneNumber())) {
       throw new CustomException(ALREADY_EXIST_PHONENUMBER);
     }
-
-    User user = User.builder()
+    userRepository.save(User.builder()
         .name(userJoinDto.getName())
         .nickname(userJoinDto.getNickname())
         .password(passwordEncoder.encode(userJoinDto.getPassword()))
@@ -98,8 +97,7 @@ public class UserService {
         .address(userJoinDto.getAddress())
         .addressDetail(userJoinDto.getAddressDetail())
         .profileImageUrl(null)
-        .build();
-    userRepository.save(user);
+        .build());
   }
 
   //이메일 인증
@@ -187,13 +185,6 @@ public class UserService {
     userRepository.save(user);
   }
 
-  //가입한 이메일 찾기(아이디 찾기)
-  public User findEmail(UserFindEmailReqDto userFindEmailReqDto) {
-    return userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
-            userFindEmailReqDto.getPhoneNumber())
-        .orElseThrow(() -> new CustomException(NO_CONTENT));
-  }
-
   //임시 비밀번호 발급(비밀번호 찾기)
   @Transactional
   public void getNewPassword(UserFindPasswordDto userFindPasswordDto) {
@@ -234,7 +225,7 @@ public class UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
     //이미 인증한 사용자가 인증 메일 다시 보내지못하게
-    if(user.isEmailVerifiedYn()){
+    if (user.isEmailVerifiedYn()) {
       throw new CustomException(ALREADY_VERIFIED);
     }
     verifyEmailForm(user.getEmail(), user.getName());
@@ -259,7 +250,7 @@ public class UserService {
   private String getVerificationEmailBody(String email, String name, String code) {
     //TODO : HTML email 폼 적용 예정
     return
-            "안녕하세요 " + name + " 회원님 ! 링크를 통해 냉장고를 털어라 이메일 인증을 진행해주세요. \n\n"
+        "안녕하세요 " + name + " 회원님 ! 링크를 통해 냉장고를 털어라 이메일 인증을 진행해주세요. \n\n"
             //.append("http://localhost:8080/v1/user/verify?email=") //로컬
             + "https://nengtul.shop/v1/users/verify?email=" //배포
             + email
@@ -323,17 +314,20 @@ public class UserService {
 
   @Transactional
   public void logout(HttpServletRequest request, Principal principal) {
-    //헤더에서 토큰 가져옴
+    //헤더에서 토큰 가져와서 Bearer부분 제거후 사용
     String token = HeaderUtil.getAccessToken(request);
 
     // AccessToken을 블랙리스트에 추가
-    BlacklistToken blacklistToken = BlacklistToken.builder()
+    blacklistTokenRepository.save(BlacklistToken.builder()
         .email(principal.getName())
         .blacklistToken(token)
-        .build();
-    blacklistTokenRepository.save(blacklistToken);
-
-    System.out.println(blacklistTokenRepository.count());
+        .build());
   }
 
+  //가입한 이메일 찾기(아이디 찾기)
+  public User findEmail(UserFindEmailReqDto userFindEmailReqDto) {
+    return userRepository.findByNameAndPhoneNumber(userFindEmailReqDto.getName(),
+            userFindEmailReqDto.getPhoneNumber())
+        .orElseThrow(() -> new CustomException(NO_CONTENT));
+  }
 }
