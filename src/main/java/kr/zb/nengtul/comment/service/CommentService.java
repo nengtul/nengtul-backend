@@ -38,12 +38,11 @@ public class CommentService {
     User user = userService.findUserByEmail(principal.getName());
     RecipeDocument recipeDocument = recipeSearchRepository.findById(recipeId)
         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RECIPE));
-    Comment comment = Comment.builder()
+    commentRepository.save(Comment.builder()
         .recipeId(recipeDocument.getId())
         .user(user)
         .comment(commentReqDto.getComment())
-        .build();
-    commentRepository.save(comment);
+        .build());
   }
 
   @Transactional

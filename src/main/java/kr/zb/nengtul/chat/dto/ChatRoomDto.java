@@ -42,8 +42,8 @@ public class ChatRoomDto {
 
         ShareBoard shareBoard = chatRoom.getShareBoard();
 
-        String shareImg = "삭제된 게시물";
-        String title = "-";
+        String shareImg = "";
+        String title = "삭제된 게시물 입니다";
         Long price = 0L;
 
         if (shareBoard != null) {

@@ -39,12 +39,11 @@ public class ReplyCommentService {
     User user = userService.findUserByEmail(principal.getName());
     Comment comment = commentRepository.findById(commentId)
         .orElseThrow(() -> new CustomException(NOT_FOUND_COMMENT));
-    ReplyComment replyComment = ReplyComment.builder()
+    replyCommentRepository.save(ReplyComment.builder()
         .replyComment(replyCommentReqDto.getReplyComment())
         .user(user)
         .comment(comment)
-        .build();
-    replyCommentRepository.save(replyComment);
+        .build());
   }
 
   @Transactional

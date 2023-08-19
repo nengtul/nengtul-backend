@@ -2,6 +2,8 @@ package kr.zb.nengtul.user.domain.dto;
 
 import static kr.zb.nengtul.global.exception.ErrorCode.EMAIL_FORMAT_NOT_CORRECT_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.EMAIL_NOT_NULL_MESSAGE;
+import static kr.zb.nengtul.global.exception.ErrorCode.LONG_NAME_MESSAGE;
+import static kr.zb.nengtul.global.exception.ErrorCode.LONG_NICKNAME_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NAME_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.NICKNAME_NOT_NULL_MESSAGE;
 import static kr.zb.nengtul.global.exception.ErrorCode.PASSWORD_NOT_NULL_MESSAGE;
@@ -27,9 +29,11 @@ import lombok.Setter;
 public class UserJoinDto {
 
   @NotEmpty(message = NAME_NOT_NULL_MESSAGE)
+  @Size(max = 10, message = LONG_NAME_MESSAGE)
   private String name;
 
   @NotEmpty(message = NICKNAME_NOT_NULL_MESSAGE)
+  @Size(max = 15, message = LONG_NICKNAME_MESSAGE)
   private String nickname;
 
   @NotEmpty(message = PASSWORD_NOT_NULL_MESSAGE)
