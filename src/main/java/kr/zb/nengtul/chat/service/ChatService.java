@@ -34,7 +34,6 @@ public class ChatService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHAT));
         if (!chat.getSender().getId().equals(reader.getId())) {
             chat.setReadMark(true);
-            chatRepository.save(chat);
         }
 
         return chat;
@@ -51,7 +50,6 @@ public class ChatService {
                 markedChat.add(chat);
             }
         }
-        chatRepository.saveAll(markedChat);
 
         return markedChat;
     }
