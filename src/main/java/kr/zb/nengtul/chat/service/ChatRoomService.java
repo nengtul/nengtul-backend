@@ -57,8 +57,6 @@ public class ChatRoomService {
             connectedChatRoom.setLeaveRoom(false);
         }
 
-        connectedChatRoomRepository.saveAll(connectedChatRooms);
-
         return chatRoom;
     }
 
